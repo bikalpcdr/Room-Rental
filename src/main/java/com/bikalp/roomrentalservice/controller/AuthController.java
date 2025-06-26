@@ -22,7 +22,8 @@ public class AuthController extends BaseController {
 
     @PostMapping("/register")
     public ResponseEntity<GlobalAPIResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return registerResponse(authService.register(request));
+        authService.register(request);
+        return registerResponse(null);
     }
 
     @PostMapping("/login")
