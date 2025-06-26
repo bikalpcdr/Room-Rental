@@ -1,8 +1,8 @@
 package com.bikalp.roomrentalservice.service;
 
-import org.springframework.stereotype.Service;
+import com.bikalp.roomrentalservice.dto.request.UserCreationRequest;
 
-@Service
+
 public interface UserService {
-
+    void createUser(UserCreationRequest request);
 }

@@ -3,7 +3,13 @@ package com.bikalp.roomrentalservice.service.impl;
 import com.bikalp.roomrentalservice.dto.request.LoginRequest;
 import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
 import com.bikalp.roomrentalservice.dto.response.AuthResponse;
+import com.bikalp.roomrentalservice.enums.UserRole;
+import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
+import com.bikalp.roomrentalservice.model.User;
+import com.bikalp.roomrentalservice.repository.UserRepo;
 import com.bikalp.roomrentalservice.service.AuthService;
+import com.bikalp.roomrentalservice.service.CustomUserDetailsService;
+import com.bikalp.roomrentalservice.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -11,39 +17,67 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
+@Service
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
 
     @Override
-    public AuthResponse register(RegisterRequest request) {
-        return null;
+    public void register(RegisterRequest request) {
+        if (userRepo.existsByEmail(request.getEmail())) {
+            throw new AlreadyExistFoundException("Email already exists");
+        }
+        if (userRepo.existsByUsername(request.getUsername())) {
+            throw new AlreadyExistFoundException("Username already exists");
+        }
+
+        User user = User.builder()
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .phoneNumber(request.getPhoneNumber())
+                .userRole(request.getRole())
+                .build();
+        userRepo.save(user);
+        log.info("User register successfully..!! {}", user);
     }
 
     @Override
     public AuthResponse login(LoginRequest request) {
         try {
-            log.info("Processing login request for user: {}", request.getUsername());
-
-            // Authenticate user
+            // authenticate username and password
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword()
-                    )
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
-            log.debug("User authenticated successfully: {}", request.getUsername());
 
-        } catch (BadCredentialsException e) {
-            log.error("Authentication failed for user: {}", request.getUsername());
-            throw new BadRequestException("Invalid username or password");
-        } catch (Exception e) {
-            log.error("Error during login: {}", e.getMessage(), e);
-            throw new BadRequestException("Login failed: " + e.getMessage());
+            // loading user details
+            User user = userRepo.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new BadCredentialsException("Username or password is incorrect"));
+
+            // generating token
+            String token = jwtUtil.generateToken(user.getUsername(), user.getUserRole().name());
+            return AuthResponse.builder()
+                    .username(user.getUsername())
+                    .role(user.getUserRole().name())
+                    .email(user.getEmail())
+                    .fullName(user.getFullName())
+                    .token(token)
+                    .build();
+        } catch (BadCredentialsException ex) {
+            throw new BadCredentialsException("Invalid username or password");
         }
     }
 }
