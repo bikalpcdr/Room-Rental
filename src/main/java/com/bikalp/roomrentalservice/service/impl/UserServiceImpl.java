@@ -1,7 +1,11 @@
 package com.bikalp.roomrentalservice.service.impl;
 
 import com.bikalp.roomrentalservice.dto.request.UserCreationRequest;
+import com.bikalp.roomrentalservice.dto.request.UserUpdateRequest;
+import com.bikalp.roomrentalservice.dto.response.UserResponse;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
+import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
+import com.bikalp.roomrentalservice.mapper.UserMapper;
 import com.bikalp.roomrentalservice.model.User;
 import com.bikalp.roomrentalservice.repository.UserRepo;
 import com.bikalp.roomrentalservice.service.UserService;
@@ -10,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -17,16 +23,11 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public void createUser(UserCreationRequest request) {
-        if (userRepo.existsByUsername(request.getUsername())) {
-            throw new AlreadyExistFoundException("User already exists with the username: " + request.getUsername());
-        }
-        if (userRepo.existsByEmail(request.getEmail())) {
-            throw new AlreadyExistFoundException("User already exists with the email: " + request.getEmail());
-        }
-
+        validateUsernameAndEmailUniqueness(request.getUsername(), request.getEmail());
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
@@ -37,5 +38,51 @@ public class UserServiceImpl implements UserService {
                 .build();
         userRepo.save(user);
         log.info("User created successfully..!! {}", user);
+    }
+
+    @Override
+    public void updateUser(UserUpdateRequest request) {
+        User user = findUserById(request.getId());
+        validateUsernameAndEmailUniqueness(request.getUsername(), null);
+
+        user.setFullName(request.getFullName());
+        user.setUsername(request.getUsername());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setUserRole(request.getRole());
+        userRepo.save(user);
+        log.info("User updated successfully..!! {}", user);
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        User user = findUserById(userId);
+        userRepo.delete(user);
+        log.info("User deleted successfully..!! {}", user.getFullName());
+    }
+
+    @Override
+    public UserResponse getUserById(Long userId) {
+        findUserById(userId);
+        return userMapper.getUserById(userId);
+    }
+
+    @Override
+    public List<UserResponse> getAllUsers() {
+        return userMapper.getAllUsers();
+    }
+
+    public User findUserById(Long userId) {
+        return userRepo.findById(userId).orElseThrow(
+                () -> new DataNotFoundException("User not found with the id: " + userId)
+        );
+    }
+
+    public void validateUsernameAndEmailUniqueness(String username, String email) {
+        if (userRepo.existsByUsername(username)) {
+            throw new AlreadyExistFoundException("User already exists with the username: " + username);
+        }
+        if (userRepo.existsByEmail(email)) {
+            throw new AlreadyExistFoundException("User already exists with the email: " + email);
+        }
     }
 }
