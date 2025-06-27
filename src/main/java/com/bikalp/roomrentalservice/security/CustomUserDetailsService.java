@@ -1,4 +1,4 @@
-package com.bikalp.roomrentalservice.service;
+package com.bikalp.roomrentalservice.security;
 
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.model.User;

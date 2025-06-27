@@ -1,7 +1,7 @@
 package com.bikalp.roomrentalservice.config;
 
 import com.bikalp.roomrentalservice.security.JwtFilter;
-import com.bikalp.roomrentalservice.service.CustomUserDetailsService;
+import com.bikalp.roomrentalservice.security.CustomUserDetailsService;
 import com.bikalp.roomrentalservice.security.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
