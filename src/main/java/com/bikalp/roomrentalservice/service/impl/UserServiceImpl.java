@@ -1,6 +1,5 @@
 package com.bikalp.roomrentalservice.service.impl;
 
-import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
 import com.bikalp.roomrentalservice.dto.request.UserCreationRequest;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
 import com.bikalp.roomrentalservice.model.User;

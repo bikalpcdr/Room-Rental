@@ -21,7 +21,7 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // creating admin user if not exist
-        if (!userRepo.existsByEmail("admin@yopmail.com")) {
+        if (!userRepo.existsByEmail("admin@yopmail.com") && !userRepo.existsByUsername("admin")) {
             log.info("creating admin user..!!");
             User adminUser = new User();
             adminUser.setUsername("admin");

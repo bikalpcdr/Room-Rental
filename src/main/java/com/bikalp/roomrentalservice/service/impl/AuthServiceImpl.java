@@ -3,24 +3,20 @@ package com.bikalp.roomrentalservice.service.impl;
 import com.bikalp.roomrentalservice.dto.request.LoginRequest;
 import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
 import com.bikalp.roomrentalservice.dto.response.AuthResponse;
-import com.bikalp.roomrentalservice.enums.UserRole;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
 import com.bikalp.roomrentalservice.model.User;
 import com.bikalp.roomrentalservice.repository.UserRepo;
 import com.bikalp.roomrentalservice.service.AuthService;
-import com.bikalp.roomrentalservice.service.CustomUserDetailsService;
+import com.bikalp.roomrentalservice.security.CustomUserDetailsService;
 import com.bikalp.roomrentalservice.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor

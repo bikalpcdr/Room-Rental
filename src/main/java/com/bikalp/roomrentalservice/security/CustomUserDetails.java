@@ -1,4 +1,4 @@
-package com.bikalp.roomrentalservice.service;
+package com.bikalp.roomrentalservice.security;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
