@@ -18,4 +18,6 @@ public class UserUpdateRequest {
     private String phoneNumber;
 
     private UserRole role = UserRole.RENTER;
+
+    private String profilePictureUrl;
 }

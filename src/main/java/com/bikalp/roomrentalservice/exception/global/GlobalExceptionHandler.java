@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
                         .message(message)
-                        .status(status.value())
+                        .status(true)
                         .timestamp(LocalDateTime.now())
                         .build(),
                 status

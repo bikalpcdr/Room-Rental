@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
@@ -48,5 +49,12 @@ public class UserController extends BaseController {
     public ResponseEntity<GlobalAPIResponse> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return deleteResponse("User");
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")
+    @PostMapping("/{userId}/profile-picture")
+    public ResponseEntity<GlobalAPIResponse> uploadProfilePicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+        String url = userService.uploadProfilePicture(userId, file);
+        return customResponse("Profile picture uploaded successfully..", url);
     }
 }

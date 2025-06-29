@@ -21,4 +21,6 @@ public class UserResponse {
     private UserRole role;
 
     private Boolean isActive;
+
+    private String profilePictureUrl;
 }
