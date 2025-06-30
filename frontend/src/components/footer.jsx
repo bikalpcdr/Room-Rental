@@ -82,18 +82,17 @@ function Footer() {
             </div>
           </div>
         </div>
-
         {/* Footer Bottom */}
-        <div className="footer-bottom">
-          <div className="footer-bottom-content">
-            <div className="copyright">
-              <p>&copy; {currentYear} Room Rental Service. All rights reserved.</p>
-            </div>
-            <div className="footer-bottom-links">
-              <Link to="/privacy">Privacy Policy</Link>
-              <Link to="/terms">Terms of Service</Link>
-              <Link to="/cookies">Cookie Policy</Link>
-            </div>
+      </div>
+      <div className="footer-bottom">
+        <div className="footer-bottom-content">
+          <div className="copyright">
+            <p>&copy; {currentYear} Room Rental Service. All rights reserved.</p>
+          </div>
+          <div className="footer-bottom-links">
+            <Link to="/privacy">Privacy Policy</Link>
+            <Link to="/terms">Terms of Service</Link>
+            <Link to="/cookies">Cookie Policy</Link>
           </div>
         </div>
       </div>
