@@ -4,6 +4,7 @@ import com.bikalp.roomrentalservice.dto.request.UserCreationRequest;
 import com.bikalp.roomrentalservice.dto.request.UserUpdateRequest;
 import com.bikalp.roomrentalservice.dto.response.UserResponse;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
+import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.mapper.UserMapper;
 import com.bikalp.roomrentalservice.model.User;
@@ -62,15 +63,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId) {
-        User user = findUserById(userId);
-        userRepo.delete(user);
-        log.info("User deleted successfully..!! {}", user.getFullName());
+        userRepo.delete(findUserById(userId));
+        log.info("User deleted successfully..!!");
     }
 
     @Override
     public UserResponse getUserById(Long userId) {
-        findUserById(userId);
-        return userMapper.getUserById(userId);
+        return userMapper.getUserById(findUserById(userId).getId());
     }
 
     @Override
@@ -82,7 +81,7 @@ public class UserServiceImpl implements UserService {
     public String uploadProfilePicture(Long userId, MultipartFile file) {
         User user = findUserById(userId);
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
+            throw new CustomizeException("File is empty");
         }
         try {
             String uploadDir = "uploads/profile-pictures";
@@ -97,7 +96,7 @@ public class UserServiceImpl implements UserService {
             userRepo.save(user);
             return url;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to upload profile picture", e);
+            throw new CustomizeException("Failed to upload profile picture");
         }
     }
 

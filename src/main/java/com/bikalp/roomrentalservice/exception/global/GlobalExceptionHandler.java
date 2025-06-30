@@ -2,6 +2,7 @@ package com.bikalp.roomrentalservice.exception.global;
 
 import com.bikalp.roomrentalservice.dto.response.ErrorResponse;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
+import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AlreadyExistFoundException.class)
     public ResponseEntity<ErrorResponse> handleAlreadyExists(AlreadyExistFoundException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(CustomizeException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyExists(CustomizeException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
