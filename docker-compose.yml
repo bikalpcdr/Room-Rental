@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    image: ${DOCKER_USERNAME:-bikalp2003}/${DOCKER_REPO:-room-rental-service}:latest
+    ports:
+      - "${APP_PORT_HTTP}:8080"
+      - "${APP_PORT_HTTPS}:8443"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      # SSL config (Spring Boot)
+      SERVER_SSL_ENABLED: "true"
+      SERVER_SSL_KEY_STORE: "/app/keystore.p12"
+      SERVER_SSL_KEY_STORE_PASSWORD: ${KEYSTORE_PASSWORD}
+      SERVER_SSL_KEY_STORE_TYPE: "PKCS12"
+      SERVER_PORT: 8443
+    volumes:
+      - ./keystore.p12:/app/keystore.p12:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db_data: 

@@ -78,13 +78,13 @@ public class BaseController {
                         .build());
     }
 
-    protected ResponseEntity<GlobalAPIResponse> updateResponse(String entityName, Object data) {
+    protected ResponseEntity<GlobalAPIResponse> updateResponse(String entityName) {
         String message = String.format("%s  updated successfully..!!", entityName);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(GlobalAPIResponse.builder()
                         .status(true)
                         .message(message)
-                        .data(data)
+                        .data(null)
                         .build());
     }
 
@@ -99,7 +99,7 @@ public class BaseController {
     }
 
     protected ResponseEntity<GlobalAPIResponse> fetchListResponse(String entityName, Object data) {
-        String message = String.format("%s  retrieved successfully..!!", entityName);
+        String message = String.format("%s  list retrieved successfully..!!", entityName);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(GlobalAPIResponse.builder()
                         .status(true)
