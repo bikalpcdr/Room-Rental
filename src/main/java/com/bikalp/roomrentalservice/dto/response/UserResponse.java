@@ -1,19 +1,26 @@
 package com.bikalp.roomrentalservice.dto.response;
 
-import lombok.*;
+import com.bikalp.roomrentalservice.enums.UserRole;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class AuthResponse {
-    private Long id;
-    private String token;
+public class UserResponse {
+
+    private Long userId;
+
     private String username;
+
     private String email;
+
     private String fullName;
-    private String role;
+
     private String phoneNumber;
+
+    private UserRole role;
+
+    private Boolean isActive;
+
     private String profilePictureUrl;
 }

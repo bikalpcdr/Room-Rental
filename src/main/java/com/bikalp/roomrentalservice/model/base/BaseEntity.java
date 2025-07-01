@@ -30,7 +30,7 @@ public abstract class BaseEntity {
 
     @LastModifiedBy
     @Column(name = "updated_by")
-    private String updatedBy;
+    private Long updatedBy;
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = Boolean.TRUE;
