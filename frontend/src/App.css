@@ -605,7 +605,7 @@
   margin-top: 2.5rem;
   background: rgba(44, 62, 80, 0.85);
   box-shadow: 0 2px 16px 0 rgba(44, 62, 80, 0.08);
-  border-radius: 0 0 18px 18px;
+  /*border-radius: 0 0 18px 18px;*/
   width: 100%;
 }
 
