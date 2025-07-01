@@ -99,7 +99,7 @@ function Register() {
                 <div className="form-group">
                   <label htmlFor="fullName">Full Name</label>
                   <div className="input-wrapper">
-                    <span className="input-icon">👤</span>
+                    <span className="input-icon1">👤</span>
                     <input
                       id="fullName"
                       name="fullName"
@@ -115,7 +115,7 @@ function Register() {
                 <div className="form-group">
                   <label htmlFor="username">Username</label>
                   <div className="input-wrapper">
-                    <span className="input-icon">🔑</span>
+                    <span className="input-icon1">🔑</span>
                     <input
                       id="username"
                       name="username"
@@ -133,7 +133,7 @@ function Register() {
                 <div className="form-group">
                   <label htmlFor="email">Email Address</label>
                   <div className="input-wrapper">
-                    <span className="input-icon">✉️</span>
+                    <span className="input-icon1">✉️</span>
                     <input
                       id="email"
                       name="email"
@@ -149,7 +149,7 @@ function Register() {
                 <div className="form-group">
                   <label htmlFor="phoneNumber">Phone Number</label>
                   <div className="input-wrapper">
-                    <span className="input-icon">📞</span>
+                    <span className="input-icon1">📞</span>
                     <input
                       id="phoneNumber"
                       name="phoneNumber"
@@ -167,7 +167,7 @@ function Register() {
                 <div className="form-group">
                   <label htmlFor="password">Password</label>
                   <div className="input-wrapper">
-                    <span className="input-icon">🔒</span>
+                    {/*<span className="input-icon">🔒</span>*/}
                     <input
                       id="password"
                       name="password"
@@ -191,7 +191,7 @@ function Register() {
                 <div className="form-group">
                   <label htmlFor="confirmPassword">Confirm Password</label>
                   <div className="input-wrapper">
-                    <span className="input-icon">🔒</span>
+                    {/*<span className="input-icon">🔒</span>*/}
                     <input
                       id="confirmPassword"
                       name="confirmPassword"

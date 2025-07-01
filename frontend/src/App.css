@@ -99,7 +99,20 @@
   font-weight: 500;
   position: relative;
 }
+.nav-link::after {
+  content:"";
+  position: absolute;
+  top: 90%;
+  left: 4px;
+  height: 2px;
+  width: 0;
+  background-color: aqua;
+  transition: all 0.5s;
+}
+.nav-link:hover::after {
+  width: 90%;
 
+}
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateY(-1px);
@@ -208,6 +221,12 @@
   text-align: center;
 }
 
+/*login and register button*/
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
 .user-avatar-large {
   width: 60px;
   height: 60px;

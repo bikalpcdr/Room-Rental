@@ -74,9 +74,10 @@
   align-items: center;
 }
 
-.input-icon {
+.input-wrapper .input-icon {
   position: absolute;
-  left: 1rem;
+  left: 90%;
+  top: 30%;
   font-size: 1.1rem;
   color: #666;
   z-index: 1;
