@@ -18,37 +18,38 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController extends BaseController {
 
     private final UserService userService;
+    String entity = "User";
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")
     @PostMapping
     public ResponseEntity<GlobalAPIResponse> createUser(@RequestBody UserCreationRequest request) {
         userService.createUser(request);
-        return createdResponse("User");
+        return createdResponse(entity);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")
     @PutMapping
     public ResponseEntity<GlobalAPIResponse> updateUser(@RequestBody UserUpdateRequest request) {
         userService.updateUser(request);
-        return updateResponse("User");
+        return updateResponse(entity);
     }
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")
     @GetMapping("/{userId}")
     public ResponseEntity<GlobalAPIResponse> getUserByUserId(@PathVariable Long userId) {
-        return fetchResponse("User", userService.getUserById(userId));
+        return fetchResponse(entity, userService.getUserById(userId));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
     public ResponseEntity<GlobalAPIResponse> getAllUsers() {
-        return fetchListResponse("User", userService.getAllUsers());
+        return fetchListResponse(entity, userService.getAllUsers());
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<GlobalAPIResponse> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
-        return deleteResponse("User");
+        return deleteResponse(entity);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")
