@@ -74,9 +74,10 @@
   align-items: center;
 }
 
-.input-icon {
+.input-wrapper .input-icon {
   position: absolute;
-  left: 1rem;
+  left: 90%;
+  top: 30%;
   font-size: 1.1rem;
   color: #666;
   z-index: 1;
@@ -239,10 +240,12 @@
   font-size: 0.95rem;
 }
 
-.register-link {
+.login-footer .register-link {
   color: #667eea;
   text-decoration: none;
   font-weight: 600;
+  background-color: transparent!important;
+  box-shadow: none!important;
   transition: color 0.3s ease;
 }
 

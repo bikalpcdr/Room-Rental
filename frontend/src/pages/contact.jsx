@@ -210,7 +210,7 @@ function Contact() {
                 <div className="form-group checkbox-group">
                   <label className="checkbox-label">
                     <input type="checkbox" required />
-                    <span className="checkmark"></span>
+                    {/*<span className="checkmark"></span>*/}
                     I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
                   </label>
                 </div>

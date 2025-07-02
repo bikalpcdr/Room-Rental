@@ -51,17 +51,17 @@ export const registerUser = async (username, email, password, fullName, phoneNum
 
 // creation for users
 export const createUser = async (username, email, password, fullName, phoneNumber, role) => {
-    return apiClient.post(`/users/`, {username, email, password, fullName, phoneNumber, role});
+    return apiClient.post(`/users`, {username, email, password, fullName, phoneNumber, role});
 }
 
 // update users
 export const updateUser = async(id, username, fullName, phoneNumber, role) => {
-    return apiClient.put(`/users/`,{id, username, fullName, phoneNumber, role})
+    return apiClient.put(`/users`,{id, username, fullName, phoneNumber, role})
 }
 
 // get all users
 export const getAllUsers = async() => {
-    return apiClient.get(`/users/`)
+    return apiClient.get(`/users`)
 }
 
 // get users by id
@@ -70,8 +70,8 @@ export const getUserById = async(id) => {
 }
 
 // delete user by id
-export const deleteUserById = async(id) => {
-    return apiClient.delete(`/users/${id}`)
+export const deleteUserById = async(userId) => {
+    return apiClient.delete(`/users/${userId}`)
 }
 
 export const uploadProfilePicture = (userId, file) => {

@@ -207,6 +207,7 @@ function AdminDashboard() {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>UserID</th>
                   <th>Username</th>
                   <th>Full Name</th>
                   <th>Email</th>
@@ -218,7 +219,8 @@ function AdminDashboard() {
               <tbody>
                 {users.map((user) => (
                   <tr key={user.id}>
-                    <td>{user.id}</td>
+                    <td>{user.userId}</td>
+                    <td>{user.userId}</td>
                     <td>{user.username}</td>
                     <td>{user.fullName}</td>
                     <td>{user.email}</td>
@@ -238,7 +240,7 @@ function AdminDashboard() {
                         </button>
                         <button
                           className="delete-btn"
-                          onClick={() => handleDeleteUser(user.id)}
+                          onClick={() => handleDeleteUser(user.userId)}
                         >
                           Delete
                         </button>
