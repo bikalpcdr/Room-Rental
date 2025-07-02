@@ -217,10 +217,9 @@ function AdminDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user, index) => (
+                {users.map((user) => (
                   <tr key={user.id}>
-
-                    <td>{index + 1}</td>
+                    <td>{user.userId}</td>
                     <td>{user.userId}</td>
                     <td>{user.username}</td>
                     <td>{user.fullName}</td>
