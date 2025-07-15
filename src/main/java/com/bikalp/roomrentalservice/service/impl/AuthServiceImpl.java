@@ -66,11 +66,14 @@ public class AuthServiceImpl implements AuthService {
             // generating token
             String token = jwtUtil.generateToken(user.getUsername(), user.getUserRole().name());
             return AuthResponse.builder()
+                    .id(user.getId())
                     .username(user.getUsername())
                     .role(user.getUserRole().name())
                     .email(user.getEmail())
                     .fullName(user.getFullName())
                     .token(token)
+                    .profilePictureUrl(user.getProfilePictureUrl())
+                    .phoneNumber(user.getPhoneNumber())
                     .build();
         } catch (BadCredentialsException ex) {
             throw new BadCredentialsException("Invalid username or password");

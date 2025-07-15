@@ -11,6 +11,6 @@ import java.time.LocalDateTime;
 @Builder
 public class ErrorResponse {
     private String message;
-    private int status;
+    private Boolean status;
     private LocalDateTime timestamp;
 }

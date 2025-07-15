@@ -2,6 +2,7 @@ package com.bikalp.roomrentalservice.exception.global;
 
 import com.bikalp.roomrentalservice.dto.response.ErrorResponse;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
+import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,11 @@ public class GlobalExceptionHandler {
         return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(CustomizeException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyExists(CustomizeException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
         String errorMsg = ex.getBindingResult().getFieldErrors().stream()
@@ -34,11 +40,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        return buildResponse("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -60,7 +61,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 ErrorResponse.builder()
                         .message(message)
-                        .status(status.value())
+                        .status(true)
                         .timestamp(LocalDateTime.now())
                         .build(),
                 status
