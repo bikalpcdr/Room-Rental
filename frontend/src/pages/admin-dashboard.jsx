@@ -93,7 +93,7 @@ function AdminDashboard() {
     e.preventDefault();
     try {
       await updateUser(
-        selectedUser.userId,
+        selectedUser.id,
         formData.username,
         formData.fullName,
         formData.phoneNumber,
@@ -133,7 +133,7 @@ function AdminDashboard() {
   };
 
   const openEditModal = (user) => {
-    setSelectedUser({ ...user, id: user.userId });
+    setSelectedUser(user);
     setFormData({
       username: user.username,
       email: user.email,

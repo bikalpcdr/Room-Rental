@@ -34,7 +34,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/*/profile-picture").authenticated()
-                        .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "OWNER", "RENTER")                        .anyRequest().authenticated()
+                        .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "OWNER", "RENTER")
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(customAccessDeniedHandler)
