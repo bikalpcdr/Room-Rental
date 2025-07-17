@@ -217,16 +217,17 @@ function AdminDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {users.map((user, index) => (
                   <tr key={user.id}>
-                    <td>{user.userId}</td>
+
+                    <td>{index + 1}</td>
                     <td>{user.userId}</td>
                     <td>{user.username}</td>
                     <td>{user.fullName}</td>
                     <td>{user.email}</td>
                     <td>{user.phoneNumber}</td>
                     <td>
-                      <span className={`role-badge role-${user.role.toLowerCase()}`}>
+                      <span  className={`role-badge role-${user.role.toLowerCase()}`}>
                         {user.role}
                       </span>
                     </td>
