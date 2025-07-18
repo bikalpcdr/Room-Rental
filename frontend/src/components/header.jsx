@@ -33,7 +33,7 @@ function Header() {
   };
 
   const getDashboardLink = () => {
-    if (isAdmin()) return "/admin";
+    if (isAdmin()) return "/admin-dashboard";
     if (isOwner()) return "/owner-dashboard";
     if (isRenter()) return "/renter-dashboard";
     return "/";

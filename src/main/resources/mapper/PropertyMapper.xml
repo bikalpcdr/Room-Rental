@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bikalp.roomrentalservice.mapper.PropertyMapper">
+
+    <resultMap id="AmenitiesEnumMap" type="com.bikalp.roomrentalservice.enums.Amenities">
+        <result column="amenity_amenities" property=""/>
+    </resultMap>
+
+    <resultMap id="PropertyResponseMap" type="com.bikalp.roomrentalservice.dto.response.PropertyResponse" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="isActive" property="isActive"/>
+        <result column="address" property="address"/>
+        <result column="description" property="description"/>
+        <result column="isAvailable" property="isAvailable"/>
+        <result column="propertyType" property="propertyType"/>
+        <result column="rentPrice" property="rentPrice"/>
+        <result column="roomCount" property="roomCount"/>
+        <result column="roomTitle" property="roomTitle"/>
+        <result column="ownerName" property="ownerName"/>
+        <result column="ownerid" property="ownerId"/>
+        <collection property="amenities"
+                    ofType="com.bikalp.roomrentalservice.enums.Amenities"
+                    resultMap="AmenitiesEnumMap"/>
+    </resultMap>
+
+    <select id="getPropertyById" resultMap="PropertyResponseMap">
+        select p.id            as id,
+               p.is_active     as isActive,
+               p.address       as address,
+               p.description   as description,
+               p.is_available  as isAvailable,
+               p.property_type as propertyType,
+               p.rent_price    as rentPrice,
+               p.room_count    as roomCount,
+               p.title         as roomTitle,
+               u.full_name     as ownerName,
+               p.owner_id      as ownerid,
+               pa.amenity      as amenity_amenities
+        from property p
+             left join property_amenities pa on p.id = pa.property_id
+             left join users u on p.owner_id = u.id
+        where p.id = #{propertyId};
+    </select>
+
+    <select id="getAllProperties" resultMap="PropertyResponseMap">
+        select p.id            as id,
+               p.is_active     as isActive,
+               p.address       as address,
+               p.description   as description,
+               p.is_available  as isAvailable,
+               p.property_type as propertyType,
+               p.rent_price    as rentPrice,
+               p.room_count    as roomCount,
+               p.title         as roomTitle,
+               u.full_name     as ownerName,
+               p.owner_id      as ownerid,
+               pa.amenity      as amenity_amenities
+        from property p
+             left join property_amenities pa on p.id = pa.property_id
+             left join users u on p.owner_id = u.id
+    </select>
+
+    <select id="getAllPropertiesByOwnerId" resultMap="PropertyResponseMap">
+        select p.id            as id,
+               p.is_active     as isActive,
+               p.address       as address,
+               p.description   as description,
+               p.is_available  as isAvailable,
+               p.property_type as propertyType,
+               p.rent_price    as rentPrice,
+               p.room_count    as roomCount,
+               p.title         as roomTitle,
+               u.full_name     as ownerName,
+               p.owner_id      as ownerid,
+               pa.amenity      as amenity_amenities
+        from property p
+             left join property_amenities pa on p.id = pa.property_id
+             left join users u on p.owner_id = u.id
+        where p.owner_id = #{ownerId};
+    </select>
+</mapper>
