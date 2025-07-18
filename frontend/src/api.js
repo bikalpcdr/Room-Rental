@@ -84,3 +84,10 @@ export const uploadProfilePicture = (userId, file) => {
     },
   });
 };
+
+// Property APIs
+export const getOwnerProperties = () => apiClient.get('/property/get-all-owner-properties');
+export const createProperty = (data) => apiClient.post('/property', data);
+export const updateProperty = (data) => apiClient.put('/property', data);
+export const deleteProperty = (id) => apiClient.delete(`/property/${id}`);
+export const getPropertyById = (propertyId) => apiClient.get(`/property/${propertyId}`);

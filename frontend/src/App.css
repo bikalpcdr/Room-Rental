@@ -51,7 +51,8 @@
 .header-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding-left: 0.1rem;
+  padding-right: 2.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -62,6 +63,8 @@
 .header-brand {
   display: flex;
   align-items: center;
+  margin-right: 2rem;
+  margin-left: 0.5rem;
 }
 
 .brand-link {
@@ -599,6 +602,18 @@
   color: #4f46e5;
 }
 
+.footer-section.contact-card .contact-info {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px 0 rgba(44, 62, 80, 0.10);
+  padding: 1.2rem 1rem;
+  margin-top: 1rem;
+  color: #222b45;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
 .footer-bottom {
   border-top: 1.5px solid #a3bffa;
   padding: 1.5rem 0;
@@ -651,7 +666,8 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .header-container {
-    padding: 0 1rem;
+    padding-left: 0;
+    padding-right: 1rem;
   }
 
   .header-nav {
@@ -664,6 +680,11 @@
 
   .brand-title {
     font-size: 1.2rem;
+  }
+
+  .header-brand {
+    margin-left: 0.25rem;
+    margin-right: 1.5rem;
   }
 
   .footer-content {
@@ -717,6 +738,10 @@
   }
   .footer-section.contact-card {
     padding: 1.2rem 0.8rem;
+  }
+  .footer-section.contact-card .contact-info {
+    padding: 1rem 0.5rem;
+    font-size: 0.98rem;
   }
 }
 

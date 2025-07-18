@@ -6,6 +6,7 @@ import { getAllUsers, deleteUserById, createUser, updateUser } from "../api";
 import { ToastContainer, toast } from "react-toastify";
 import { getUserData } from "../utils/auth";
 import "react-toastify/dist/ReactToastify.css";
+import UserForm from "../forms/UserForm";
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -267,71 +268,13 @@ function AdminDashboard() {
                   ×
                 </button>
               </div>
-              <form onSubmit={handleCreateUser}>
-                <div className="form-group">
-                  <label>Username:</label>
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email:</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Password:</label>
-                  <input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Full Name:</label>
-                  <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Phone Number:</label>
-                  <input
-                    type="text"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Role:</label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    required
-                  >
-                    <option value="RENTER">Renter</option>
-                    <option value="OWNER">Owner</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                </div>
-                <div className="modal-actions">
-                  <button type="button" onClick={() => setShowCreateModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit">Create User</button>
-                </div>
-              </form>
+              <UserForm
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleCreateUser}
+                onCancel={() => setShowCreateModal(false)}
+                isEdit={false}
+              />
             </div>
           </div>
         )}
@@ -349,53 +292,13 @@ function AdminDashboard() {
                   ×
                 </button>
               </div>
-              <form onSubmit={handleUpdateUser}>
-                <div className="form-group">
-                  <label>Username:</label>
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Full Name:</label>
-                  <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Phone Number:</label>
-                  <input
-                    type="text"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Role:</label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    required
-                  >
-                    <option value="RENTER">Renter</option>
-                    <option value="OWNER">Owner</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                </div>
-                <div className="modal-actions">
-                  <button type="button" onClick={() => setShowEditModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit">Update User</button>
-                </div>
-              </form>
+              <UserForm
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleUpdateUser}
+                onCancel={() => setShowEditModal(false)}
+                isEdit={true}
+              />
             </div>
           </div>
         )}

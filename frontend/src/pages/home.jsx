@@ -54,7 +54,12 @@ function Home() {
               ) : (
                 <div className="welcome-message">
                   <p>Welcome back, {userData?.fullName}!</p>
-                  <Link to={`/${userData?.role.toLowerCase() === 'admin' ? 'admin' : userData?.role.toLowerCase()}-dashboard`} className="btn btn-primary">
+                  <Link
+                    to={
+                      userData?.role?.toLowerCase() === 'admin' ? '/admin' : `/${userData?.role?.toLowerCase()}-dashboard`
+                    }
+                    className="btn btn-primary"
+                  >
                     Go to Dashboard
                   </Link>
                 </div>

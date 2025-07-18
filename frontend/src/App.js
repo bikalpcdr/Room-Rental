@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/admin-dashboard";
 import OwnerDashboard from "./pages/owner-dashboard";
 import RenterDashboard from "./pages/renter-dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ViewProperty from "./pages/view-property";
 import "./App.css";
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/property/:id" element={<ViewProperty />} />
         <Route 
           path="/admin" 
           element={
