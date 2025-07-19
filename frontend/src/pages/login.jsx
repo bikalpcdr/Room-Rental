@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -6,6 +6,7 @@ import "../style/login.css";
 import { loginUser } from "../api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PropTypes from "prop-types";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -15,14 +16,12 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const res = await loginUser(username, password);
       const userData = res.data?.data;
-      
-      // Store user data and token in localStorage
       localStorage.setItem('token', userData.token);
       localStorage.setItem('userData', JSON.stringify({
         id: userData.id,
@@ -32,8 +31,6 @@ function Login() {
         role: userData.role,
         profilePictureUrl: userData.profilePictureUrl
       }));
-
-      // Store remember me preference
       if (rememberMe) {
         localStorage.setItem('rememberMe', 'true');
         localStorage.setItem('savedUsername', username);
@@ -41,11 +38,7 @@ function Login() {
         localStorage.removeItem('rememberMe');
         localStorage.removeItem('savedUsername');
       }
-
-      // Set flag to show welcome toast on dashboard
       localStorage.setItem('showWelcomeToast', 'true');
-
-      // Redirect immediately based on user role
       switch (userData.role) {
         case 'ADMIN':
           navigate('/admin');
@@ -59,7 +52,6 @@ function Login() {
         default:
           navigate('/');
       }
-
     } catch (err) {
       toast.error(
           err.response?.data?.message || "Login failed. Please try again."
@@ -67,7 +59,15 @@ function Login() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [username, password, rememberMe, navigate]);
+
+  const handlePasswordToggle = useCallback(() => {
+    setShowPassword((prev) => !prev);
+  }, []);
+
+  const handleRememberMe = useCallback((e) => {
+    setRememberMe(e.target.checked);
+  }, []);
 
   return (
     <>
@@ -100,7 +100,6 @@ function Login() {
               <div className="form-group">
                 <label htmlFor="password">Password</label>
                 <div className="input-wrapper">
-                  {/*<span className="input-icon">🔒</span>*/}
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -112,7 +111,7 @@ function Login() {
                   <button
                     type="button"
                     className="password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={handlePasswordToggle}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? "🙈" : "👁️"}
@@ -125,7 +124,7 @@ function Login() {
                   <input
                     type="checkbox"
                     checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
+                    onChange={handleRememberMe}
                   />
                   <span className="checkmark"></span>
                   Remember me
@@ -178,4 +177,6 @@ function Login() {
   );
 }
 
-export default Login;
+Login.propTypes = {};
+
+export default React.memo(Login);

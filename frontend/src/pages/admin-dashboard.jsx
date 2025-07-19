@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/admin-dashboard.css";
@@ -7,6 +7,89 @@ import { ToastContainer, toast } from "react-toastify";
 import { getUserData } from "../utils/auth";
 import "react-toastify/dist/ReactToastify.css";
 import UserForm from "../forms/UserForm";
+import PropTypes from "prop-types";
+
+const StatsCards = React.memo(({ stats }) => (
+  <div className="stats-container">
+    <div className="stat-card">
+      <h3>Total Users</h3>
+      <p className="stat-number">{stats.totalUsers}</p>
+    </div>
+    <div className="stat-card">
+      <h3>Admins</h3>
+      <p className="stat-number">{stats.admins}</p>
+    </div>
+    <div className="stat-card">
+      <h3>Owners</h3>
+      <p className="stat-number">{stats.owners}</p>
+    </div>
+    <div className="stat-card">
+      <h3>Renters</h3>
+      <p className="stat-number">{stats.renters}</p>
+    </div>
+  </div>
+));
+
+StatsCards.propTypes = {
+  stats: PropTypes.shape({
+    totalUsers: PropTypes.number,
+    admins: PropTypes.number,
+    owners: PropTypes.number,
+    renters: PropTypes.number,
+  }).isRequired,
+};
+
+const UsersTable = React.memo(({ users, onEdit, onDelete }) => (
+  <div className="table-container">
+    <table className="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>UserID</th>
+          <th>Username</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {users.map((user, index) => (
+          <tr key={user.id}>
+            <td>{index + 1}</td>
+            <td>{user.userId}</td>
+            <td>{user.username}</td>
+            <td>{user.fullName}</td>
+            <td>{user.email}</td>
+            <td>{user.phoneNumber}</td>
+            <td>
+              <span className={`role-badge role-${user.role.toLowerCase()}`}>
+                {user.role}
+              </span>
+            </td>
+            <td>
+              <div className="action-buttons">
+                <button className="edit-btn" onClick={() => onEdit(user)}>
+                  Edit
+                </button>
+                <button className="delete-btn" onClick={() => onDelete(user.userId)}>
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+));
+
+UsersTable.propTypes = {
+  users: PropTypes.array.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+};
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -25,30 +108,17 @@ function AdminDashboard() {
 
   const userData = getUserData();
 
-  // Statistics
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    admins: 0,
-    owners: 0,
-    renters: 0
-  });
-
   useEffect(() => {
     fetchUsers();
-    
-    // Check if we should show welcome toast
     const showWelcomeToast = localStorage.getItem('showWelcomeToast');
     if (showWelcomeToast === 'true') {
       toast.success(`Welcome back, ${userData.fullName}! 🎉`);
       localStorage.removeItem('showWelcomeToast');
     }
+    // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    calculateStats();
-  }, [users]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getAllUsers();
@@ -59,18 +129,17 @@ function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const calculateStats = () => {
+  const stats = useMemo(() => {
     const totalUsers = users.length;
     const admins = users.filter(user => user.role === "ADMIN").length;
     const owners = users.filter(user => user.role === "OWNER").length;
     const renters = users.filter(user => user.role === "RENTER").length;
+    return { totalUsers, admins, owners, renters };
+  }, [users]);
 
-    setStats({ totalUsers, admins, owners, renters });
-  };
-
-  const handleCreateUser = async (e) => {
+  const handleCreateUser = useCallback(async (e) => {
     e.preventDefault();
     try {
       await createUser(
@@ -88,9 +157,9 @@ function AdminDashboard() {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create user");
     }
-  };
+  }, [formData, fetchUsers]);
 
-  const handleUpdateUser = async (e) => {
+  const handleUpdateUser = useCallback(async (e) => {
     e.preventDefault();
     try {
       await updateUser(
@@ -107,9 +176,9 @@ function AdminDashboard() {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update user");
     }
-  };
+  }, [formData, selectedUser, fetchUsers]);
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = useCallback(async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await deleteUserById(userId);
@@ -119,9 +188,9 @@ function AdminDashboard() {
         toast.error(error.response?.data?.message || "Failed to delete user");
       }
     }
-  };
+  }, [fetchUsers]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({
       username: "",
       email: "",
@@ -131,9 +200,9 @@ function AdminDashboard() {
       role: "RENTER"
     });
     setSelectedUser(null);
-  };
+  }, []);
 
-  const openEditModal = (user) => {
+  const openEditModal = useCallback((user) => {
     setSelectedUser(user);
     setFormData({
       username: user.username,
@@ -144,12 +213,12 @@ function AdminDashboard() {
       role: user.role
     });
     setShowEditModal(true);
-  };
+  }, []);
 
-  const openCreateModal = () => {
+  const openCreateModal = useCallback(() => {
     resetForm();
     setShowCreateModal(true);
-  };
+  }, [resetForm]);
 
   if (loading) {
     return (
@@ -181,78 +250,12 @@ function AdminDashboard() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="stats-container">
-          <div className="stat-card">
-            <h3>Total Users</h3>
-            <p className="stat-number">{stats.totalUsers}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Admins</h3>
-            <p className="stat-number">{stats.admins}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Owners</h3>
-            <p className="stat-number">{stats.owners}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Renters</h3>
-            <p className="stat-number">{stats.renters}</p>
-          </div>
-        </div>
+        <StatsCards stats={stats} />
 
         {/* Users Table */}
         <div className="users-section">
           <h2>User Management</h2>
-          <div className="table-container">
-            <table className="users-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>UserID</th>
-                  <th>Username</th>
-                  <th>Full Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Role</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user, index) => (
-                  <tr key={user.id}>
-
-                    <td>{index + 1}</td>
-                    <td>{user.userId}</td>
-                    <td>{user.username}</td>
-                    <td>{user.fullName}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phoneNumber}</td>
-                    <td>
-                      <span  className={`role-badge role-${user.role.toLowerCase()}`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
-                        <button
-                          className="edit-btn"
-                          onClick={() => openEditModal(user)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleDeleteUser(user.userId)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <UsersTable users={users} onEdit={openEditModal} onDelete={handleDeleteUser} />
         </div>
 
         {/* Create User Modal */}
@@ -310,4 +313,6 @@ function AdminDashboard() {
   );
 }
 
-export default AdminDashboard; 
+AdminDashboard.propTypes = {};
+
+export default React.memo(AdminDashboard); 

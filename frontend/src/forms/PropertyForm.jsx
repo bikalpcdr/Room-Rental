@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
+import PropTypes from "prop-types";
 import "../style/form.css";
 
 const PROPERTY_TYPES = ["ROOM", "FLAT", "HOUSE"];
@@ -14,19 +15,15 @@ const AMENITIES = [
 ];
 
 function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
-  const handleAmenityChange = (amenity) => {
-    if (formData.amenities.includes(amenity)) {
-      setFormData({
-        ...formData,
-        amenities: formData.amenities.filter((a) => a !== amenity),
-      });
-    } else {
-      setFormData({
-        ...formData,
-        amenities: [...formData.amenities, amenity],
-      });
-    }
-  };
+  const handleAmenityChange = useCallback((amenity) => {
+    setFormData((prev) =>
+      prev.amenities.includes(amenity)
+        ? { ...prev, amenities: prev.amenities.filter((a) => a !== amenity) }
+        : { ...prev, amenities: [...prev.amenities, amenity] }
+    );
+  }, [setFormData]);
+
+  const amenityRows = useMemo(() => [AMENITIES.slice(0, 4), AMENITIES.slice(4, 8)], []);
 
   return (
     <form onSubmit={onSubmit} autoComplete="off">
@@ -36,7 +33,7 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
           id="property-title"
           type="text"
           value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          onChange={e => setFormData({ ...formData, title: e.target.value })}
           required
           placeholder="e.g. Cozy Room in City Center"
         />
@@ -46,7 +43,7 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
         <textarea
           id="property-description"
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          onChange={e => setFormData({ ...formData, description: e.target.value })}
           required
           placeholder="Describe your property, features, nearby places, etc."
           rows={3}
@@ -57,7 +54,7 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
         <select
           id="property-type"
           value={formData.propertyType}
-          onChange={(e) => setFormData({ ...formData, propertyType: e.target.value })}
+          onChange={e => setFormData({ ...formData, propertyType: e.target.value })}
           required
         >
           <option value="">Select Type</option>
@@ -72,7 +69,7 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
           id="property-address"
           type="text"
           value={formData.address}
-          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+          onChange={e => setFormData({ ...formData, address: e.target.value })}
           required
           placeholder="e.g. 123 Main St, Kathmandu"
         />
@@ -84,7 +81,7 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
             id="property-roomCount"
             type="number"
             value={formData.roomCount}
-            onChange={(e) => setFormData({ ...formData, roomCount: Number(e.target.value) })}
+            onChange={e => setFormData({ ...formData, roomCount: Number(e.target.value) })}
             required
             min={1}
             placeholder="e.g. 2"
@@ -96,7 +93,7 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
             id="property-rentPrice"
             type="number"
             value={formData.rentPrice}
-            onChange={(e) => setFormData({ ...formData, rentPrice: Number(e.target.value) })}
+            onChange={e => setFormData({ ...formData, rentPrice: Number(e.target.value) })}
             required
             min={0}
             placeholder="e.g. 15000"
@@ -107,7 +104,7 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
           <select
             id="property-available"
             value={formData.isAvailable}
-            onChange={(e) => setFormData({ ...formData, isAvailable: e.target.value === "true" })}
+            onChange={e => setFormData({ ...formData, isAvailable: e.target.value === "true" })}
           >
             <option value="true">Yes</option>
             <option value="false">No</option>
@@ -117,30 +114,20 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
       <div className="form-group">
         <label>Amenities</label>
         <div>
-          <div className="amenities-row">
-            {AMENITIES.slice(0, 4).map((amenity) => (
-              <label key={amenity} className="amenity-checkbox">
-                <input
-                  type="checkbox"
-                  checked={formData.amenities.includes(amenity)}
-                  onChange={() => handleAmenityChange(amenity)}
-                />
-                {amenity}
-              </label>
-            ))}
-          </div>
-          <div className="amenities-row">
-            {AMENITIES.slice(4, 8).map((amenity) => (
-              <label key={amenity} className="amenity-checkbox">
-                <input
-                  type="checkbox"
-                  checked={formData.amenities.includes(amenity)}
-                  onChange={() => handleAmenityChange(amenity)}
-                />
-                {amenity}
-              </label>
-            ))}
-          </div>
+          {amenityRows.map((row, i) => (
+            <div className="amenities-row" key={i}>
+              {row.map((amenity) => (
+                <label key={amenity} className="amenity-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={formData.amenities.includes(amenity)}
+                    onChange={() => handleAmenityChange(amenity)}
+                  />
+                  {amenity}
+                </label>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
       <div className="modal-actions">
@@ -152,5 +139,13 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
     </form>
   );
 }
+
+PropertyForm.propTypes = {
+  formData: PropTypes.object.isRequired,
+  setFormData: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  isEdit: PropTypes.bool,
+};
 
 export default PropertyForm; 
