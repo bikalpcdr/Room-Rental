@@ -13,6 +13,17 @@ import RenterDashboard from "./pages/renter-dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ViewProperty from "./pages/view-property";
 import "./App.css";
+import PropTypes from "prop-types";
+
+function NotFound() {
+  return (
+    <div style={{ textAlign: "center", margin: "4rem" }}>
+      <h1>404 - Page Not Found</h1>
+      <p>The page you are looking for does not exist.</p>
+      <a href="/">Go to Home</a>
+    </div>
+  );
+}
 
 function App() {
   return (
@@ -50,9 +61,12 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
-export default App;
+App.propTypes = {};
+
+export default React.memo(App);

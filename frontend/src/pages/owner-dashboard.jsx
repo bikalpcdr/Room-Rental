@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import Footer from "../components/footer";
 import PropertyForm from "../forms/PropertyForm";
 import "../style/admin-dashboard.css";
 import { getOwnerProperties, createProperty, updateProperty, deleteProperty, getPropertyById } from "../api";
+import PropTypes from "prop-types";
 
 function OwnerDashboard() {
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -30,15 +31,15 @@ function OwnerDashboard() {
 
   useEffect(() => {
     fetchProperties();
-    // Welcome toast
     const showWelcomeToast = localStorage.getItem('showWelcomeToast');
     if (showWelcomeToast === 'true') {
       toast.success(`Welcome back, ${userData.fullName}! 🏠`);
       localStorage.removeItem('showWelcomeToast');
     }
+    // eslint-disable-next-line
   }, []);
 
-  const fetchProperties = async () => {
+  const fetchProperties = useCallback(async () => {
     setLoading(true);
     try {
       const res = await getOwnerProperties();
@@ -48,9 +49,9 @@ function OwnerDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleAddProperty = () => {
+  const handleAddProperty = useCallback(() => {
     setFormData({
       roomTitle: "",
       description: "",
@@ -63,9 +64,9 @@ function OwnerDashboard() {
     });
     setIsEdit(false);
     setShowFormModal(true);
-  };
+  }, []);
 
-  const handleEditProperty = (property) => {
+  const handleEditProperty = useCallback((property) => {
     setFormData({
       ...property,
       title: property.title || property.roomTitle || "",
@@ -73,9 +74,9 @@ function OwnerDashboard() {
     setSelectedProperty(property);
     setIsEdit(true);
     setShowFormModal(true);
-  };
+  }, []);
 
-  const handleDeleteProperty = async (propertyId) => {
+  const handleDeleteProperty = useCallback(async (propertyId) => {
     if (window.confirm("Are you sure you want to delete this property?")) {
       try {
         await deleteProperty(propertyId);
@@ -85,20 +86,19 @@ function OwnerDashboard() {
         toast.error("Failed to delete property");
       }
     }
-  };
+  }, [fetchProperties]);
 
-  const handleViewProperty = async (property) => {
+  const handleViewProperty = useCallback(async (property) => {
     try {
       const res = await getPropertyById(property.id || property.propertyId);
       const details = res.data?.data;
       toast.info(`Title: ${details.title || details.roomTitle}\nAddress: ${details.address}`);
-      // You can replace this with a modal or detailed view as needed
     } catch (err) {
       toast.error("Failed to fetch property details");
     }
-  };
+  }, []);
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = useCallback(async (e) => {
     e.preventDefault();
     try {
       if (isEdit) {
@@ -113,7 +113,7 @@ function OwnerDashboard() {
     } catch (err) {
       toast.error("Failed to save property");
     }
-  };
+  }, [isEdit, formData, selectedProperty, fetchProperties]);
 
   return (
     <>
@@ -222,4 +222,6 @@ function OwnerDashboard() {
   );
 }
 
-export default OwnerDashboard; 
+OwnerDashboard.propTypes = {};
+
+export default React.memo(OwnerDashboard); 
