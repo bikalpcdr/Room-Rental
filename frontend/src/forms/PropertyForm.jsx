@@ -148,4 +148,4 @@ PropertyForm.propTypes = {
   isEdit: PropTypes.bool,
 };
 
-export default PropertyForm; 
+export default PropertyForm;
