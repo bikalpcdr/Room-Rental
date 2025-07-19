@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/admin-dashboard.css";
+import PropTypes from "prop-types";
 
 function RenterDashboard() {
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -15,29 +16,29 @@ function RenterDashboard() {
   });
 
   useEffect(() => {
-    // Check if we should show welcome toast
     const showWelcomeToast = localStorage.getItem('showWelcomeToast');
     if (showWelcomeToast === 'true') {
       toast.success(`Welcome back, ${userData.fullName}! 🏠`);
       localStorage.removeItem('showWelcomeToast');
     }
+    // eslint-disable-next-line
   }, []);
 
-  const handleSearchRooms = () => {
+  const handleSearchRooms = useCallback(() => {
     toast.info("Room search features coming soon!");
-  };
+  }, []);
 
-  const handleViewBookings = () => {
+  const handleViewBookings = useCallback(() => {
     toast.info("Booking management features coming soon!");
-  };
+  }, []);
 
-  const handleViewSaved = () => {
+  const handleViewSaved = useCallback(() => {
     toast.info("Saved properties features coming soon!");
-  };
+  }, []);
 
-  const handleViewSpending = () => {
+  const handleViewSpending = useCallback(() => {
     toast.info("Spending tracking features coming soon!");
-  };
+  }, []);
 
   return (
     <>
@@ -107,4 +108,6 @@ function RenterDashboard() {
   );
 }
 
-export default RenterDashboard; 
+RenterDashboard.propTypes = {};
+
+export default React.memo(RenterDashboard); 
