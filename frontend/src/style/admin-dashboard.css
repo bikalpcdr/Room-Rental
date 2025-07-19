@@ -180,7 +180,8 @@
 }
 
 .edit-btn,
-.delete-btn {
+.delete-btn,
+.view-btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
@@ -189,6 +190,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
+
 
 .edit-btn {
   background: #007bff;
@@ -199,15 +201,21 @@
   background: #0056b3;
 }
 
-.delete-btn {
+.delete-btn{
   background: #dc3545;
   color: white;
 }
-
+.view-btn {
+  background: green;
+  color: white;
+}
 .delete-btn:hover {
   background: #c82333;
 }
-
+.first {
+  max-width: 300px;
+  line-height: 1.6;
+}
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -371,11 +379,12 @@
   }
   
   .edit-btn,
-  .delete-btn {
+  .delete-btn,
+  .view-btn{
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
   }
-  
+
   .modal {
     margin: 1rem;
     padding: 1.5rem;

@@ -145,6 +145,7 @@ function OwnerDashboard() {
               <table className="users-table">
                 <thead>
                   <tr>
+                    <th>S.N</th>
                     <th>Title</th>
                     <th>Type</th>
                     <th>Address</th>
@@ -156,16 +157,17 @@ function OwnerDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {properties.map((property) => (
+                  {properties.map((property, index) => (
                     <tr key={property.id || property.propertyId}>
+                      <td>{index+1}</td>
                       <td>{property.roomTitle || property.roomTitle}</td>
                       <td>{property.propertyType}</td>
                       <td>{property.address}</td>
                       <td>{property.roomCount}</td>
                       <td>{property.rentPrice}</td>
                       <td>{property.isAvailable ? "Yes" : "No"}</td>
-                      <td>{property.amenities?.join(", ")}</td>
-                      <td>
+                      <td className={"first"}>{property.amenities?.join(", ")}</td>
+                      <td className={"btn"}>
                         <button className="view-btn" onClick={() => navigate(`/property/${property.id || property.propertyId}`)}>
                           View
                         </button>

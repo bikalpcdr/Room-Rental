@@ -5,7 +5,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import "../style/view-property.css";
 function ViewProperty() {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
@@ -48,26 +48,28 @@ function ViewProperty() {
   return (
     <>
       <Header />
-      <main style={{ maxWidth: 700, margin: "2rem auto", background: "#fff", borderRadius: 12, boxShadow: "0 4px 24px rgba(0,0,0,0.08)", padding: "2rem" }}>
-        <h1 style={{ marginBottom: "1.5rem" }}>{property.title || property.roomTitle}</h1>
-        <div style={{ marginBottom: "1rem" }}><b>Description:</b> {property.description}</div>
-        <div style={{ marginBottom: "1rem" }}><b>Type:</b> {property.propertyType}</div>
-        <div style={{ marginBottom: "1rem" }}><b>Address:</b> {property.address}</div>
-        <div style={{ marginBottom: "1rem" }}><b>Room Count:</b> {property.roomCount}</div>
-        <div style={{ marginBottom: "1rem" }}><b>Rent Price:</b> {property.rentPrice}</div>
-        <div style={{ marginBottom: "1rem" }}><b>Available:</b> {property.isAvailable ? "Yes" : "No"}</div>
-        <div style={{ marginBottom: "1rem" }}><b>Owner:</b> {property.ownerName}</div>
-        <div style={{ marginBottom: "1rem" }}>
-          <b>Amenities:</b>
-          <ul style={{ margin: 0, paddingLeft: 20 }}>
+      <main className={"view-property"}>
+        <h1>{property.title || property.roomTitle}</h1>
+          <div className={"mian__items"}>
+        <div><span>Description:</span> {property.description}</div>
+        <div><span>Type:</span> {property.propertyType}</div>
+        <div><span>Address:</span> {property.address}</div>
+        <div><span>Room Count:</span> {property.roomCount}</div>
+        <div><span>Rent Price:</span> {property.rentPrice}</div>
+        <div ><span>Available:</span> {property.isAvailable ? "Yes" : "No"}</div>
+        <div><span>Owner:</span> {property.ownerName}</div>
+        <div className={"amenities"}>
+          <span>Amenities:</span>
+          <ul>
             {property.amenities && property.amenities.length > 0 ? (
-              property.amenities.map((a) => <li key={a}>{a}</li>)
+              property.amenities.map((a) => <li key={a}>{a},</li>)
             ) : (
               <li>None</li>
             )}
           </ul>
         </div>
-        <Link to="/owner-dashboard" style={{ color: "#667eea", textDecoration: "underline" }}>Back to Dashboard</Link>
+          </div>
+        <Link to="/owner-dashboard" className={"back_to_dashboard , edit-btn"}>Back to Dashboard</Link>
       </main>
       <Footer />
       <ToastContainer position="top-right" autoClose={3000} />
