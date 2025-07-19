@@ -1,0 +1,43 @@
+ul {
+    list-style: none;
+}
+.view-property {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+}
+.view-property h1 {
+    text-transform: capitalize;
+}
+.view-property span {
+    font-weight: 600;
+}
+.view-property .mian__items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 0;
+}
+.view-property .mian__items .amenities {
+    display: flex;
+}
+.view-property .mian__items ul {
+    margin: 0;
+    padding: 0 5px;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+.view-property .mian__items ul li:nth-child(odd) {
+    color:red;
+}
+
+.view-property .back_to_dashboard {
+    color: white;
+    text-decoration: underline;
+    width: fit-content;
+}
