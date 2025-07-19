@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
-import "../style/form.css";
+import "../style/PropertyForm.css";
 
 const PROPERTY_TYPES = ["ROOM", "FLAT", "HOUSE"];
 const AMENITIES = [

@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
+import "../style/UserForm.css";
 
 function UserForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
   const handleChange = useCallback((e) => {
