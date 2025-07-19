@@ -8,17 +8,17 @@ import PropTypes from "prop-types";
 
 const teamMembers = [
   {
-    name: "John Smith",
+    name: "Bikalpa Chaudhary",
     role: "CEO & Founder",
     bio: "Passionate about revolutionizing the rental industry with innovative technology solutions.",
   },
   {
-    name: "Sarah Johnson",
+    name: "Arbin Lama",
     role: "CTO",
     bio: "Leading our technical development with expertise in scalable platforms and user experience.",
   },
   {
-    name: "Mike Davis",
+    name: "Rajib Bikram Shah",
     role: "Head of Operations",
     bio: "Ensuring smooth operations and exceptional customer service across all touchpoints.",
   },
