@@ -80,21 +80,39 @@ public class UserServiceImpl implements UserService {
     @Override
     public String uploadProfilePicture(Long userId, MultipartFile file) {
         User user = findUserById(userId);
+
         if (file.isEmpty()) {
             throw new CustomizeException("File is empty");
         }
+
         try {
-            String uploadDir = "uploads/profile-pictures";
+            String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/profile-pictures";
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
-            String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".") ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.')) : "";
+
+            // deleting existing profile picture form that directory if exist
+            if (user.getProfilePictureUrl() != null) {
+                String oldFileName = Paths.get(user.getProfilePictureUrl()).getFileName().toString();
+                File oldFile = new File(uploadDir, oldFileName);
+                if (oldFile.exists()) {
+                    oldFile.delete();
+                }
+            }
+
+            String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
+                    ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'))
+                    : "";
             String filename = "user-" + userId + "-" + UUID.randomUUID() + ext;
+
             Path filePath = Paths.get(uploadDir, filename);
             Files.write(filePath, file.getBytes());
-            String url = "/" + uploadDir + "/" + filename;
+
+            String url = "/profile-pictures/" + filename;
             user.setProfilePictureUrl(url);
             userRepo.save(user);
+
             return url;
+
         } catch (IOException e) {
             throw new CustomizeException("Failed to upload profile picture");
         }
