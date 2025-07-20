@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'bikalp2003/room-rental-service:latest'
-        FRONTEND_IMAGE = 'bikalp2003/room-rental-frontend:latest'
+        DOCKER_IMAGE = 'room-rental-app-1'
+        FRONTEND_IMAGE = 'room-rental-frontend-1'
     }
 
     stages {
@@ -54,9 +54,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                // NOTE: The database is expected to be running on the host system and is not managed by docker-compose.
-                // The backend and frontend will be exposed on ports 18080 (backend HTTP), 18443 (backend HTTPS), and 18081 (frontend).
-                sshagent(['YOUR_SSH_CREDENTIALS_ID']) {
+                sshagent(['My_SSH_CREDENTIALS_ID']) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no user@your.server.ip "
                         cd /path/to/your/project &&
