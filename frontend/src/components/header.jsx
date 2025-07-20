@@ -25,10 +25,9 @@ function Header() {
     return "/";
   }, [userData]);
 
-  const backendBaseUrl = "http://localhost:7777";
   const getProfileImageUrl = useCallback((url) => {
     if (!url) return null;
-    return url.startsWith("http") ? url : backendBaseUrl + url;
+    return url.startsWith("http") ? url : url;
   }, []);
 
   const toggleMenu = useCallback(() => setIsMenuOpen((open) => !open), []);
