@@ -4,6 +4,8 @@ import com.bikalp.roomrentalservice.enums.Amenities;
 import com.bikalp.roomrentalservice.enums.PropertyType;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @Getter
@@ -19,4 +21,5 @@ public class PropertyRequest {
     private Boolean isAvailable;
     private Long ownerId;
     private List<Amenities> amenities;
+    private List<MultipartFile> images;
 } 

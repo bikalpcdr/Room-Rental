@@ -6,17 +6,18 @@ import Footer from "../components/footer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../style/view-property.css";
-import PropTypes from "prop-types";
 
 function ViewProperty() {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mainImage, setMainImage] = useState(null);
 
   const fetchProperty = useCallback(async () => {
     try {
       const res = await getPropertyById(id);
       setProperty(res.data?.data);
+      setMainImage(res.data?.data?.images?.[0] || null);
     } catch (err) {
       toast.error("Failed to fetch property details");
     } finally {
@@ -28,11 +29,13 @@ function ViewProperty() {
     fetchProperty();
   }, [fetchProperty]);
 
+  const getImageUrl = (url) => url?.startsWith("http") ? url : url;
+
   if (loading) {
     return (
       <>
         <Header />
-        <div style={{ textAlign: "center", margin: "2rem" }}>Loading property details...</div>
+        <div className="vp-loading">Loading property details...</div>
         <Footer />
       </>
     );
@@ -42,7 +45,7 @@ function ViewProperty() {
     return (
       <>
         <Header />
-        <div style={{ textAlign: "center", margin: "2rem" }}>Property not found.</div>
+        <div className="vp-loading">Property not found.</div>
         <Footer />
       </>
     );
@@ -51,35 +54,69 @@ function ViewProperty() {
   return (
     <>
       <Header />
-      <main className={"view-property"}>
-        <h1>{property.title || property.roomTitle}</h1>
-        <div className={"main__items"}>
-          <div><span>Description:</span> {property.description}</div>
-          <div><span>Type:</span> {property.propertyType}</div>
-          <div><span>Address:</span> {property.address}</div>
-          <div><span>Room Count:</span> {property.roomCount}</div>
-          <div><span>Rent Price:</span> {property.rentPrice}</div>
-          <div><span>Available:</span> {property.isAvailable ? "Yes" : "No"}</div>
-          <div><span>Owner:</span> {property.ownerName}</div>
-          <div className={"amenities"}>
-            <span>Amenities:</span>
-            <ul>
-              {property.amenities && property.amenities.length > 0 ? (
-                property.amenities.map((a) => <li key={a}>{a},</li>)
-              ) : (
-                <li>None</li>
-              )}
-            </ul>
+      <main className="vp-container">
+        <div className="vp-card">
+          <div className="vp-gallery">
+            {mainImage && (
+              <img
+                src={getImageUrl(mainImage)}
+                alt="Main Property"
+                className="vp-main-image"
+              />
+            )}
+            {property.images && property.images.length > 1 && (
+              <div className="vp-thumbnails">
+                {property.images.map((img, idx) => (
+                  <img
+                    key={img + idx}
+                    src={getImageUrl(img)}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className={`vp-thumb ${mainImage === img ? "active" : ""}`}
+                    onClick={() => setMainImage(img)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="vp-details">
+            <h1 className="vp-title">{(property.title || property.roomTitle || "").trim()}</h1>
+            <div className="vp-meta">
+              <span className="vp-type">{(property.propertyType || "").trim()}</span>
+              <span className="vp-rooms">{property.roomCount} rooms</span>
+              <span className="vp-price">Rs. {property.rentPrice}</span>
+              <span className={`vp-available ${property.isAvailable ? "yes" : "no"}`}>
+                {property.isAvailable ? "Available" : "Not Available"}
+              </span>
+            </div>
+            <div className="vp-address">{(property.address || "").trim()}</div>
+            <div className="vp-description">{(property.description || "").trim()}</div>
+            <div className="vp-amenities">
+              <h3>Amenities</h3>
+              <ul>
+                {property.amenities && property.amenities.length > 0 ? (
+                  property.amenities.map((a) => (
+                    <li key={a}>
+                      <span className={`amenity-icon ${a.toLowerCase()}`}></span>
+                      {a.replace(/_/g, ' ')}
+                    </li>
+                  ))
+                ) : (
+                  <li>None</li>
+                )}
+              </ul>
+            </div>
+            <div className="vp-owner">
+              <h3>Owner</h3>
+              <div>{(property.ownerName || "").trim()}</div>
+            </div>
+            <Link to="/owner-dashboard" className="vp-back-btn">Back to Dashboard</Link>
           </div>
         </div>
-        <Link to="/owner-dashboard" className={"back_to_dashboard edit-btn"}>Back to Dashboard</Link>
       </main>
       <Footer />
       <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }
-
-ViewProperty.propTypes = {};
 
 export default React.memo(ViewProperty); 

@@ -22,6 +22,9 @@
         <collection property="amenities"
                     ofType="com.bikalp.roomrentalservice.enums.Amenities"
                     resultMap="AmenitiesEnumMap"/>
+        <collection property="images" ofType="string">
+            <result column="image_url" />
+        </collection>
     </resultMap>
 
     <select id="getPropertyById" resultMap="PropertyResponseMap">
@@ -36,10 +39,12 @@
                p.title         as roomTitle,
                u.full_name     as ownerName,
                p.owner_id      as ownerid,
-               pa.amenity      as amenity_amenities
+               pa.amenity      as amenity_amenities,
+               pi.image_url    as image_url
         from property p
              left join property_amenities pa on p.id = pa.property_id
              left join users u on p.owner_id = u.id
+             left join property_image pi on p.id = pi.property_id
         where p.id = #{propertyId};
     </select>
 
@@ -55,10 +60,12 @@
                p.title         as roomTitle,
                u.full_name     as ownerName,
                p.owner_id      as ownerid,
-               pa.amenity      as amenity_amenities
+               pa.amenity      as amenity_amenities,
+               pi.image_url    as image_url
         from property p
              left join property_amenities pa on p.id = pa.property_id
              left join users u on p.owner_id = u.id
+             left join property_image pi on p.id = pi.property_id
     </select>
 
     <select id="getAllPropertiesByOwnerId" resultMap="PropertyResponseMap">
@@ -73,10 +80,12 @@
                p.title         as roomTitle,
                u.full_name     as ownerName,
                p.owner_id      as ownerid,
-               pa.amenity      as amenity_amenities
+               pa.amenity      as amenity_amenities,
+               pi.image_url    as image_url
         from property p
              left join property_amenities pa on p.id = pa.property_id
              left join users u on p.owner_id = u.id
+             left join property_image pi on p.id = pi.property_id
         where p.owner_id = #{ownerId};
     </select>
 </mapper>
