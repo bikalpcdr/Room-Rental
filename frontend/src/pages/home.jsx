@@ -52,17 +52,17 @@ const steps = [
 const testimonials = [
   {
     content: '"Found my perfect room within a day! The process was so smooth and the landlord was very professional."',
-    name: "Sarah Johnson",
+    name: "Nabraj Bohora",
     role: "Student"
   },
   {
     content: '"As a landlord, this platform has made it so much easier to find reliable tenants. Highly recommended!"',
-    name: "Mike Chen",
+    name: "Gharbeti baa",
     role: "Property Owner"
   },
   {
     content: '"The verification process gave me peace of mind. I knew exactly what I was getting into before booking."',
-    name: "Emily Davis",
+    name: "Hari Chalise",
     role: "Professional"
   }
 ];

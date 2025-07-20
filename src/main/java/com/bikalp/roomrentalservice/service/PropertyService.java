@@ -2,6 +2,7 @@ package com.bikalp.roomrentalservice.service;
 
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
 import com.bikalp.roomrentalservice.dto.response.PropertyResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

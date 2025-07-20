@@ -6,14 +6,24 @@ import com.bikalp.roomrentalservice.dto.response.PropertyResponse;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.mapper.PropertyMapper;
 import com.bikalp.roomrentalservice.model.Property;
+import com.bikalp.roomrentalservice.model.PropertyImage;
 import com.bikalp.roomrentalservice.model.User;
+import com.bikalp.roomrentalservice.repository.PropertyImageRepo;
 import com.bikalp.roomrentalservice.repository.PropertyRepo;
 import com.bikalp.roomrentalservice.service.PropertyService;
-import com.bikalp.roomrentalservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,19 +32,50 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyRepo propertyRepo;
     private final PropertyMapper propertyMapper;
     private final UserDataConfig userDataConfig;
-    private final UserService userService;
+    private final PropertyImageRepo propertyImageRepo;
 
     @Override
+    @Transactional
     public void createProperty(PropertyRequest request) {
         Property property = mapToEntity(request, userDataConfig.getLoggedInUser());
         propertyRepo.save(property);
+        // Handle image upload if images are present
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/property-images";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+            for (MultipartFile file : request.getImages()) {
+                if (file.isEmpty()) continue;
+                String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
+                        ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'))
+                        : "";
+                String filename = "property-" + property.getId() + "-" + UUID.randomUUID() + ext;
+                Path filePath = Paths.get(uploadDir, filename);
+                try {
+                    Files.write(filePath, file.getBytes());
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to save property image", e);
+                }
+                String url = "/property-images/" + filename;
+                PropertyImage propertyImage = PropertyImage.builder()
+                        .imageUrl(url)
+                        .property(property)
+                        .build();
+                propertyImageRepo.save(propertyImage);
+                if (property.getImages() == null) {
+                    property.setImages(new ArrayList<>());
+                }
+                property.getImages().add(propertyImage);
+            }
+            propertyRepo.save(property);
+        }
     }
 
     @Override
     public void updateProperty(PropertyRequest request) {
         Property property = getPropertyByIdOrThrow(request.getPropertyId());
 
-        updateEntity(property, request,userDataConfig.getLoggedInUser());
+        updateEntity(property, request, userDataConfig.getLoggedInUser());
         propertyRepo.save(property);
     }
 

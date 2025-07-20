@@ -6,7 +6,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import PropertyForm from "../forms/PropertyForm";
 import "../style/admin-dashboard.css";
-import { getOwnerProperties, createProperty, updateProperty, deleteProperty, getPropertyById } from "../api";
+import { getOwnerProperties, createProperty, updateProperty, deleteProperty, getPropertyById, uploadPropertyImages } from "../api";
 import PropTypes from "prop-types";
 
 function OwnerDashboard() {
@@ -26,6 +26,7 @@ function OwnerDashboard() {
     isAvailable: true,
     amenities: [],
   });
+  const [selectedImages, setSelectedImages] = useState([]);
 
   const navigate = useNavigate();
 
@@ -105,15 +106,16 @@ function OwnerDashboard() {
         await updateProperty({ ...formData, propertyId: selectedProperty.propertyId || selectedProperty.id });
         toast.success("Property updated successfully!");
       } else {
-        await createProperty(formData);
+        await createProperty(formData, selectedImages);
         toast.success("Property created successfully!");
       }
       setShowFormModal(false);
+      setSelectedImages([]);
       fetchProperties();
     } catch (err) {
       toast.error("Failed to save property");
     }
-  }, [isEdit, formData, selectedProperty, fetchProperties]);
+  }, [isEdit, formData, selectedProperty, fetchProperties, selectedImages]);
 
   return (
     <>
@@ -211,6 +213,7 @@ function OwnerDashboard() {
                 onSubmit={handleFormSubmit}
                 onCancel={() => setShowFormModal(false)}
                 isEdit={isEdit}
+                onImagesChange={setSelectedImages}
               />
             </div>
           </div>

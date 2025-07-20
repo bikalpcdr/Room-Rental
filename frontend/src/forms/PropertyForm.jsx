@@ -14,7 +14,7 @@ const AMENITIES = [
   "COMMERCIAL_SPACE"
 ];
 
-function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
+function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, onImagesChange }) {
   const handleAmenityChange = useCallback((amenity) => {
     setFormData((prev) =>
       prev.amenities.includes(amenity)
@@ -22,6 +22,12 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
         : { ...prev, amenities: [...prev.amenities, amenity] }
     );
   }, [setFormData]);
+
+  const handleImagesChange = useCallback((e) => {
+    if (typeof onImagesChange === 'function') {
+      onImagesChange(Array.from(e.target.files));
+    }
+  }, [onImagesChange]);
 
   const amenityRows = useMemo(() => [AMENITIES.slice(0, 4), AMENITIES.slice(4, 8)], []);
 
@@ -130,6 +136,16 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit }) {
           ))}
         </div>
       </div>
+      <div className="form-group">
+        <label htmlFor="property-images">Property Images</label>
+        <input
+          id="property-images"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImagesChange}
+        />
+      </div>
       <div className="modal-actions">
         <button type="button" onClick={onCancel}>
           Cancel
@@ -146,6 +162,7 @@ PropertyForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   isEdit: PropTypes.bool,
+  onImagesChange: PropTypes.func,
 };
 
 export default PropertyForm;
