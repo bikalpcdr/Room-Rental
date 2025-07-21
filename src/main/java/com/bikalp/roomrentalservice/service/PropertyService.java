@@ -18,4 +18,8 @@ public interface PropertyService {
     List<PropertyResponse> getAllProperties();
 
     List<PropertyResponse> getAllPropertiesByOwnerId();
+
+    void uploadImagesForProperty(Long propertyId, List<MultipartFile> images);
+
+    void deletePropertyImagesByImageId(Long imageId);
 } 

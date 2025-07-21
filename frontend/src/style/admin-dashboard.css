@@ -424,3 +424,18 @@
   font-size: 0.8rem;
   font-weight: 500;
 } 
+
+.upload-images-btn {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  margin-left: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+.upload-images-btn:hover {
+  background-color: #388e3c;
+} 

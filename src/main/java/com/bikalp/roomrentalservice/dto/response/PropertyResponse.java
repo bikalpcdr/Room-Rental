@@ -4,7 +4,6 @@ import com.bikalp.roomrentalservice.enums.Amenities;
 import com.bikalp.roomrentalservice.enums.PropertyType;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,5 +22,5 @@ public class PropertyResponse {
     private Long ownerId;
     private String ownerName;
     private List<Amenities> amenities;
-    private List<MultipartFile> images;
+    private List<ImageDto> images;
 } 

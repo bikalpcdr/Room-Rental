@@ -12,7 +12,7 @@ import org.springframework.util.unit.DataSize;
 public class TomcatFactoryConfig {
     @Bean
     public TomcatServletWebServerFactory tomcatFactory() {
-
+        System.out.println("TomcatFactoryConfig: Custom Tomcat factory bean is being used!");
         // setting default size 100MB
         return new TomcatServletWebServerFactory() {
             @Override
@@ -25,31 +25,11 @@ public class TomcatFactoryConfig {
     }
 
     @Bean
-    public ServletContextInitializer servletContextInitializer() {
-        return servletContext -> {
-            // Set the fileCountMax attribute for multipart uploads
-            servletContext.setAttribute("org.apache.tomcat.util.http.fileupload.fileCountMax", 20);
-        };
-    }
-
-    @Bean
-    public org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer fileCountMaxCustomizer() {
-        return context -> context.getServletContext().setAttribute("org.apache.tomcat.util.http.fileupload.fileCountMax", 20);
-    }
-
-    @Bean
     public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
-
-        // Set max individual file size
         factory.setMaxFileSize(DataSize.ofMegabytes(20)); // 20MB per file
-
-        // Set max total request size
         factory.setMaxRequestSize(DataSize.ofMegabytes(100)); // 100MB total
-
-        // ✅ Optional: Increase number of file items allowed
         factory.setFileSizeThreshold(DataSize.ofKilobytes(512)); // when file writing to disk starts
-
         return factory.createMultipartConfig();
     }
 }

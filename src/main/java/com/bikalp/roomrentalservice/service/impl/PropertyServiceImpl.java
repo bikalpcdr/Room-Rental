@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartException;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,37 +41,6 @@ public class PropertyServiceImpl implements PropertyService {
     public void createProperty(PropertyRequest request) {
         Property property = mapToEntity(request, userDataConfig.getLoggedInUser());
         propertyRepo.save(property);
-        // Handle image upload if images are present
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
-            String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/property-images";
-            File dir = new File(uploadDir);
-            if (!dir.exists()) dir.mkdirs();
-            for (MultipartFile file : request.getImages()) {
-                if (file.isEmpty()) continue;
-                String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
-                        ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'))
-                        : "";
-                String filename = "property-" + property.getId() + "-" + UUID.randomUUID() + ext;
-                Path filePath = Paths.get(uploadDir, filename);
-                try {
-                    Files.write(filePath, file.getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new CustomizeException("Failed to save property image");
-                }
-                String url = "/property-images/" + filename;
-                PropertyImage propertyImage = PropertyImage.builder()
-                        .imageUrl(url)
-                        .property(property)
-                        .build();
-                propertyImageRepo.save(propertyImage);
-                if (property.getImages() == null) {
-                    property.setImages(new ArrayList<>());
-                }
-                property.getImages().add(propertyImage);
-            }
-            propertyRepo.save(property);
-        }
     }
 
     @Override
@@ -84,6 +54,19 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public void deleteProperty(Long propertyId) {
         Property property = getPropertyByIdOrThrow(propertyId);
+        // Delete associated image files from the filesystem
+        if (property.getImages() != null) {
+            String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/property-images";
+            for (PropertyImage image : property.getImages()) {
+                if (image.getImageUrl() != null) {
+                    String fileName = image.getImageUrl().replace("/property-images/", "");
+                    java.io.File file = new java.io.File(uploadDir, fileName);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                }
+            }
+        }
         propertyRepo.delete(property);
     }
 
@@ -101,6 +84,61 @@ public class PropertyServiceImpl implements PropertyService {
     public List<PropertyResponse> getAllPropertiesByOwnerId() {
         User owner = userDataConfig.getLoggedInUser();
         return propertyMapper.getAllPropertiesByOwnerId(owner.getId());
+    }
+
+    @Override
+    @Transactional
+    public void uploadImagesForProperty(Long propertyId, List<MultipartFile> images) {
+        if (images == null || images.isEmpty()) {
+            throw new CustomizeException("No images provided for upload.");
+        }
+        long nonEmptyCount = images.stream().filter(f -> !f.isEmpty()).count();
+        if (nonEmptyCount > 20) {
+            throw new MultipartException("You can upload a maximum of 20 images per property.");
+        }
+        Property property = getPropertyByIdOrThrow(propertyId);
+        String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/property-images";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) dir.mkdirs();
+        for (MultipartFile file : images) {
+            if (file.isEmpty()) continue;
+            String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
+                    ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'))
+                    : "";
+            String filename = "property-" + property.getId() + "-" + UUID.randomUUID() + ext;
+            Path filePath = Paths.get(uploadDir, filename);
+            try {
+                Files.write(filePath, file.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new CustomizeException("Failed to save property image");
+            }
+            String url = "/property-images/" + filename;
+            PropertyImage propertyImage = PropertyImage.builder()
+                    .imageUrl(url)
+                    .property(property)
+                    .build();
+            propertyImageRepo.save(propertyImage);
+            if (property.getImages() == null) {
+                property.setImages(new ArrayList<>());
+            }
+            property.getImages().add(propertyImage);
+        }
+        propertyRepo.save(property);
+    }
+
+    @Override
+    public void deletePropertyImagesByImageId(Long imageId) {
+        PropertyImage image = propertyImageRepo.findById(imageId)
+                .orElseThrow(() -> new DataNotFoundException("Image not found"));
+        // Delete file from filesystem
+        String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/property-images";
+        if (image.getImageUrl() != null) {
+            String fileName = image.getImageUrl().replace("/property-images/", "");
+            java.io.File file = new java.io.File(uploadDir, fileName);
+            if (file.exists()) file.delete();
+        }
+        propertyImageRepo.delete(image);
     }
 
     private Property getPropertyByIdOrThrow(Long propertyId) {

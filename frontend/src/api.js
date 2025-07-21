@@ -127,31 +127,25 @@ export const uploadProfilePicture = (userId, file) => {
 export const getOwnerProperties = () => apiClient.get('/property/get-all-owner-properties');
 
 /**
- * Create a new property with images (multipart/form-data)
+ * Create a new property (details only, no images)
  * @param {object} data - property fields
- * @param {File[]} images - array of image files
+ * @returns {Promise} - resolves to propertyId
+ */
+export const createProperty = (data) => {
+  return apiClient.post('/property', data)
+    .then(res => res.data.data); // assuming propertyId is in data
+};
+
+/**
+ * Upload images for a property
+ * @param {string|number} propertyId
+ * @param {File[]} images
  * @returns {Promise}
  */
-export const createProperty = (data, images = []) => {
+export const uploadPropertyImages = (propertyId, images = []) => {
   const formData = new FormData();
-  // Map frontend field names to backend expected names
-  if (data.title || data.roomTitle) formData.append('title', data.title || data.roomTitle);
-  if (data.description) formData.append('description', data.description);
-  if (data.propertyType) formData.append('propertyType', data.propertyType);
-  if (data.address) formData.append('address', data.address);
-  if (data.roomCount) formData.append('roomCount', data.roomCount);
-  if (data.rentPrice) formData.append('rentPrice', data.rentPrice);
-  if (data.isAvailable !== undefined) formData.append('isAvailable', data.isAvailable);
-  if (data.ownerId) formData.append('ownerId', data.ownerId);
-  if (data.amenities && Array.isArray(data.amenities)) {
-    data.amenities.forEach((a) => formData.append('amenities', a));
-  }
-
-  formData.append('images', images[0])
-  for (let pair of formData.entries()) {
-    console.log('FormData:', pair[0], pair[1]);
-  }
-  return apiClient.post('/property', formData, {
+  images.forEach((img) => formData.append('images', img));
+  return apiClient.post(`/property/${propertyId}/images`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     },
@@ -178,3 +172,11 @@ export const deleteProperty = (id) => apiClient.delete(`/property/${id}`);
  * @returns {Promise}
  */
 export const getPropertyById = (propertyId) => apiClient.get(`/property/${propertyId}`);
+
+/**
+ * Delete a property image by imageId
+ * @param {string|number} imageId
+ * @returns {Promise}
+ */
+export const deletePropertyImage = (imageId) =>
+  apiClient.delete(`/property/delete-image/${imageId}`);

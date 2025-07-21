@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.access.AccessDeniedException;
+import org.apache.tomcat.util.http.fileupload.impl.FileCountLimitExceededException;
+import org.springframework.web.multipart.MultipartException;
 
 import java.time.LocalDateTime;
 
@@ -55,6 +57,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
         return buildResponse("You do not have the right to access this resource", HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler({MultipartException.class})
+    public ResponseEntity<ErrorResponse> handleMultipartExceptions(Exception ex) {
+        ex.printStackTrace();
+        return buildResponse("You can upload a maximum of 20 images per property.", HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(String message, HttpStatus status) {

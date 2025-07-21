@@ -78,6 +78,16 @@ public class BaseController {
                         .build());
     }
 
+    protected ResponseEntity<GlobalAPIResponse> uploadResponse(String entityName) {
+        String message = String.format("%s uploaded successfully..!!", entityName);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(GlobalAPIResponse.builder()
+                        .status(true)
+                        .message(message)
+                        .data(null)
+                        .build());
+    }
+
     protected ResponseEntity<GlobalAPIResponse> updateResponse(String entityName) {
         String message = String.format("%s  updated successfully..!!", entityName);
         return ResponseEntity.status(HttpStatus.CREATED)
