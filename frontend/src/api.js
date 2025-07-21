@@ -146,9 +146,8 @@ export const createProperty = (data, images = []) => {
   if (data.amenities && Array.isArray(data.amenities)) {
     data.amenities.forEach((a) => formData.append('amenities', a));
   }
-  // Only append non-empty files
-  images.filter(f => f && f.size > 0).forEach((file) => formData.append('images', file));
-  // Debug log: show all form data entries
+
+  formData.append('images', images[0])
   for (let pair of formData.entries()) {
     console.log('FormData:', pair[0], pair[1]);
   }

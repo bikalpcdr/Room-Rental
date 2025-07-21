@@ -3,6 +3,7 @@ package com.bikalp.roomrentalservice.service.impl;
 import com.bikalp.roomrentalservice.config.UserDataConfig;
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
 import com.bikalp.roomrentalservice.dto.response.PropertyResponse;
+import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.mapper.PropertyMapper;
 import com.bikalp.roomrentalservice.model.Property;
@@ -54,7 +55,8 @@ public class PropertyServiceImpl implements PropertyService {
                 try {
                     Files.write(filePath, file.getBytes());
                 } catch (IOException e) {
-                    throw new RuntimeException("Failed to save property image", e);
+                    e.printStackTrace();
+                    throw new CustomizeException("Failed to save property image");
                 }
                 String url = "/property-images/" + filename;
                 PropertyImage propertyImage = PropertyImage.builder()
