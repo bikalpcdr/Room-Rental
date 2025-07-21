@@ -15,12 +15,12 @@ const AMENITIES = [
   "COMMERCIAL_SPACE"
 ];
 
-function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, propertyId }) {
+function PropertyFormEdit({ formData, setFormData, onSubmit, onCancel, propertyId }) {
   const [existingImages, setExistingImages] = useState([]);
 
-  // Fetch property details and images on edit
+  // Fetch property details and images on mount
   useEffect(() => {
-    if (isEdit && propertyId) {
+    if (propertyId) {
       getPropertyById(propertyId).then(res => {
         const data = res.data?.data;
         setExistingImages(data?.images || []);
@@ -28,7 +28,7 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
     } else {
       setExistingImages([]);
     }
-  }, [isEdit, propertyId]);
+  }, [propertyId]);
 
   const handleAmenityChange = useCallback((amenity) => {
     setFormData((prev) =>
@@ -44,6 +44,8 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
   };
 
   const amenityRows = useMemo(() => [AMENITIES.slice(0, 4), AMENITIES.slice(4, 8)], []);
+
+  const API_BASE_URL = "http://localhost:7777";
 
   return (
     <form onSubmit={onSubmit} autoComplete="off">
@@ -150,14 +152,14 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
           ))}
         </div>
       </div>
-      {isEdit && existingImages.length > 0 && (
+      {existingImages.length > 0 && (
         <div className="form-group">
           <label>Existing Images</label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
             {existingImages.map((img) => (
               <div key={img.id} style={{ position: 'relative', display: 'inline-block' }}>
                 <img
-                  src={img.imageUrl}
+                  src={img.url && img.url.startsWith('http') ? img.url : API_BASE_URL + img.url}
                   alt="property"
                   style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 4, border: '1px solid #ccc' }}
                 />
@@ -194,19 +196,18 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
         <button type="button" onClick={onCancel}>
           Cancel
         </button>
-        <button type="submit">{isEdit ? "Update Property" : "Create Property"}</button>
+        <button type="submit">Update Property</button>
       </div>
     </form>
   );
 }
 
-PropertyForm.propTypes = {
+PropertyFormEdit.propTypes = {
   formData: PropTypes.object.isRequired,
   setFormData: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  isEdit: PropTypes.bool,
   propertyId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
-export default PropertyForm;
+export default PropertyFormEdit; 

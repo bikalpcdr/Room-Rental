@@ -7,6 +7,11 @@
         <result column="amenity_amenities" property=""/>
     </resultMap>
 
+    <resultMap id="ImageDtoMap" type="com.bikalp.roomrentalservice.dto.response.ImageDto">
+        <id column="imageId" property="id"/>
+        <result column="image_url" property="url"/>
+    </resultMap>
+
     <resultMap id="PropertyResponseMap" type="com.bikalp.roomrentalservice.dto.response.PropertyResponse" autoMapping="true">
         <id column="id" property="id"/>
         <result column="isActive" property="isActive"/>
@@ -22,9 +27,7 @@
         <collection property="amenities"
                     ofType="com.bikalp.roomrentalservice.enums.Amenities"
                     resultMap="AmenitiesEnumMap"/>
-        <collection property="images" ofType="string">
-            <result column="image_url" />
-        </collection>
+        <collection property="images" ofType="com.bikalp.roomrentalservice.dto.response.ImageDto" resultMap="ImageDtoMap"/>
     </resultMap>
 
     <select id="getPropertyById" resultMap="PropertyResponseMap">
@@ -40,6 +43,7 @@
                u.full_name     as ownerName,
                p.owner_id      as ownerid,
                pa.amenity      as amenity_amenities,
+               pi.id           as imageId,
                pi.image_url    as image_url
         from property p
              left join property_amenities pa on p.id = pa.property_id

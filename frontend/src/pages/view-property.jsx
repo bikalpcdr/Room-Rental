@@ -13,6 +13,12 @@ function ViewProperty() {
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState(null);
 
+  const API_BASE_URL = "http://localhost:7777";
+  const getImageUrl = (img) =>
+    img && typeof img.url === "string"
+      ? (img.url.startsWith("http") ? img.url : API_BASE_URL + img.url)
+      : "";
+
   const fetchProperty = useCallback(async () => {
     try {
       const res = await getPropertyById(id);
@@ -28,8 +34,6 @@ function ViewProperty() {
   useEffect(() => {
     fetchProperty();
   }, [fetchProperty]);
-
-  const getImageUrl = (url) => url?.startsWith("http") ? url : url;
 
   if (loading) {
     return (
@@ -68,7 +72,7 @@ function ViewProperty() {
               <div className="vp-thumbnails">
                 {property.images.map((img, idx) => (
                   <img
-                    key={img + idx}
+                    key={img.id || idx}
                     src={getImageUrl(img)}
                     alt={`Thumbnail ${idx + 1}`}
                     className={`vp-thumb ${mainImage === img ? "active" : ""}`}

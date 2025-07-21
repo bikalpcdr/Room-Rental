@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import PropertyForm from "../forms/PropertyForm";
+import PropertyFormEdit from "../forms/PropertyFormEdit";
+import PropertyImageUploadForm from "../forms/PropertyImageUploadForm";
 import "../style/admin-dashboard.css";
 import { getOwnerProperties, createProperty, updateProperty, deleteProperty, getPropertyById, uploadPropertyImages } from "../api";
 import PropTypes from "prop-types";
@@ -27,6 +29,9 @@ function OwnerDashboard() {
     amenities: [],
   });
   const [selectedImages, setSelectedImages] = useState([]);
+  const [newPropertyId, setNewPropertyId] = useState(null);
+  const [showImageUpload, setShowImageUpload] = useState(false);
+  const [existingImageCount, setExistingImageCount] = useState(0);
 
   const navigate = useNavigate();
 
@@ -93,7 +98,12 @@ function OwnerDashboard() {
     try {
       const res = await getPropertyById(property.id || property.propertyId);
       const details = res.data?.data;
-      toast.info(`Title: ${details.title || details.roomTitle}\nAddress: ${details.address}`);
+      // Show all property info and images in a modal or alert
+      let info = `Title: ${details.roomTitle || details.title}\nAddress: ${details.address}\nType: ${details.propertyType}\nRooms: ${details.roomCount}\nRent: ${details.rentPrice}\nAvailable: ${details.isAvailable ? "Yes" : "No"}\nAmenities: ${(details.amenities || []).join(", ")}`;
+      if (details.images && details.images.length > 0) {
+        info += `\nImages:\n` + details.images.map(img => (img.url ? (window.location.origin + img.url) : (window.location.origin + img))).join("\n");
+      }
+      alert(info);
     } catch (err) {
       toast.error("Failed to fetch property details");
     }
@@ -105,17 +115,48 @@ function OwnerDashboard() {
       if (isEdit) {
         await updateProperty({ ...formData, propertyId: selectedProperty.propertyId || selectedProperty.id });
         toast.success("Property updated successfully!");
+        setShowFormModal(false);
+        fetchProperties();
       } else {
-        await createProperty(formData, selectedImages);
+        // 1. Create property (no images)
+        await createProperty(formData);
+        setShowFormModal(false);
         toast.success("Property created successfully!");
+        fetchProperties();
       }
-      setShowFormModal(false);
       setSelectedImages([]);
-      fetchProperties();
     } catch (err) {
       toast.error("Failed to save property");
     }
-  }, [isEdit, formData, selectedProperty, fetchProperties, selectedImages]);
+  }, [isEdit, formData, selectedProperty, fetchProperties]);
+
+  const handleImageUpload = async () => {
+    console.log("Upload Images clicked", selectedImages, newPropertyId);
+    try {
+      if (selectedImages.length > 0 && newPropertyId) {
+        await uploadPropertyImages(newPropertyId, selectedImages);
+        toast.success("Images uploaded successfully!");
+        setShowImageUpload(false);
+        setNewPropertyId(null);
+        fetchProperties();
+      }
+    } catch (err) {
+      toast.error("Failed to upload images");
+    }
+  };
+
+  const openImageUploadModal = async (propertyId) => {
+    setNewPropertyId(propertyId);
+    setSelectedImages([]);
+    setShowImageUpload(true);
+    // Fetch property details to get current image count
+    try {
+      const res = await getPropertyById(propertyId);
+      setExistingImageCount(res.data?.data?.images?.length || 0);
+    } catch {
+      setExistingImageCount(0);
+    }
+  };
 
   return (
     <>
@@ -179,6 +220,12 @@ function OwnerDashboard() {
                         <button className="delete-btn" onClick={() => handleDeleteProperty(property.id || property.propertyId)}>
                           Delete
                         </button>
+                        <button
+                          className="upload-images-btn"
+                          onClick={() => openImageUploadModal(property.id || property.propertyId)}
+                        >
+                          Upload Images
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -207,13 +254,43 @@ function OwnerDashboard() {
                   ×
                 </button>
               </div>
-              <PropertyForm
-                formData={formData}
-                setFormData={setFormData}
-                onSubmit={handleFormSubmit}
-                onCancel={() => setShowFormModal(false)}
-                isEdit={isEdit}
-                onImagesChange={setSelectedImages}
+              {isEdit ? (
+                <PropertyFormEdit
+                  formData={formData}
+                  setFormData={setFormData}
+                  onSubmit={handleFormSubmit}
+                  onCancel={() => setShowFormModal(false)}
+                  propertyId={selectedProperty?.propertyId || selectedProperty?.id}
+                />
+              ) : (
+                <PropertyForm
+                  formData={formData}
+                  setFormData={setFormData}
+                  onSubmit={handleFormSubmit}
+                  onCancel={() => setShowFormModal(false)}
+                  isEdit={isEdit}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Image Upload Modal */}
+        {showImageUpload && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <div className="modal-header">
+                <h2>Upload Images for Property</h2>
+                <button type="button" className="close-btn" onClick={() => setShowImageUpload(false)}>
+                  ×
+                </button>
+              </div>
+              <PropertyImageUploadForm
+                selectedImages={selectedImages}
+                setSelectedImages={setSelectedImages}
+                onUpload={handleImageUpload}
+                onCancel={() => setShowImageUpload(false)}
+                existingImageCount={existingImageCount}
               />
             </div>
           </div>

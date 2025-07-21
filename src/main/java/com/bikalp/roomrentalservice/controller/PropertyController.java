@@ -9,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -20,10 +23,16 @@ public class PropertyController extends BaseController {
     String entity = "Property";
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<GlobalAPIResponse> createProperty(@ModelAttribute PropertyRequest request) {
+    @PostMapping
+    public ResponseEntity<GlobalAPIResponse> createProperty(@RequestBody PropertyRequest request) {
         propertyService.createProperty(request);
         return createdResponse(entity);
+    }
+
+    @PostMapping(value = "/{propertyId}/images",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GlobalAPIResponse> uploadImagesForProperty(@PathVariable("propertyId") Long propertyId, @RequestParam List<MultipartFile> images) {
+        propertyService.uploadImagesForProperty(propertyId, images);
+        return uploadResponse("Property images");
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
@@ -56,5 +65,12 @@ public class PropertyController extends BaseController {
     public ResponseEntity<GlobalAPIResponse> deletePropertyById(@PathVariable Long propertyId) {
         propertyService.deleteProperty(propertyId);
         return deleteResponse(entity);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @DeleteMapping("/delete-image/{imageId}")
+    public ResponseEntity<GlobalAPIResponse> deletePropertyImagesByImageId(@PathVariable Long imageId) {
+        propertyService.deletePropertyImagesByImageId(imageId);
+        return deleteResponse("Image");
     }
 }
