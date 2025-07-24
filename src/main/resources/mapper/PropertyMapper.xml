@@ -65,6 +65,7 @@
                u.full_name     as ownerName,
                p.owner_id      as ownerid,
                pa.amenity      as amenity_amenities,
+               pi.id           as imageId,
                pi.image_url    as image_url
         from property p
              left join property_amenities pa on p.id = pa.property_id
@@ -85,6 +86,7 @@
                u.full_name     as ownerName,
                p.owner_id      as ownerid,
                pa.amenity      as amenity_amenities,
+               pi.id           as imageId,
                pi.image_url    as image_url
         from property p
              left join property_amenities pa on p.id = pa.property_id

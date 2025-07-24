@@ -21,5 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:uploads/");
+        // Serve property images from absolute path
+        registry.addResourceHandler("/property-images/**")
+                .addResourceLocations("file:/home/yenyasof/Downloads/room-rental/frontend/public/property-images/");
     }
 }

@@ -56,7 +56,7 @@ public class PropertyController extends BaseController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("get-all-owner-properties")
-    public ResponseEntity<GlobalAPIResponse> getAllPropertiesByOwnerId() {
+    public ResponseEntity<GlobalAPIResponse> getAllPropertiesOfSpecificOwner() {
         return fetchListResponse(entity, propertyService.getAllPropertiesByOwnerId());
     }
 
