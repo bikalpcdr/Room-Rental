@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/privacy.css";
+import PropTypes from "prop-types";
 
 function Privacy() {
   return (
@@ -282,4 +283,6 @@ function Privacy() {
   );
 }
 
-export default Privacy; 
+Privacy.propTypes = {};
+
+export default React.memo(Privacy); 

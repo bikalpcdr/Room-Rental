@@ -173,6 +173,21 @@
   color: white;
 }
 
+.role-pending {
+  background: #ffc107;
+  color: #212529;
+}
+
+.role-confirmed {
+  background: #28a745;
+  color: white;
+}
+
+.role-cancelled {
+  background: #dc3545;
+  color: white;
+}
+
 /* Action Buttons */
 .action-buttons {
   display: flex;
@@ -180,7 +195,8 @@
 }
 
 .edit-btn,
-.delete-btn {
+.delete-btn,
+.view-btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
@@ -189,6 +205,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
 }
+
 
 .edit-btn {
   background: #007bff;
@@ -199,15 +216,21 @@
   background: #0056b3;
 }
 
-.delete-btn {
+.delete-btn{
   background: #dc3545;
   color: white;
 }
-
+.view-btn {
+  background: green;
+  color: white;
+}
 .delete-btn:hover {
   background: #c82333;
 }
-
+.first {
+  max-width: 300px;
+  line-height: 1.6;
+}
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -228,8 +251,8 @@
   border-radius: 12px;
   padding: 2rem;
   width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
+  max-width: 900px;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
@@ -371,11 +394,12 @@
   }
   
   .edit-btn,
-  .delete-btn {
+  .delete-btn,
+  .view-btn{
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
   }
-  
+
   .modal {
     margin: 1rem;
     padding: 1.5rem;
@@ -414,4 +438,30 @@
   color: #667eea;
   font-size: 0.8rem;
   font-weight: 500;
+} 
+
+.upload-images-btn {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  margin-left: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+.upload-images-btn:hover {
+  background-color: #388e3c;
+} 
+
+.floating-table-modal {
+  max-width: 1100px;
+  min-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  background: #fff;
+  margin: 0 auto;
 } 

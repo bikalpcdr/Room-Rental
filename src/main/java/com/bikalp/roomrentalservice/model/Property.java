@@ -6,7 +6,10 @@ import com.bikalp.roomrentalservice.model.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import com.bikalp.roomrentalservice.model.PropertyImage;
+import lombok.Builder.Default;
 
 @Getter
 @Setter
@@ -42,6 +45,10 @@ public class Property extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PropertyImage> images = new ArrayList<>();
 
     @ElementCollection(targetClass = Amenities.class)
     @Enumerated(EnumType.STRING)

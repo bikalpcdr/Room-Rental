@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -6,6 +6,7 @@ import "../style/register.css";
 import { registerUser } from "../api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PropTypes from "prop-types";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -23,15 +24,15 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }, []);
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match!");
       return false;
@@ -45,15 +46,13 @@ function Register() {
       return false;
     }
     return true;
-  };
+  }, [formData, acceptTerms]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
     try {
       const res = await registerUser(
@@ -64,8 +63,6 @@ function Register() {
         formData.phoneNumber, 
         formData.role
       );
-      
-      // If the message indicates an error, show error toast
       if (res.data?.message?.toLowerCase().includes("already exists") || 
           res.data?.message?.toLowerCase().includes("exist")) {
         toast.error(res.data.message);
@@ -80,7 +77,19 @@ function Register() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, validateForm, navigate]);
+
+  const handlePasswordToggle = useCallback(() => {
+    setShowPassword((prev) => !prev);
+  }, []);
+
+  const handleConfirmPasswordToggle = useCallback(() => {
+    setShowConfirmPassword((prev) => !prev);
+  }, []);
+
+  const handleAcceptTerms = useCallback((e) => {
+    setAcceptTerms(e.target.checked);
+  }, []);
 
   return (
     <>
@@ -167,7 +176,6 @@ function Register() {
                 <div className="form-group">
                   <label htmlFor="password">Password</label>
                   <div className="input-wrapper">
-                    {/*<span className="input-icon">🔒</span>*/}
                     <input
                       id="password"
                       name="password"
@@ -180,7 +188,7 @@ function Register() {
                     <button
                       type="button"
                       className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={handlePasswordToggle}
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? "🙈" : "👁️"}
@@ -191,7 +199,6 @@ function Register() {
                 <div className="form-group">
                   <label htmlFor="confirmPassword">Confirm Password</label>
                   <div className="input-wrapper">
-                    {/*<span className="input-icon">🔒</span>*/}
                     <input
                       id="confirmPassword"
                       name="confirmPassword"
@@ -204,7 +211,7 @@ function Register() {
                     <button
                       type="button"
                       className="password-toggle"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={handleConfirmPasswordToggle}
                       aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                     >
                       {showConfirmPassword ? "🙈" : "👁️"}
@@ -236,7 +243,7 @@ function Register() {
                   <input
                     type="checkbox"
                     checked={acceptTerms}
-                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    onChange={handleAcceptTerms}
                   />
                   <span className="checkmark"></span>
                   I agree to the <Link to="/terms" className="terms-link">Terms of Service</Link> and <Link to="/privacy" className="terms-link">Privacy Policy</Link>
@@ -286,4 +293,6 @@ function Register() {
   );
 }
 
-export default Register;
+Register.propTypes = {};
+
+export default React.memo(Register);

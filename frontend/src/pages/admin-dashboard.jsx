@@ -1,11 +1,55 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/admin-dashboard.css";
-import { getAllUsers, deleteUserById, createUser, updateUser } from "../api";
+import { getAllUsers, deleteUserById, createUser, updateUser, getAllProperties, deleteProperty } from "../api";
 import { ToastContainer, toast } from "react-toastify";
 import { getUserData } from "../utils/auth";
 import "react-toastify/dist/ReactToastify.css";
+import UserForm from "../forms/UserForm";
+import PropTypes from "prop-types";
+import UsersTable from "../components/UserTable";
+import PropertiesTable from "../components/PropertyTable";
+import FloatingTableModal from "../components/FloatingTableModal";
+
+const StatsCards = React.memo(({ stats, onViewUsers, onViewProperties }) => (
+  <div className="stats-container">
+    <div className="stat-card" onClick={onViewUsers} style={{ cursor: 'pointer' }}>
+      <h3>Total Users</h3>
+      <p className="stat-number">{stats.totalUsers}</p>
+      <small>Click to manage users</small>
+    </div>
+    <div className="stat-card" onClick={onViewProperties} style={{ cursor: 'pointer' }}>
+      <h3>Total Properties</h3>
+      <p className="stat-number">{stats.totalProperties}</p>
+      <small>Click to manage properties</small>
+    </div>
+    <div className="stat-card">
+      <h3>Admins</h3>
+      <p className="stat-number">{stats.admins}</p>
+    </div>
+    <div className="stat-card">
+      <h3>Owners</h3>
+      <p className="stat-number">{stats.owners}</p>
+    </div>
+    <div className="stat-card">
+      <h3>Renters</h3>
+      <p className="stat-number">{stats.renters}</p>
+    </div>
+  </div>
+));
+
+StatsCards.propTypes = {
+  stats: PropTypes.shape({
+    totalUsers: PropTypes.number,
+    totalProperties: PropTypes.number,
+    admins: PropTypes.number,
+    owners: PropTypes.number,
+    renters: PropTypes.number,
+  }).isRequired,
+  onViewUsers: PropTypes.func.isRequired,
+  onViewProperties: PropTypes.func.isRequired,
+};
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -13,6 +57,13 @@ function AdminDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserTable, setShowUserTable] = useState(false);
+  
+  // Property management states
+  const [properties, setProperties] = useState([]);
+  const [propertiesLoading, setPropertiesLoading] = useState(false);
+  const [showPropertyTable, setShowPropertyTable] = useState(false);
+  
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -24,30 +75,7 @@ function AdminDashboard() {
 
   const userData = getUserData();
 
-  // Statistics
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    admins: 0,
-    owners: 0,
-    renters: 0
-  });
-
-  useEffect(() => {
-    fetchUsers();
-    
-    // Check if we should show welcome toast
-    const showWelcomeToast = localStorage.getItem('showWelcomeToast');
-    if (showWelcomeToast === 'true') {
-      toast.success(`Welcome back, ${userData.fullName}! 🎉`);
-      localStorage.removeItem('showWelcomeToast');
-    }
-  }, []);
-
-  useEffect(() => {
-    calculateStats();
-  }, [users]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getAllUsers();
@@ -58,18 +86,42 @@ function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const calculateStats = () => {
+  const fetchProperties = useCallback(async () => {
+    try {
+      setPropertiesLoading(true);
+      const response = await getAllProperties();
+      setProperties(response.data?.data || []);
+    } catch (error) {
+      toast.error("Failed to fetch properties");
+      console.error("Error fetching properties:", error);
+    } finally {
+      setPropertiesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+    fetchProperties();
+    const showWelcomeToast = localStorage.getItem('showWelcomeToast');
+    if (showWelcomeToast === 'true') {
+      toast.success(`Welcome back, ${userData.fullName}! 🎉`);
+      localStorage.removeItem('showWelcomeToast');
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  const stats = useMemo(() => {
     const totalUsers = users.length;
+    const totalProperties = properties.length;
     const admins = users.filter(user => user.role === "ADMIN").length;
     const owners = users.filter(user => user.role === "OWNER").length;
     const renters = users.filter(user => user.role === "RENTER").length;
+    return { totalUsers, totalProperties, admins, owners, renters };
+  }, [users, properties]);
 
-    setStats({ totalUsers, admins, owners, renters });
-  };
-
-  const handleCreateUser = async (e) => {
+  const handleCreateUser = useCallback(async (e) => {
     e.preventDefault();
     try {
       await createUser(
@@ -87,13 +139,13 @@ function AdminDashboard() {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create user");
     }
-  };
+  }, [formData, fetchUsers]);
 
-  const handleUpdateUser = async (e) => {
+  const handleUpdateUser = useCallback(async (e) => {
     e.preventDefault();
     try {
       await updateUser(
-        selectedUser.userId,
+        selectedUser.id,
         formData.username,
         formData.fullName,
         formData.phoneNumber,
@@ -106,9 +158,9 @@ function AdminDashboard() {
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update user");
     }
-  };
+  }, [formData, selectedUser, fetchUsers]);
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = useCallback(async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await deleteUserById(userId);
@@ -118,9 +170,21 @@ function AdminDashboard() {
         toast.error(error.response?.data?.message || "Failed to delete user");
       }
     }
-  };
+  }, [fetchUsers]);
 
-  const resetForm = () => {
+  const handleDeleteProperty = useCallback(async (propertyId) => {
+    if (window.confirm("Are you sure you want to delete this property?")) {
+      try {
+        await deleteProperty(propertyId);
+        toast.success("Property deleted successfully!");
+        fetchProperties();
+      } catch (err) {
+        toast.error("Failed to delete property");
+      }
+    }
+  }, [fetchProperties]);
+
+  const resetForm = useCallback(() => {
     setFormData({
       username: "",
       email: "",
@@ -130,10 +194,10 @@ function AdminDashboard() {
       role: "RENTER"
     });
     setSelectedUser(null);
-  };
+  }, []);
 
-  const openEditModal = (user) => {
-    setSelectedUser({ ...user, id: user.userId });
+  const openEditModal = useCallback((user) => {
+    setSelectedUser(user);
     setFormData({
       username: user.username,
       email: user.email,
@@ -143,12 +207,12 @@ function AdminDashboard() {
       role: user.role
     });
     setShowEditModal(true);
-  };
+  }, []);
 
-  const openCreateModal = () => {
+  const openCreateModal = useCallback(() => {
     resetForm();
     setShowCreateModal(true);
-  };
+  }, [resetForm]);
 
   if (loading) {
     return (
@@ -180,79 +244,38 @@ function AdminDashboard() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="stats-container">
-          <div className="stat-card">
-            <h3>Total Users</h3>
-            <p className="stat-number">{stats.totalUsers}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Admins</h3>
-            <p className="stat-number">{stats.admins}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Owners</h3>
-            <p className="stat-number">{stats.owners}</p>
-          </div>
-          <div className="stat-card">
-            <h3>Renters</h3>
-            <p className="stat-number">{stats.renters}</p>
-          </div>
-        </div>
+        <StatsCards stats={stats} onViewUsers={() => setShowUserTable(true)} onViewProperties={() => setShowPropertyTable(true)} />
 
         {/* Users Table */}
-        <div className="users-section">
-          <h2>User Management</h2>
-          <div className="table-container">
-            <table className="users-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>UserID</th>
-                  <th>Username</th>
-                  <th>Full Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Role</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user, index) => (
-                  <tr key={user.id}>
-
-                    <td>{index + 1}</td>
-                    <td>{user.userId}</td>
-                    <td>{user.username}</td>
-                    <td>{user.fullName}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phoneNumber}</td>
-                    <td>
-                      <span  className={`role-badge role-${user.role.toLowerCase()}`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="action-buttons">
-                        <button
-                          className="edit-btn"
-                          onClick={() => openEditModal(user)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleDeleteUser(user.userId)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <FloatingTableModal
+          isOpen={showUserTable}
+          onClose={() => setShowUserTable(false)}
+          title="User Management"
+        >
+          <UsersTable users={users} onEdit={openEditModal} onDelete={handleDeleteUser} />
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <button className="create-user-btn" onClick={openCreateModal}>
+              + Add User
+            </button>
           </div>
-        </div>
+        </FloatingTableModal>
+
+        {/* Property Management Section */}
+        <FloatingTableModal
+          isOpen={showPropertyTable}
+          onClose={() => setShowPropertyTable(false)}
+          title="Property Management"
+        >
+          {propertiesLoading ? (
+            <p>Loading properties...</p>
+          ) : properties.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#666', fontSize: '1.1rem' }}>
+              No properties found.
+            </p>
+          ) : (
+            <PropertiesTable properties={properties} onDelete={handleDeleteProperty} />
+          )}
+        </FloatingTableModal>
 
         {/* Create User Modal */}
         {showCreateModal && (
@@ -267,71 +290,13 @@ function AdminDashboard() {
                   ×
                 </button>
               </div>
-              <form onSubmit={handleCreateUser}>
-                <div className="form-group">
-                  <label>Username:</label>
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email:</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Password:</label>
-                  <input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Full Name:</label>
-                  <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Phone Number:</label>
-                  <input
-                    type="text"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Role:</label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    required
-                  >
-                    <option value="RENTER">Renter</option>
-                    <option value="OWNER">Owner</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                </div>
-                <div className="modal-actions">
-                  <button type="button" onClick={() => setShowCreateModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit">Create User</button>
-                </div>
-              </form>
+              <UserForm
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleCreateUser}
+                onCancel={() => setShowCreateModal(false)}
+                isEdit={false}
+              />
             </div>
           </div>
         )}
@@ -349,53 +314,13 @@ function AdminDashboard() {
                   ×
                 </button>
               </div>
-              <form onSubmit={handleUpdateUser}>
-                <div className="form-group">
-                  <label>Username:</label>
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Full Name:</label>
-                  <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Phone Number:</label>
-                  <input
-                    type="text"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Role:</label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    required
-                  >
-                    <option value="RENTER">Renter</option>
-                    <option value="OWNER">Owner</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                </div>
-                <div className="modal-actions">
-                  <button type="button" onClick={() => setShowEditModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit">Update User</button>
-                </div>
-              </form>
+              <UserForm
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleUpdateUser}
+                onCancel={() => setShowEditModal(false)}
+                isEdit={true}
+              />
             </div>
           </div>
         )}
@@ -407,4 +332,6 @@ function AdminDashboard() {
   );
 }
 
-export default AdminDashboard; 
+AdminDashboard.propTypes = {};
+
+export default React.memo(AdminDashboard); 

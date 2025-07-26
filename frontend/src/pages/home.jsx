@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -6,25 +6,85 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { isAuthenticated, getUserData } from "../utils/auth";
 import "../style/home.css";
+import PropTypes from "prop-types";
+
+const features = [
+  {
+    icon: "🔒",
+    title: "Secure & Verified",
+    desc: "All properties are verified and landlords are background-checked for your safety.",
+    feature: "Secure & Verified Properties"
+  },
+  {
+    icon: "💰",
+    title: "Best Prices",
+    desc: "Find rooms at competitive prices with no hidden fees or surprise charges.",
+    feature: "Best Prices"
+  },
+  {
+    icon: "⚡",
+    title: "Instant Booking",
+    desc: "Book your room instantly with our streamlined booking process.",
+    feature: "Instant Booking"
+  },
+  {
+    icon: "📱",
+    title: "24/7 Support",
+    desc: "Get help anytime with our round-the-clock customer support team.",
+    feature: "24/7 Support"
+  }
+];
+
+const stats = [
+  { value: "10,000+", label: "Rooms Available" },
+  { value: "5,000+", label: "Happy Renters" },
+  { value: "500+", label: "Verified Landlords" },
+  { value: "50+", label: "Cities Covered" }
+];
+
+const steps = [
+  { number: 1, title: "Search", desc: "Browse through thousands of available rooms in your preferred location." },
+  { number: 2, title: "Compare", desc: "Compare prices, amenities, and reviews to find your perfect match." },
+  { number: 3, title: "Book", desc: "Book instantly with secure payment and get confirmation immediately." },
+  { number: 4, title: "Move In", desc: "Meet your landlord, get keys, and move into your new room hassle-free." }
+];
+
+const testimonials = [
+  {
+    content: '"Found my perfect room within a day! The process was so smooth and the landlord was very professional."',
+    name: "Nabraj Bohora",
+    role: "Student"
+  },
+  {
+    content: '"As a landlord, this platform has made it so much easier to find reliable tenants. Highly recommended!"',
+    name: "Gharbeti baa",
+    role: "Property Owner"
+  },
+  {
+    content: '"The verification process gave me peace of mind. I knew exactly what I was getting into before booking."',
+    name: "Hari Chalise",
+    role: "Professional"
+  }
+];
 
 function Home() {
   const userData = getUserData();
 
-  const handleFeatureClick = (feature) => {
+  const handleFeatureClick = useCallback((feature) => {
     if (!isAuthenticated()) {
       toast.info("Please sign in to access this feature!");
     } else {
       toast.success(`Welcome to ${feature}!`);
     }
-  };
+  }, []);
 
-  const handleTestimonialClick = () => {
+  const handleTestimonialClick = useCallback(() => {
     toast.info("Thank you for your interest! More testimonials coming soon.");
-  };
+  }, []);
 
-  const handleStatsClick = () => {
+  const handleStatsClick = useCallback(() => {
     toast.info("These are our current platform statistics!");
-  };
+  }, []);
 
   return (
     <>
@@ -54,7 +114,12 @@ function Home() {
               ) : (
                 <div className="welcome-message">
                   <p>Welcome back, {userData?.fullName}!</p>
-                  <Link to={`/${userData?.role.toLowerCase() === 'admin' ? 'admin' : userData?.role.toLowerCase()}-dashboard`} className="btn btn-primary">
+                  <Link
+                    to={
+                      userData?.role?.toLowerCase() === 'admin' ? '/admin' : `/${userData?.role?.toLowerCase()}-dashboard`
+                    }
+                    className="btn btn-primary"
+                  >
                     Go to Dashboard
                   </Link>
                 </div>
@@ -73,26 +138,13 @@ function Home() {
           <div className="container">
             <h2 className="section-title">Why Choose Room Rental Service?</h2>
             <div className="features-grid">
-              <div className="feature-card" onClick={() => handleFeatureClick("Secure & Verified Properties")}>
-                <div className="feature-icon">🔒</div>
-                <h3>Secure & Verified</h3>
-                <p>All properties are verified and landlords are background-checked for your safety.</p>
-              </div>
-              <div className="feature-card" onClick={() => handleFeatureClick("Best Prices")}>
-                <div className="feature-icon">💰</div>
-                <h3>Best Prices</h3>
-                <p>Find rooms at competitive prices with no hidden fees or surprise charges.</p>
-              </div>
-              <div className="feature-card" onClick={() => handleFeatureClick("Instant Booking")}>
-                <div className="feature-icon">⚡</div>
-                <h3>Instant Booking</h3>
-                <p>Book your room instantly with our streamlined booking process.</p>
-              </div>
-              <div className="feature-card" onClick={() => handleFeatureClick("24/7 Support")}>
-                <div className="feature-icon">📱</div>
-                <h3>24/7 Support</h3>
-                <p>Get help anytime with our round-the-clock customer support team.</p>
-              </div>
+              {features.map((f) => (
+                <div className="feature-card" key={f.title} onClick={() => handleFeatureClick(f.feature)}>
+                  <div className="feature-icon">{f.icon}</div>
+                  <h3>{f.title}</h3>
+                  <p>{f.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -101,22 +153,12 @@ function Home() {
         <section className="stats-section">
           <div className="container">
             <div className="stats-grid">
-              <div className="stat-item" onClick={handleStatsClick}>
-                <h3>10,000+</h3>
-                <p>Rooms Available</p>
-              </div>
-              <div className="stat-item" onClick={handleStatsClick}>
-                <h3>5,000+</h3>
-                <p>Happy Renters</p>
-              </div>
-              <div className="stat-item" onClick={handleStatsClick}>
-                <h3>500+</h3>
-                <p>Verified Landlords</p>
-              </div>
-              <div className="stat-item" onClick={handleStatsClick}>
-                <h3>50+</h3>
-                <p>Cities Covered</p>
-              </div>
+              {stats.map((s) => (
+                <div className="stat-item" key={s.label} onClick={handleStatsClick}>
+                  <h3>{s.value}</h3>
+                  <p>{s.label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -126,26 +168,13 @@ function Home() {
           <div className="container">
             <h2 className="section-title">How It Works</h2>
             <div className="steps-grid">
-              <div className="step-card">
-                <div className="step-number">1</div>
-                <h3>Search</h3>
-                <p>Browse through thousands of available rooms in your preferred location.</p>
-              </div>
-              <div className="step-card">
-                <div className="step-number">2</div>
-                <h3>Compare</h3>
-                <p>Compare prices, amenities, and reviews to find your perfect match.</p>
-              </div>
-              <div className="step-card">
-                <div className="step-number">3</div>
-                <h3>Book</h3>
-                <p>Book instantly with secure payment and get confirmation immediately.</p>
-              </div>
-              <div className="step-card">
-                <div className="step-number">4</div>
-                <h3>Move In</h3>
-                <p>Meet your landlord, get keys, and move into your new room hassle-free.</p>
-              </div>
+              {steps.map((step) => (
+                <div className="step-card" key={step.number}>
+                  <div className="step-number">{step.number}</div>
+                  <h3>{step.title}</h3>
+                  <p>{step.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -155,42 +184,20 @@ function Home() {
           <div className="container">
             <h2 className="section-title">What Our Users Say</h2>
             <div className="testimonials-grid">
-              <div className="testimonial-card" onClick={handleTestimonialClick}>
-                <div className="testimonial-content">
-                  <p>"Found my perfect room within a day! The process was so smooth and the landlord was very professional."</p>
-                </div>
-                <div className="testimonial-author">
-                  <div className="author-avatar">👤</div>
-                  <div className="author-info">
-                    <h4>Sarah Johnson</h4>
-                    <p>Student</p>
+              {testimonials.map((t) => (
+                <div className="testimonial-card" key={t.name} onClick={handleTestimonialClick}>
+                  <div className="testimonial-content">
+                    <p>{t.content}</p>
+                  </div>
+                  <div className="testimonial-author">
+                    <div className="author-avatar">👤</div>
+                    <div className="author-info">
+                      <h4>{t.name}</h4>
+                      <p>{t.role}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="testimonial-card" onClick={handleTestimonialClick}>
-                <div className="testimonial-content">
-                  <p>"As a landlord, this platform has made it so much easier to find reliable tenants. Highly recommended!"</p>
-                </div>
-                <div className="testimonial-author">
-                  <div className="author-avatar">👤</div>
-                  <div className="author-info">
-                    <h4>Mike Chen</h4>
-                    <p>Property Owner</p>
-                  </div>
-                </div>
-              </div>
-              <div className="testimonial-card" onClick={handleTestimonialClick}>
-                <div className="testimonial-content">
-                  <p>"The verification process gave me peace of mind. I knew exactly what I was getting into before booking."</p>
-                </div>
-                <div className="testimonial-author">
-                  <div className="author-avatar">👤</div>
-                  <div className="author-info">
-                    <h4>Emily Davis</h4>
-                    <p>Professional</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -230,4 +237,6 @@ function Home() {
   );
 }
 
-export default Home;
+Home.propTypes = {};
+
+export default React.memo(Home);

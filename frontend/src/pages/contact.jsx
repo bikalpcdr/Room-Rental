@@ -1,9 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/contact.css";
+import PropTypes from "prop-types";
+
+const faqs = [
+  {
+    question: "How do I list my room for rent?",
+    answer:
+      "Simply create an account, verify your property ownership, and use our easy-to-use listing tool to upload photos and details about your room.",
+  },
+  {
+    question: "What are the fees for using the platform?",
+    answer:
+      "We charge a small percentage fee only when a successful rental is completed. There are no upfront costs to list your property.",
+  },
+  {
+    question: "How do I verify a property owner?",
+    answer:
+      "We use multiple verification methods including document verification, phone verification, and address confirmation to ensure property authenticity.",
+  },
+  {
+    question: "What payment methods do you accept?",
+    answer:
+      "We accept all major credit cards, debit cards, and bank transfers. All payments are processed securely through our payment partners.",
+  },
+  {
+    question: "How long does it take to get a response?",
+    answer:
+      "We typically respond to all inquiries within 24 hours during business days. For urgent matters, please call our support line.",
+  },
+  {
+    question: "Can I cancel a booking?",
+    answer:
+      "Yes, you can cancel bookings according to our cancellation policy. Please check the specific terms for your booking or contact support.",
+  },
+];
+
+const locations = [
+  {
+    city: "New York",
+    address: "123 Main Street, New York, NY 10001",
+    phone: "+1 (555) 123-4567",
+    email: "nyc@roomrental.com",
+  },
+  {
+    city: "Los Angeles",
+    address: "456 Sunset Blvd, Los Angeles, CA 90210",
+    phone: "+1 (555) 234-5678",
+    email: "la@roomrental.com",
+  },
+  {
+    city: "Chicago",
+    address: "789 Michigan Ave, Chicago, IL 60601",
+    phone: "+1 (555) 345-6789",
+    email: "chicago@roomrental.com",
+  },
+];
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -17,19 +72,17 @@ function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitStatus('success');
@@ -42,11 +95,9 @@ function Contact() {
         phone: "",
         inquiryType: "general"
       });
-      
-      // Reset status after 3 seconds
       setTimeout(() => setSubmitStatus(null), 3000);
     }, 1500);
-  };
+  }, []);
 
   return (
     <>
@@ -115,14 +166,12 @@ function Contact() {
                 <h2>Send us a Message</h2>
                 <p>Fill out the form below and we'll get back to you within 24 hours.</p>
               </div>
-              
               {submitStatus === 'success' && (
                 <div className="success-message">
                   <i className="fas fa-check-circle"></i>
                   <p>Thank you! Your message has been sent successfully. We'll get back to you soon.</p>
                 </div>
               )}
-
               <form className="contact-form" onSubmit={handleSubmit}>
                 <div className="form-row">
                   <div className="form-group">
@@ -150,7 +199,6 @@ function Contact() {
                     />
                   </div>
                 </div>
-
                 <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="phone">Phone Number</label>
@@ -180,7 +228,6 @@ function Contact() {
                     </select>
                   </div>
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="subject">Subject *</label>
                   <input
@@ -193,7 +240,6 @@ function Contact() {
                     placeholder="Enter message subject"
                   />
                 </div>
-
                 <div className="form-group">
                   <label htmlFor="message">Message *</label>
                   <textarea
@@ -206,15 +252,12 @@ function Contact() {
                     placeholder="Tell us how we can help you..."
                   ></textarea>
                 </div>
-
                 <div className="form-group checkbox-group">
                   <label className="checkbox-label">
                     <input type="checkbox" required />
-                    {/*<span className="checkmark"></span>*/}
                     I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
                   </label>
                 </div>
-
                 <button 
                   type="submit" 
                   className="submit-btn"
@@ -242,48 +285,12 @@ function Contact() {
           <div className="section-content">
             <h2 className="section-title">Frequently Asked Questions</h2>
             <div className="faq-grid">
-              <div className="faq-item">
-                <h3>How do I list my room for rent?</h3>
-                <p>
-                  Simply create an account, verify your property ownership, and use our 
-                  easy-to-use listing tool to upload photos and details about your room.
-                </p>
-              </div>
-              <div className="faq-item">
-                <h3>What are the fees for using the platform?</h3>
-                <p>
-                  We charge a small percentage fee only when a successful rental is completed. 
-                  There are no upfront costs to list your property.
-                </p>
-              </div>
-              <div className="faq-item">
-                <h3>How do I verify a property owner?</h3>
-                <p>
-                  We use multiple verification methods including document verification, 
-                  phone verification, and address confirmation to ensure property authenticity.
-                </p>
-              </div>
-              <div className="faq-item">
-                <h3>What payment methods do you accept?</h3>
-                <p>
-                  We accept all major credit cards, debit cards, and bank transfers. 
-                  All payments are processed securely through our payment partners.
-                </p>
-              </div>
-              <div className="faq-item">
-                <h3>How long does it take to get a response?</h3>
-                <p>
-                  We typically respond to all inquiries within 24 hours during business days. 
-                  For urgent matters, please call our support line.
-                </p>
-              </div>
-              <div className="faq-item">
-                <h3>Can I cancel a booking?</h3>
-                <p>
-                  Yes, you can cancel bookings according to our cancellation policy. 
-                  Please check the specific terms for your booking or contact support.
-                </p>
-              </div>
+              {faqs.map((faq, idx) => (
+                <div className="faq-item" key={faq.question}>
+                  <h3>{faq.question}</h3>
+                  <p>{faq.answer}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -293,42 +300,20 @@ function Contact() {
           <div className="section-content">
             <h2 className="section-title">Our Office Locations</h2>
             <div className="locations-grid">
-              <div className="location-card">
-                <div className="location-header">
-                  <i className="fas fa-building"></i>
-                  <h3>New York</h3>
+              {locations.map((loc) => (
+                <div className="location-card" key={loc.city}>
+                  <div className="location-header">
+                    <i className="fas fa-building"></i>
+                    <h3>{loc.city}</h3>
+                  </div>
+                  <div className="location-details">
+                    <p><strong>Address:</strong></p>
+                    <p>{loc.address}</p>
+                    <p><strong>Phone:</strong> {loc.phone}</p>
+                    <p><strong>Email:</strong> {loc.email}</p>
+                  </div>
                 </div>
-                <div className="location-details">
-                  <p><strong>Address:</strong></p>
-                  <p>123 Main Street, New York, NY 10001</p>
-                  <p><strong>Phone:</strong> +1 (555) 123-4567</p>
-                  <p><strong>Email:</strong> nyc@roomrental.com</p>
-                </div>
-              </div>
-              <div className="location-card">
-                <div className="location-header">
-                  <i className="fas fa-building"></i>
-                  <h3>Los Angeles</h3>
-                </div>
-                <div className="location-details">
-                  <p><strong>Address:</strong></p>
-                  <p>456 Sunset Blvd, Los Angeles, CA 90210</p>
-                  <p><strong>Phone:</strong> +1 (555) 234-5678</p>
-                  <p><strong>Email:</strong> la@roomrental.com</p>
-                </div>
-              </div>
-              <div className="location-card">
-                <div className="location-header">
-                  <i className="fas fa-building"></i>
-                  <h3>Chicago</h3>
-                </div>
-                <div className="location-details">
-                  <p><strong>Address:</strong></p>
-                  <p>789 Michigan Ave, Chicago, IL 60601</p>
-                  <p><strong>Phone:</strong> +1 (555) 345-6789</p>
-                  <p><strong>Email:</strong> chicago@roomrental.com</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -360,4 +345,6 @@ function Contact() {
   );
 }
 
-export default Contact; 
+Contact.propTypes = {};
+
+export default React.memo(Contact); 

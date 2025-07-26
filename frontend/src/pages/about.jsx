@@ -4,6 +4,32 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/about.css";
+import PropTypes from "prop-types";
+
+const teamMembers = [
+  {
+    name: "Bikalpa Chaudhary",
+    role: "CEO & Founder",
+    bio: "Passionate about revolutionizing the rental industry with innovative technology solutions.",
+  },
+  {
+    name: "Arbin Lama",
+    role: "CTO",
+    bio: "Leading our technical development with expertise in scalable platforms and user experience.",
+  },
+  {
+    name: "Rajib Bikram Shah",
+    role: "Head of Operations",
+    bio: "Ensuring smooth operations and exceptional customer service across all touchpoints.",
+  },
+];
+
+const stats = [
+  { number: "10,000+", label: "Happy Renters" },
+  { number: "5,000+", label: "Property Owners" },
+  { number: "15,000+", label: "Rooms Listed" },
+  { number: "98%", label: "Satisfaction Rate" },
+];
 
 function About() {
   return (
@@ -134,22 +160,12 @@ function About() {
           <div className="section-content">
             <h2 className="section-title">Our Impact</h2>
             <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-number">10,000+</div>
-                <div className="stat-label">Happy Renters</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">5,000+</div>
-                <div className="stat-label">Property Owners</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">15,000+</div>
-                <div className="stat-label">Rooms Listed</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">98%</div>
-                <div className="stat-label">Satisfaction Rate</div>
-              </div>
+              {stats.map((stat, idx) => (
+                <div className="stat-card" key={stat.label}>
+                  <div className="stat-number">{stat.number}</div>
+                  <div className="stat-label">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -159,39 +175,16 @@ function About() {
           <div className="section-content">
             <h2 className="section-title">Meet Our Team</h2>
             <div className="team-grid">
-              <div className="team-card">
-                <div className="team-avatar">
-                  <i className="fas fa-user"></i>
+              {teamMembers.map((member) => (
+                <div className="team-card" key={member.name}>
+                  <div className="team-avatar">
+                    <i className="fas fa-user"></i>
+                  </div>
+                  <h3>{member.name}</h3>
+                  <p className="team-role">{member.role}</p>
+                  <p className="team-bio">{member.bio}</p>
                 </div>
-                <h3>John Smith</h3>
-                <p className="team-role">CEO & Founder</p>
-                <p className="team-bio">
-                  Passionate about revolutionizing the rental industry with innovative 
-                  technology solutions.
-                </p>
-              </div>
-              <div className="team-card">
-                <div className="team-avatar">
-                  <i className="fas fa-user"></i>
-                </div>
-                <h3>Sarah Johnson</h3>
-                <p className="team-role">CTO</p>
-                <p className="team-bio">
-                  Leading our technical development with expertise in scalable 
-                  platforms and user experience.
-                </p>
-              </div>
-              <div className="team-card">
-                <div className="team-avatar">
-                  <i className="fas fa-user"></i>
-                </div>
-                <h3>Mike Davis</h3>
-                <p className="team-role">Head of Operations</p>
-                <p className="team-bio">
-                  Ensuring smooth operations and exceptional customer service 
-                  across all touchpoints.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -217,4 +210,6 @@ function About() {
   );
 }
 
-export default About; 
+About.propTypes = {};
+
+export default React.memo(About); 

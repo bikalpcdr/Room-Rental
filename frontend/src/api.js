@@ -20,16 +20,12 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Add response interceptor to handle authentication errors
 apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid
@@ -39,48 +35,227 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Login API call
-export const loginUser = async (username, password) => {
-    return apiClient.post(`/auth/login`, {username, password});
-};
+/**
+ * Login API call
+ * @param {string} username
+ * @param {string} password
+ * @returns {Promise}
+ */
+export const loginUser = (username, password) =>
+  apiClient.post(`/auth/login`, { username, password });
 
-// Register API call
-export const registerUser = async (username, email, password, fullName, phoneNumber, role) => {
-    return apiClient.post(`/auth/register`, {username, email, password, fullName, phoneNumber, role});
-};
+/**
+ * Register API call
+ * @param {string} username
+ * @param {string} email
+ * @param {string} password
+ * @param {string} fullName
+ * @param {string} phoneNumber
+ * @param {string} role
+ * @returns {Promise}
+ */
+export const registerUser = (username, email, password, fullName, phoneNumber, role) =>
+  apiClient.post(`/auth/register`, { username, email, password, fullName, phoneNumber, role });
 
-// creation for users
-export const createUser = async (username, email, password, fullName, phoneNumber, role) => {
-    return apiClient.post(`/users`, {username, email, password, fullName, phoneNumber, role});
-}
+/**
+ * Create a new user (admin)
+ * @param {string} username
+ * @param {string} email
+ * @param {string} password
+ * @param {string} fullName
+ * @param {string} phoneNumber
+ * @param {string} role
+ * @returns {Promise}
+ */
+export const createUser = (username, email, password, fullName, phoneNumber, role) =>
+  apiClient.post(`/users`, { username, email, password, fullName, phoneNumber, role });
 
-// update users
-export const updateUser = async(id, username, fullName, phoneNumber, role) => {
-    return apiClient.put(`/users`,{id, username, fullName, phoneNumber, role})
-}
+/**
+ * Update user details
+ * @param {string} id
+ * @param {string} username
+ * @param {string} fullName
+ * @param {string} phoneNumber
+ * @param {string} role
+ * @returns {Promise}
+ */
+export const updateUser = (id, username, fullName, phoneNumber, role) =>
+  apiClient.put(`/users`, { id, username, fullName, phoneNumber, role });
 
-// get all users
-export const getAllUsers = async() => {
-    return apiClient.get(`/users`)
-}
+/**
+ * Get all users
+ * @returns {Promise}
+ */
+export const getAllUsers = () => apiClient.get(`/users`);
 
-// get users by id
-export const getUserById = async(id) => {
-    return apiClient.get(`/users/${id}`)
-}
+/**
+ * Get user by ID
+ * @param {string} id
+ * @returns {Promise}
+ */
+export const getUserById = (id) => apiClient.get(`/users/${id}`);
 
-// delete user by id
-export const deleteUserById = async(userId) => {
-    return apiClient.delete(`/users/${userId}`)
-}
+/**
+ * Delete user by ID
+ * @param {string} userId
+ * @returns {Promise}
+ */
+export const deleteUserById = (userId) => apiClient.delete(`/users/${userId}`);
 
+/**
+ * Upload user profile picture
+ * @param {string} userId
+ * @param {File} file
+ * @returns {Promise}
+ */
 export const uploadProfilePicture = (userId, file) => {
   const formData = new FormData();
   formData.append("file", file);
   return apiClient.post(`/users/${userId}/profile-picture`, formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      "Content-Type": "multipart/form-data"
+      // Authorization header is set by interceptor
     },
   });
 };
+
+// Property APIs
+/**
+ * Get all properties for the owner
+ * @returns {Promise}
+ */
+export const getOwnerProperties = () => apiClient.get('/property/get-all-owner-properties');
+
+/**
+ * Create a new property (details only, no images)
+ * @param {object} data - property fields
+ * @returns {Promise} - resolves to propertyId
+ */
+export const createProperty = (data) => {
+  return apiClient.post('/property', data)
+    .then(res => res.data.data); // assuming propertyId is in data
+};
+
+/**
+ * Upload images for a property
+ * @param {string|number} propertyId
+ * @param {File[]} images
+ * @returns {Promise}
+ */
+export const uploadPropertyImages = (propertyId, images = []) => {
+  const formData = new FormData();
+  images.forEach((img) => formData.append('images', img));
+  return apiClient.post(`/property/${propertyId}/images`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+  });
+};
+
+/**
+ * Update a property
+ * @param {object} data
+ * @returns {Promise}
+ */
+export const updateProperty = (data) => apiClient.put('/property', data);
+
+/**
+ * Delete a property by ID
+ * @param {string} id
+ * @returns {Promise}
+ */
+export const deleteProperty = (id) => apiClient.delete(`/property/${id}`);
+
+/**
+ * Get property by ID
+ * @param {string} propertyId
+ * @returns {Promise}
+ */
+export const getPropertyById = (propertyId) => apiClient.get(`/property/${propertyId}`);
+
+/**
+ * Get all properties
+ * @returns {Promise}
+ */
+export const getAllProperties = () => apiClient.get('/property');
+
+/**
+ * Search properties with filters
+ * @param {object} filterRequest
+ * @returns {Promise}
+ */
+export const searchProperties = (filterRequest) => apiClient.post('/property/search-property', filterRequest);
+
+// Booking APIs
+/**
+ * Get all bookings for a renter
+ * @param {string} renterId
+ * @returns {Promise}
+ */
+export const getBookingsByRenterId = (renterId) => apiClient.get(`/booking/renter/${renterId}`);
+
+/**
+ * Get all bookings for an owner
+ * @param {string} ownerId
+ * @returns {Promise}
+ */
+export const getBookingsByOwnerId = (ownerId) => apiClient.get(`/booking/owner/${ownerId}`);
+
+/**
+ * Get all bookings (admin only)
+ * @returns {Promise}
+ */
+export const getAllBookings = () => apiClient.get('/booking');
+
+/**
+ * Get booking by ID
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const getBookingById = (bookingId) => apiClient.get(`/booking/${bookingId}`);
+
+/**
+ * Create a new booking
+ * @param {object} bookingData - booking fields
+ * @returns {Promise}
+ */
+export const createBooking = (bookingData) => apiClient.post('/booking', bookingData);
+
+/**
+ * Update a booking
+ * @param {object} bookingData
+ * @returns {Promise}
+ */
+export const updateBooking = (bookingData) => apiClient.put('/booking', bookingData);
+
+/**
+ * Delete a booking
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const deleteBooking = (bookingId) => apiClient.delete(`/booking/${bookingId}`);
+
+/**
+ * Cancel a booking
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const cancelBooking = (bookingId) => apiClient.put(`/booking/cancel/${bookingId}`);
+
+/**
+ * Approve a booking
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const approveBooking = (bookingId) => apiClient.put(`/booking/approve/${bookingId}`);
+
+/**
+ * Delete a property image by imageId
+ * @param {string|number} imageId
+ * @returns {Promise}
+ */
+export const deletePropertyImage = (imageId) =>
+  apiClient.delete(`/property/delete-image/${imageId}`);
+
+// Fetch booking requests for owner
+export const fetchBookingRequests = () => apiClient.get('/property/fetch-booking-request');

@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/terms.css";
+import PropTypes from "prop-types";
 
 function Terms() {
   return (
@@ -216,4 +217,6 @@ function Terms() {
   );
 }
 
-export default Terms; 
+Terms.propTypes = {};
+
+export default React.memo(Terms); 
