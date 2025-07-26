@@ -3,10 +3,12 @@ package com.bikalp.roomrentalservice.service.impl;
 import com.bikalp.roomrentalservice.config.UserDataConfig;
 import com.bikalp.roomrentalservice.dto.request.FilterRequest;
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
+import com.bikalp.roomrentalservice.dto.response.BookingRequestResponse;
 import com.bikalp.roomrentalservice.dto.response.PropertyResponse;
 import com.bikalp.roomrentalservice.enums.PropertyType;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
+import com.bikalp.roomrentalservice.mapper.BookingMapper;
 import com.bikalp.roomrentalservice.mapper.PropertyMapper;
 import com.bikalp.roomrentalservice.model.Property;
 import com.bikalp.roomrentalservice.model.PropertyImage;
@@ -28,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import com.bikalp.roomrentalservice.dto.response.BookingResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyMapper propertyMapper;
     private final UserDataConfig userDataConfig;
     private final PropertyImageRepo propertyImageRepo;
+    private final BookingMapper bookingMapper;
 
     @Override
     @Transactional
@@ -146,6 +150,11 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     public List<PropertyResponse> searchProperty(FilterRequest request) {
         return propertyMapper.searchProperty(request);
+    }
+
+    @Override
+    public List<BookingResponse> fetchBookingRequest() {
+        return bookingMapper.fetchBookingRequest(userDataConfig.getLoggedInUser().getId());
     }
 
     private Property getPropertyByIdOrThrow(Long propertyId) {

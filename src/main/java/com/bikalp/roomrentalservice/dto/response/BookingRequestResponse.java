@@ -1,14 +1,15 @@
 package com.bikalp.roomrentalservice.dto.response;
 
-import com.bikalp.roomrentalservice.enums.BookingStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class BookingResponse {
+public class BookingRequestResponse {
+
     private Long id;
-    private BookingStatus status;
+    private UserResponse user;
     private PropertyResponse property;
-    private UserResponse renter;
+
 }
+

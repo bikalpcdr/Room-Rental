@@ -14,4 +14,6 @@ public interface BookingMapper {
     List<BookingResponse> getAllBookedPropertyByOwnerId(Long ownerId);
 
     List<BookingResponse> getAllBookings();
+
+    List<BookingResponse> fetchBookingRequest(Long ownerId);
 }

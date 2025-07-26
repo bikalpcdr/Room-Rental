@@ -24,6 +24,13 @@
         <association property="property"
                      javaType="com.bikalp.roomrentalservice.dto.response.PropertyResponse"
                      resultMap="PropertyResponseMap"/>
+        <association property="renter"
+                     javaType="com.bikalp.roomrentalservice.dto.response.UserResponse">
+            <id column="renterId" property="userId"/>
+            <result column="renterFullName" property="fullName"/>
+            <result column="renterEmail" property="email"/>
+            <result column="renterPhone" property="phoneNumber"/>
+        </association>
     </resultMap>
 
     <select id="getBookingById" resultMap="BookingResponseMap">
@@ -38,11 +45,16 @@
                p.address        as address,
                pi.id            as imageId,
                pi.image_url     as image_url,
-               pa.amenity       as amenity_amenities
+               pa.amenity       as amenity_amenities,
+               u.id             as renterId,
+               u.full_name      as renterFullName,
+               u.email          as renterEmail,
+               u.phone_number   as renterPhone
         from booking b
                  left join property p on b.property_id = p.id
                  left join property_image pi on p.id = pi.property_id
                  left join property_amenities pa on p.id = pa.property_id
+                 left join users u on b.renter_id = u.id
         where b.id = #{bookingId}
     </select>
 
@@ -58,11 +70,16 @@
                p.address        as address,
                pi.id            as imageId,
                pi.image_url     as image_url,
-               pa.amenity       as amenity_amenities
+               pa.amenity       as amenity_amenities,
+               u.id             as renterId,
+               u.full_name      as renterFullName,
+               u.email          as renterEmail,
+               u.phone_number   as renterPhone
         from booking b
                  left join property p on b.property_id = p.id
                  left join property_image pi on p.id = pi.property_id
                  left join property_amenities pa on p.id = pa.property_id
+                 left join users u on b.renter_id = u.id
         where b.renter_id = #{renterId}
     </select>
 
@@ -78,11 +95,16 @@
                p.address        as address,
                pi.id            as imageId,
                pi.image_url     as image_url,
-               pa.amenity       as amenity_amenities
+               pa.amenity       as amenity_amenities,
+               u.id             as renterId,
+               u.full_name      as renterFullName,
+               u.email          as renterEmail,
+               u.phone_number   as renterPhone
         from booking b
                  left join property p on b.property_id = p.id
                  left join property_image pi on p.id = pi.property_id
                  left join property_amenities pa on p.id = pa.property_id
+                 left join users u on b.renter_id = u.id
         where p.owner_id = #{ownerId}
     </select>
     <select id="getAllBookings" resultMap="BookingResponseMap">
@@ -97,10 +119,39 @@
                p.address        as address,
                pi.id            as imageId,
                pi.image_url     as image_url,
-               pa.amenity       as amenity_amenities
+               pa.amenity       as amenity_amenities,
+               u.id             as renterId,
+               u.full_name      as renterFullName,
+               u.email          as renterEmail,
+               u.phone_number   as renterPhone
         from booking b
                  left join property p on b.property_id = p.id
                  left join property_image pi on p.id = pi.property_id
                  left join property_amenities pa on p.id = pa.property_id
+                 left join users u on b.renter_id = u.id
+    </select>
+    <select id="fetchBookingRequest" resultMap="BookingResponseMap">
+        select b.id             as id,
+               b.status         as bookingStatus,
+               p.id             as propertyId,
+               p.title          as roomTitle,
+               p.description    as description,
+               p.room_count     as roomCount,
+               p.rent_price     as rentPrice,
+               p.is_available   as isAvailable,
+               p.address        as address,
+               pi.id            as imageId,
+               pi.image_url     as image_url,
+               pa.amenity       as amenity_amenities,
+               u.id             as renterId,
+               u.full_name      as renterFullName,
+               u.email          as renterEmail,
+               u.phone_number   as renterPhone
+        from booking b
+                 left join property p on b.property_id = p.id
+                 left join property_image pi on p.id = pi.property_id
+                 left join property_amenities pa on p.id = pa.property_id
+                 left join users u on b.renter_id = u.id
+        where p.owner_id = #{renterId} and b.status = 'PENDING';
     </select>
 </mapper>

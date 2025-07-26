@@ -80,4 +80,9 @@ public class PropertyController extends BaseController {
     public ResponseEntity<GlobalAPIResponse> searchProperty(@RequestBody FilterRequest request){
         return fetchListResponse(entity,propertyService.searchProperty(request));
     }
+
+    @GetMapping("/fetch-booking-request")
+    public ResponseEntity<GlobalAPIResponse> fetchBookingRequest(){
+        return fetchListResponse(entity,propertyService.fetchBookingRequest());
+    }
 }

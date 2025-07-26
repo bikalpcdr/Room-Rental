@@ -77,11 +77,13 @@
                p.owner_id      as ownerId,
                pa.amenity      as amenity_amenities,
                pi.id           as imageId,
-               pi.image_url    as image_url
+               pi.image_url    as image_url,
+               b.status        as status
         from property p
                  left join property_amenities pa on p.id = pa.property_id
                  left join users u on p.owner_id = u.id
                  left join property_image pi on p.id = pi.property_id
+                 left join booking b on b.property_id = p.id
         where p.owner_id = #{ownerId};
     </select>
     <select id="searchProperty" resultMap="PropertyResponseMap">
