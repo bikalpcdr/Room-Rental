@@ -14,84 +14,105 @@
 
     <resultMap id="PropertyResponseMap" type="com.bikalp.roomrentalservice.dto.response.PropertyResponse" autoMapping="true">
         <id column="id" property="id"/>
-        <result column="isActive" property="isActive"/>
-        <result column="address" property="address"/>
-        <result column="description" property="description"/>
-        <result column="isAvailable" property="isAvailable"/>
-        <result column="propertyType" property="propertyType"/>
-        <result column="rentPrice" property="rentPrice"/>
-        <result column="roomCount" property="roomCount"/>
-        <result column="roomTitle" property="roomTitle"/>
-        <result column="ownerName" property="ownerName"/>
-        <result column="ownerid" property="ownerId"/>
-        <collection property="amenities"
-                    ofType="com.bikalp.roomrentalservice.enums.Amenities"
-                    resultMap="AmenitiesEnumMap"/>
+
+        <collection property="amenities" ofType="com.bikalp.roomrentalservice.enums.Amenities" resultMap="AmenitiesEnumMap"/>
+
         <collection property="images" ofType="com.bikalp.roomrentalservice.dto.response.ImageDto" resultMap="ImageDtoMap"/>
     </resultMap>
 
     <select id="getPropertyById" resultMap="PropertyResponseMap">
         select p.id            as id,
-               p.is_active     as isActive,
+               p.is_active     as is_active,
                p.address       as address,
                p.description   as description,
-               p.is_available  as isAvailable,
-               p.property_type as propertyType,
-               p.rent_price    as rentPrice,
-               p.room_count    as roomCount,
+               p.is_available  as is_available,
+               p.property_type as property_type,
+               p.rent_price    as rent_price,
+               p.room_count    as room_count,
                p.title         as roomTitle,
                u.full_name     as ownerName,
-               p.owner_id      as ownerid,
+               p.owner_id      as ownerId,
                pa.amenity      as amenity_amenities,
                pi.id           as imageId,
                pi.image_url    as image_url
         from property p
-             left join property_amenities pa on p.id = pa.property_id
-             left join users u on p.owner_id = u.id
-             left join property_image pi on p.id = pi.property_id
+                 left join property_amenities pa on p.id = pa.property_id
+                 left join users u on p.owner_id = u.id
+                 left join property_image pi on p.id = pi.property_id
         where p.id = #{propertyId};
     </select>
 
     <select id="getAllProperties" resultMap="PropertyResponseMap">
         select p.id            as id,
-               p.is_active     as isActive,
+               p.is_active     as is_active,
                p.address       as address,
                p.description   as description,
-               p.is_available  as isAvailable,
-               p.property_type as propertyType,
-               p.rent_price    as rentPrice,
-               p.room_count    as roomCount,
+               p.is_available  as is_available,
+               p.property_type as property_type,
+               p.rent_price    as rent_price,
+               p.room_count    as room_count,
                p.title         as roomTitle,
                u.full_name     as ownerName,
-               p.owner_id      as ownerid,
+               p.owner_id      as ownerId,
                pa.amenity      as amenity_amenities,
                pi.id           as imageId,
                pi.image_url    as image_url
         from property p
-             left join property_amenities pa on p.id = pa.property_id
-             left join users u on p.owner_id = u.id
-             left join property_image pi on p.id = pi.property_id
+                 left join property_amenities pa on p.id = pa.property_id
+                 left join users u on p.owner_id = u.id
+                 left join property_image pi on p.id = pi.property_id
     </select>
 
     <select id="getAllPropertiesByOwnerId" resultMap="PropertyResponseMap">
         select p.id            as id,
-               p.is_active     as isActive,
+               p.is_active     as is_active,
                p.address       as address,
                p.description   as description,
-               p.is_available  as isAvailable,
-               p.property_type as propertyType,
-               p.rent_price    as rentPrice,
-               p.room_count    as roomCount,
+               p.is_available  as is_available,
+               p.property_type as property_type,
+               p.rent_price    as rent_price,
+               p.room_count    as room_count,
                p.title         as roomTitle,
                u.full_name     as ownerName,
-               p.owner_id      as ownerid,
+               p.owner_id      as ownerId,
                pa.amenity      as amenity_amenities,
                pi.id           as imageId,
                pi.image_url    as image_url
         from property p
-             left join property_amenities pa on p.id = pa.property_id
-             left join users u on p.owner_id = u.id
-             left join property_image pi on p.id = pi.property_id
+                 left join property_amenities pa on p.id = pa.property_id
+                 left join users u on p.owner_id = u.id
+                 left join property_image pi on p.id = pi.property_id
         where p.owner_id = #{ownerId};
+    </select>
+    <select id="searchProperty" resultMap="PropertyResponseMap">
+        select p.id            as id,
+               p.is_active     as is_active,
+               p.address       as address,
+               p.description   as description,
+               p.is_available  as is_available,
+               p.property_type as property_type,
+               p.rent_price    as rent_price,
+               p.room_count    as room_count,
+               p.title         as roomTitle,
+               u.full_name     as ownerName,
+               p.owner_id      as ownerId,
+               pa.amenity      as amenity_amenities,
+               pi.id           as imageId,
+               pi.image_url    as image_url
+        from property p
+                 left join property_amenities pa on p.id = pa.property_id
+                 left join users u on p.owner_id = u.id
+                 left join property_image pi on p.id = pi.property_id
+        <where>
+            <if test="propertyType != null">
+                AND p.property_type = #{propertyType}
+            </if>
+            <if test="address != null and address != ''">
+                AND p.address ILIKE CONCAT('%', #{address}, '%')
+            </if>
+            <if test="priceRange > 0">
+                AND p.rent_price &lt;= #{priceRange}
+            </if>
+        </where>
     </select>
 </mapper>

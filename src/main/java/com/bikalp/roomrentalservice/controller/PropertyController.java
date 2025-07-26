@@ -1,8 +1,10 @@
 package com.bikalp.roomrentalservice.controller;
 
 import com.bikalp.roomrentalservice.controller.base.BaseController;
+import com.bikalp.roomrentalservice.dto.request.FilterRequest;
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
 import com.bikalp.roomrentalservice.dto.response.GlobalAPIResponse;
+import com.bikalp.roomrentalservice.enums.PropertyType;
 import com.bikalp.roomrentalservice.service.PropertyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -48,7 +50,7 @@ public class PropertyController extends BaseController {
         return fetchResponse(entity, propertyService.getPropertyById(propertyId));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER','RENTER')")
     @GetMapping
     public ResponseEntity<GlobalAPIResponse> getAllProperties() {
         return fetchResponse(entity, propertyService.getAllProperties());
@@ -72,5 +74,10 @@ public class PropertyController extends BaseController {
     public ResponseEntity<GlobalAPIResponse> deletePropertyImagesByImageId(@PathVariable Long imageId) {
         propertyService.deletePropertyImagesByImageId(imageId);
         return deleteResponse("Image");
+    }
+
+    @PostMapping("/search-property")
+    public ResponseEntity<GlobalAPIResponse> searchProperty(@RequestBody FilterRequest request){
+        return fetchListResponse(entity,propertyService.searchProperty(request));
     }
 }

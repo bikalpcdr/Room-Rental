@@ -174,6 +174,82 @@ export const deleteProperty = (id) => apiClient.delete(`/property/${id}`);
 export const getPropertyById = (propertyId) => apiClient.get(`/property/${propertyId}`);
 
 /**
+ * Get all properties
+ * @returns {Promise}
+ */
+export const getAllProperties = () => apiClient.get('/property');
+
+/**
+ * Search properties with filters
+ * @param {object} filterRequest
+ * @returns {Promise}
+ */
+export const searchProperties = (filterRequest) => apiClient.post('/property/search-property', filterRequest);
+
+// Booking APIs
+/**
+ * Get all bookings for a renter
+ * @param {string} renterId
+ * @returns {Promise}
+ */
+export const getBookingsByRenterId = (renterId) => apiClient.get(`/booking/renter/${renterId}`);
+
+/**
+ * Get all bookings for an owner
+ * @param {string} ownerId
+ * @returns {Promise}
+ */
+export const getBookingsByOwnerId = (ownerId) => apiClient.get(`/booking/owner/${ownerId}`);
+
+/**
+ * Get all bookings (admin only)
+ * @returns {Promise}
+ */
+export const getAllBookings = () => apiClient.get('/booking');
+
+/**
+ * Get booking by ID
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const getBookingById = (bookingId) => apiClient.get(`/booking/${bookingId}`);
+
+/**
+ * Create a new booking
+ * @param {object} bookingData - booking fields
+ * @returns {Promise}
+ */
+export const createBooking = (bookingData) => apiClient.post('/booking', bookingData);
+
+/**
+ * Update a booking
+ * @param {object} bookingData
+ * @returns {Promise}
+ */
+export const updateBooking = (bookingData) => apiClient.put('/booking', bookingData);
+
+/**
+ * Delete a booking
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const deleteBooking = (bookingId) => apiClient.delete(`/booking/${bookingId}`);
+
+/**
+ * Cancel a booking
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const cancelBooking = (bookingId) => apiClient.put(`/booking/cancel/${bookingId}`);
+
+/**
+ * Approve a booking
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const approveBooking = (bookingId) => apiClient.put(`/booking/approve/${bookingId}`);
+
+/**
  * Delete a property image by imageId
  * @param {string|number} imageId
  * @returns {Promise}
