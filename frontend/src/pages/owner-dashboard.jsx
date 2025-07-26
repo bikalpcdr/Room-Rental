@@ -7,9 +7,13 @@ import Footer from "../components/footer";
 import PropertyForm from "../forms/PropertyForm";
 import PropertyFormEdit from "../forms/PropertyFormEdit";
 import PropertyImageUploadForm from "../forms/PropertyImageUploadForm";
+import FloatingTableModal from "../components/FloatingTableModal";
+import OwnerPropertyTable from "../components/OwnerPropertyTable";
 import "../style/admin-dashboard.css";
-import { getOwnerProperties, createProperty, updateProperty, deleteProperty, getPropertyById, uploadPropertyImages } from "../api";
+import { getOwnerProperties, createProperty, updateProperty, deleteProperty, getPropertyById, uploadPropertyImages, approveBooking, cancelBooking, fetchBookingRequests } from "../api";
 import PropTypes from "prop-types";
+import { ViewPropertyModal } from "../pages/view-property";
+import OwnerBookingRequestTable from "../components/OwnerBookingRequestTable";
 
 function OwnerDashboard() {
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -32,11 +36,22 @@ function OwnerDashboard() {
   const [newPropertyId, setNewPropertyId] = useState(null);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [existingImageCount, setExistingImageCount] = useState(0);
+  
+  // Booking request states
+  const [bookings, setBookings] = useState([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [showBookingsModal, setShowBookingsModal] = useState(false);
+  
+  // Property management state
+  const [showPropertyTable, setShowPropertyTable] = useState(false);
+  const [showPropertyModal, setShowPropertyModal] = useState(false);
+  const [propertyModalId, setPropertyModalId] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProperties();
+    fetchBookings();
     const showWelcomeToast = localStorage.getItem('showWelcomeToast');
     if (showWelcomeToast === 'true') {
       toast.success(`Welcome back, ${userData.fullName}! 🏠`);
@@ -54,6 +69,18 @@ function OwnerDashboard() {
       toast.error("Failed to fetch properties");
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  const fetchBookings = useCallback(async () => {
+    setBookingsLoading(true);
+    try {
+      const res = await fetchBookingRequests();
+      setBookings(res.data?.data || []);
+    } catch (err) {
+      toast.error("Failed to fetch booking requests");
+    } finally {
+      setBookingsLoading(false);
     }
   }, []);
 
@@ -158,6 +185,46 @@ function OwnerDashboard() {
     }
   };
 
+  // Booking request handlers
+  const handleViewBookings = useCallback(() => {
+    setShowBookingsModal(true);
+  }, []);
+
+  const handleApproveBooking = useCallback(async (bookingId) => {
+    try {
+      await approveBooking(bookingId);
+      toast.success("Booking approved successfully!");
+      fetchBookings();
+      fetchProperties(); // Refresh properties to update availability
+    } catch (err) {
+      toast.error("Failed to approve booking");
+    }
+  }, [fetchBookings, fetchProperties]);
+
+  const handleRejectBooking = useCallback(async (bookingId) => {
+    try {
+      await cancelBooking(bookingId);
+      toast.success("Booking rejected successfully!");
+      fetchBookings();
+    } catch (err) {
+      toast.error("Failed to reject booking");
+    }
+  }, [fetchBookings]);
+
+  const getPendingBookingsCount = () => {
+    return bookings.filter(booking => booking.status === 'PENDING').length;
+  };
+
+  const handleViewProperties = useCallback(() => {
+    setShowPropertyTable(true);
+  }, []);
+
+  const handleViewPropertyModal = useCallback((propertyId) => {
+    setShowPropertyTable(false); // Close the table modal
+    setPropertyModalId(propertyId);
+    setShowPropertyModal(true);
+  }, []);
+
   return (
     <>
       <Header />
@@ -173,76 +240,81 @@ function OwnerDashboard() {
             <p className="stat-number">{properties.length}</p>
             <small>Click to add property</small>
           </div>
-        </div>
-
-        <div className="users-section">
-          <h2>Property Management</h2>
-          {loading ? (
-            <p>Loading properties...</p>
-          ) : properties.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#666', fontSize: '1.1rem' }}>
-              No properties found. Click "+ Add Property" to create one.
-            </p>
-          ) : (
-            <div className="table-container">
-              <table className="users-table">
-                <thead>
-                  <tr>
-                    <th>S.N</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Address</th>
-                    <th>Rooms</th>
-                    <th>Rent</th>
-                    <th>Available</th>
-                    <th>Amenities</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {properties.map((property, index) => (
-                    <tr key={property.id || property.propertyId}>
-                      <td>{index+1}</td>
-                      <td>{property.roomTitle || property.roomTitle}</td>
-                      <td>{property.propertyType}</td>
-                      <td>{property.address}</td>
-                      <td>{property.roomCount}</td>
-                      <td>{property.rentPrice}</td>
-                      <td>{property.isAvailable ? "Yes" : "No"}</td>
-                      <td className={"first"}>{property.amenities?.join(", ")}</td>
-                      <td className={"btn"}>
-                        <button className="view-btn" onClick={() => navigate(`/property/${property.id || property.propertyId}`)}>
-                          View
-                        </button>
-                        <button className="edit-btn" onClick={() => handleEditProperty(property)}>
-                          Edit
-                        </button>
-                        <button className="delete-btn" onClick={() => handleDeleteProperty(property.id || property.propertyId)}>
-                          Delete
-                        </button>
-                        <button
-                          className="upload-images-btn"
-                          onClick={() => openImageUploadModal(property.id || property.propertyId)}
-                        >
-                          Upload Images
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-            <button 
-              className="create-user-btn" 
-              onClick={handleAddProperty}
-              style={{ margin: '0 1rem' }}
-            >
-              + Add Property
-            </button>
+          <div className="stat-card" onClick={handleViewBookings} style={{ cursor: 'pointer' }}>
+            <h3>Booking Requests</h3>
+            <p className="stat-number">{getPendingBookingsCount()}</p>
+            <small>Click to view requests</small>
+          </div>
+          <div className="stat-card" onClick={handleViewProperties} style={{ cursor: 'pointer' }}>
+            <h3>Property Management</h3>
+            <p className="stat-number">{properties.length}</p>
+            <small>Click to manage properties</small>
           </div>
         </div>
+
+        {/* Property Management Floating Table */}
+        {showPropertyTable && (
+          <FloatingTableModal
+            isOpen={showPropertyTable}
+            onClose={() => setShowPropertyTable(false)}
+            title="Property Management"
+          >
+            {loading ? (
+              <p>Loading properties...</p>
+            ) : properties.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#666', fontSize: '1.1rem' }}>
+                No properties found. Click "+ Add Property" to create one.
+              </p>
+            ) : (
+              <OwnerPropertyTable
+                properties={properties}
+                onEdit={handleEditProperty}
+                onDelete={handleDeleteProperty}
+                onUploadImages={openImageUploadModal}
+                onViewProperty={handleViewPropertyModal}
+              />
+            )}
+            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+              <button 
+                className="create-user-btn" 
+                onClick={handleAddProperty}
+                style={{ margin: '0 1rem' }}
+              >
+                + Add Property
+              </button>
+              <button 
+                className="create-user-btn" 
+                onClick={handleViewBookings}
+                style={{ margin: '0 1rem' }}
+              >
+                📋 View Booking Requests
+              </button>
+            </div>
+          </FloatingTableModal>
+        )}
+
+        {/* Booking Requests Modal */}
+        {showBookingsModal && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <div className="modal-header">
+                <h2>Booking Requests</h2>
+                <button className="close-btn" onClick={() => setShowBookingsModal(false)}>
+                  ×
+                </button>
+              </div>
+              <div className="modal-content">
+                <OwnerBookingRequestTable
+                  bookings={bookings}
+                  loading={bookingsLoading}
+                  onApprove={handleApproveBooking}
+                  onReject={handleRejectBooking}
+                  onViewProperty={handleViewPropertyModal}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Property Form Modal */}
         {showFormModal && (
@@ -294,6 +366,15 @@ function OwnerDashboard() {
               />
             </div>
           </div>
+        )}
+
+        {/* Property Details Floating Modal */}
+        {showPropertyModal && (
+          <ViewPropertyModal
+            propertyId={propertyModalId}
+            isOpen={showPropertyModal}
+            onClose={() => setShowPropertyModal(false)}
+          />
         )}
       </main>
       <Footer />

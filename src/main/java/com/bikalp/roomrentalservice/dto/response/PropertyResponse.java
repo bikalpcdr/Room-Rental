@@ -16,6 +16,7 @@ public class PropertyResponse {
     private PropertyType propertyType;
     private String address;
     private Long roomCount;
+    private String status;
     private double rentPrice;
     private Boolean isAvailable;
     private Boolean isActive;

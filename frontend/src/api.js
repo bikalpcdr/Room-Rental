@@ -256,3 +256,6 @@ export const approveBooking = (bookingId) => apiClient.put(`/booking/approve/${b
  */
 export const deletePropertyImage = (imageId) =>
   apiClient.delete(`/property/delete-image/${imageId}`);
+
+// Fetch booking requests for owner
+export const fetchBookingRequests = () => apiClient.get('/property/fetch-booking-request');
