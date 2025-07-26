@@ -1,8 +1,10 @@
 package com.bikalp.roomrentalservice.service.impl;
 
 import com.bikalp.roomrentalservice.config.UserDataConfig;
+import com.bikalp.roomrentalservice.dto.request.FilterRequest;
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
 import com.bikalp.roomrentalservice.dto.response.PropertyResponse;
+import com.bikalp.roomrentalservice.enums.PropertyType;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.mapper.PropertyMapper;
@@ -139,6 +141,11 @@ public class PropertyServiceImpl implements PropertyService {
             if (file.exists()) file.delete();
         }
         propertyImageRepo.delete(image);
+    }
+
+    @Override
+    public List<PropertyResponse> searchProperty(FilterRequest request) {
+        return propertyMapper.searchProperty(request);
     }
 
     private Property getPropertyByIdOrThrow(Long propertyId) {

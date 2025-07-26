@@ -12,6 +12,7 @@ import OwnerDashboard from "./pages/owner-dashboard";
 import RenterDashboard from "./pages/renter-dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ViewProperty from "./pages/view-property";
+import PropertySearch from "./pages/property-search";
 import "./App.css";
 import PropTypes from "prop-types";
 
@@ -37,6 +38,7 @@ function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/property/:id" element={<ViewProperty />} />
+        <Route path="/property-search" element={<PropertySearch />} />
         <Route 
           path="/admin" 
           element={

@@ -98,6 +98,26 @@ public class BaseController {
                         .build());
     }
 
+    protected ResponseEntity<GlobalAPIResponse> cancelResponse(String entityName) {
+        String message = String.format("%s  cancel successfully..!!", entityName);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(GlobalAPIResponse.builder()
+                        .status(true)
+                        .message(message)
+                        .data(null)
+                        .build());
+    }
+
+    protected ResponseEntity<GlobalAPIResponse> approveResponse(String entityName) {
+        String message = String.format("%s  approve successfully..!!", entityName);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(GlobalAPIResponse.builder()
+                        .status(true)
+                        .message(message)
+                        .data(null)
+                        .build());
+    }
+
     protected ResponseEntity<GlobalAPIResponse> fetchResponse(String entityName, Object data) {
         String message = String.format("%s  retrieved successfully..!!", entityName);
         return ResponseEntity.status(HttpStatus.CREATED)
