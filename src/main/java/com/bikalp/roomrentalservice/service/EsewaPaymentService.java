@@ -17,30 +17,25 @@ public class EsewaPaymentService {
 
     public Map<String, String> initiatePayment(String amount, String referenceId, String productId, String successUrl, String failureUrl) {
         // eSewa official field names
-        String amt = amount;
         String tax_amount = "0";
-        String total_amount = amount;
-        String transaction_uuid = productId;
         String product_code = esewaConfig.getMerchantId();
         String product_service_charge = "0";
         String product_delivery_charge = "0";
-        String su = successUrl;
-        String fu = failureUrl;
         String signed_field_names = "total_amount,transaction_uuid,product_code";
 
         // Signature generation (HMAC-SHA256, base64)
-        String signature = generateEsewaSignature(total_amount, transaction_uuid, product_code, esewaConfig.getSecretKey());
+        String signature = generateEsewaSignature(amount, productId, product_code, esewaConfig.getSecretKey());
 
         Map<String, String> formFields = new HashMap<>();
-        formFields.put("amount", amt);
+        formFields.put("amount", amount);
         formFields.put("tax_amount", tax_amount);
-        formFields.put("total_amount", total_amount);
-        formFields.put("transaction_uuid", transaction_uuid);
+        formFields.put("total_amount", amount);
+        formFields.put("transaction_uuid", productId);
         formFields.put("product_code", product_code);
         formFields.put("product_service_charge", product_service_charge);
         formFields.put("product_delivery_charge", product_delivery_charge);
-        formFields.put("su", su);
-        formFields.put("fu", fu);
+        formFields.put("su", successUrl);
+        formFields.put("fu", failureUrl);
         formFields.put("signed_field_names", signed_field_names);
         formFields.put("signature", signature);
         formFields.put("paymentUrl", esewaConfig.getBaseUrl() + "/api/epay/main/v2/form");

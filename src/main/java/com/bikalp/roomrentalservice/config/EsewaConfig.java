@@ -1,8 +1,12 @@
 package com.bikalp.roomrentalservice.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+@Getter
+@Setter
 @Configuration
 public class EsewaConfig {
     @Value("${esewa.merchant_id}")
@@ -20,9 +24,15 @@ public class EsewaConfig {
     @Value("${esewa.base_url}")
     private String baseUrl;
 
-    public String getMerchantId() { return merchantId; }
-    public String getSecretKey() { return secretKey; }
-    public String getClientId() { return clientId; }
-    public String getClientSecret() { return clientSecret; }
-    public String getBaseUrl() { return baseUrl; }
-} 
+    @Value("${esewa.id}")
+    private String esewaId;
+
+    @Value("${esewa.password}")
+    private String password;
+
+    @Value("${esewa.mpin}")
+    private String mPin;
+
+    @Value("${esewa.token}")
+    private String token;
+}
