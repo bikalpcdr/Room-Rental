@@ -1,6 +1,7 @@
 package com.bikalp.roomrentalservice.service;
 
 import com.bikalp.roomrentalservice.config.EsewaConfig;
+import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.crypto.Mac;
@@ -12,8 +13,11 @@ import java.util.Map;
 @Service
 public class EsewaPaymentService {
 
-    @Autowired
-    private EsewaConfig esewaConfig;
+    private final EsewaConfig esewaConfig;
+
+    public EsewaPaymentService(EsewaConfig esewaConfig) {
+        this.esewaConfig = esewaConfig;
+    }
 
     public Map<String, String> initiatePayment(String amount, String referenceId, String productId, String successUrl, String failureUrl) {
         // eSewa official field names
@@ -38,7 +42,7 @@ public class EsewaPaymentService {
         formFields.put("fu", failureUrl);
         formFields.put("signed_field_names", signed_field_names);
         formFields.put("signature", signature);
-        formFields.put("paymentUrl", esewaConfig.getBaseUrl() + "/api/epay/main/v2/form");
+        formFields.put("paymentUrl", esewaConfig.getBaseUrl());
         return formFields;
     }
 
@@ -64,7 +68,7 @@ public class EsewaPaymentService {
             byte[] hash = sha256_HMAC.doFinal(data.getBytes());
             return Base64.getEncoder().encodeToString(hash);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate eSewa signature", e);
+            throw new CustomizeException("Failed to generate eSewa signature");
         }
     }
 } 

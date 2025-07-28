@@ -10,8 +10,11 @@ import java.util.Map;
 @RequestMapping("/api/payment")
 public class PaymentController {
 
-    @Autowired
-    private EsewaPaymentService esewaPaymentService;
+    private final EsewaPaymentService esewaPaymentService;
+
+    public PaymentController(EsewaPaymentService esewaPaymentService) {
+        this.esewaPaymentService = esewaPaymentService;
+    }
 
     @PostMapping("/initiate")
     public Map<String, String> initiatePayment(@RequestParam String amount,
