@@ -26,8 +26,7 @@ public class AuditorConfig {
             
             Object principal = authentication.getPrincipal();
             
-            if (principal instanceof CustomUserDetails) {
-                CustomUserDetails userDetails = (CustomUserDetails) principal;
+            if (principal instanceof CustomUserDetails userDetails) {
                 return Optional.of(userDetails.getId());
             }
             

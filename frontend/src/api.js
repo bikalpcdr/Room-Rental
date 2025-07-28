@@ -259,3 +259,23 @@ export const deletePropertyImage = (imageId) =>
 
 // Fetch booking requests for owner
 export const fetchBookingRequests = () => apiClient.get('/property/fetch-booking-request');
+
+/**
+ * Initiate eSewa payment
+ * @param {object} params - { amount, referenceId, productId, successUrl, failureUrl }
+ * @returns {Promise}
+ */
+export const initiateEsewaPayment = ({ amount, referenceId, productId, successUrl, failureUrl }) =>
+  apiClient.post(`/payment/initiate`, null, {
+    params: { amount, referenceId, productId, successUrl, failureUrl }
+  });
+
+/**
+ * Verify eSewa payment
+ * @param {object} params - { amt, rid, pid }
+ * @returns {Promise}
+ */
+export const verifyEsewaPayment = ({ amt, rid, pid }) =>
+  apiClient.post(`/payment/verify`, null, {
+    params: { amt, rid, pid }
+  });
