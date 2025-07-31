@@ -27,8 +27,9 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            // Token expired or invalid
+        // Only handle 401 errors for authenticated requests (not login attempts)
+        if (error.response?.status === 401 && error.config.url !== '/auth/login') {
+            // Token expired or invalid for authenticated requests
             logout();
         }
         return Promise.reject(error);
@@ -121,34 +122,45 @@ export const uploadProfilePicture = (userId, file) => {
 
 // Property APIs
 /**
- * Get all properties for the owner
+ * Get all properties for owner
  * @returns {Promise}
  */
 export const getOwnerProperties = () => apiClient.get('/property/get-all-owner-properties');
 
 /**
- * Create a new property (details only, no images)
+ * Create a new property
  * @param {object} data - property fields
- * @returns {Promise} - resolves to propertyId
+ * @returns {Promise}
  */
 export const createProperty = (data) => {
-    return apiClient.post('/property', data)
-        .then(res => res.data.data); // assuming propertyId is in data
+    const formData = new FormData();
+    Object.keys(data).forEach(key => {
+        if (key === 'images') {
+            data[key].forEach(image => formData.append('images', image));
+        } else {
+            formData.append(key, data[key]);
+        }
+    });
+    return apiClient.post('/property', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
 };
 
 /**
- * Upload images for a property
- * @param {string|number} propertyId
+ * Upload property images
+ * @param {string} propertyId
  * @param {File[]} images
  * @returns {Promise}
  */
 export const uploadPropertyImages = (propertyId, images = []) => {
     const formData = new FormData();
-    images.forEach((img) => formData.append('images', img));
+    images.forEach(image => formData.append('images', image));
     return apiClient.post(`/property/${propertyId}/images`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
-        },
+        }
     });
 };
 
@@ -160,7 +172,7 @@ export const uploadPropertyImages = (propertyId, images = []) => {
 export const updateProperty = (data) => apiClient.put('/property', data);
 
 /**
- * Delete a property by ID
+ * Delete a property
  * @param {string} id
  * @returns {Promise}
  */

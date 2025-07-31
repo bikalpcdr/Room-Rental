@@ -23,6 +23,18 @@
   padding: 3rem 2rem;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Success State */
+.login-container.success {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+}
+
+.login-container.success .login-header h1,
+.login-container.success .login-header p {
+  color: white;
 }
 
 /* Login Header */
@@ -34,6 +46,17 @@
 .login-logo {
   font-size: 3rem;
   margin-bottom: 1rem;
+  transition: all 0.5s ease;
+}
+
+.login-logo.success-animation {
+  animation: successBounce 0.8s ease-out;
+}
+
+@keyframes successBounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 
 .login-header h1 {
@@ -41,12 +64,14 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
+  transition: color 0.3s ease;
 }
 
 .login-header p {
   color: #666;
   font-size: 1rem;
   margin: 0;
+  transition: color 0.3s ease;
 }
 
 /* Form Styles */
@@ -72,15 +97,32 @@
   position: relative;
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper.error {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 .input-wrapper .input-icon {
   position: absolute;
-  left: 90%;
-  top: 30%;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 1.1rem;
   color: #666;
   z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.input-wrapper.error .input-icon {
+  color: #e53e3e;
 }
 
 .form-group input {
@@ -101,8 +143,51 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-group input.error {
+  border-color: #e53e3e;
+  background: #fff5f5;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
+
+.form-group input:disabled {
+  background: #f7fafc;
+  color: #a0aec0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .form-group input::placeholder {
   color: #999;
+}
+
+/* Error Messages */
+.error-message {
+  color: #e53e3e;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Lockout Message */
+.lockout-message {
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #c53030;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.3s ease-in;
 }
 
 /* Password Toggle */
@@ -115,13 +200,18 @@
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 4px;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
   color: #666;
 }
 
-.password-toggle:hover {
+.password-toggle:hover:not(:disabled) {
   background: rgba(102, 126, 234, 0.1);
   color: #667eea;
+}
+
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Form Options */
@@ -139,10 +229,21 @@
   cursor: pointer;
   font-size: 0.9rem;
   color: #666;
+  transition: opacity 0.3s ease;
+}
+
+.checkbox-wrapper:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .checkbox-wrapper input[type="checkbox"] {
   display: none;
+}
+
+.checkbox-wrapper input[type="checkbox"]:disabled + .checkmark {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .checkmark {
@@ -205,10 +306,18 @@
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
-.login-button:disabled {
+.login-button:disabled,
+.login-button.disabled {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
+  background: #a0aec0;
+}
+
+.login-button:disabled:hover,
+.login-button.disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* Loading Spinner */
@@ -303,22 +412,28 @@
   transition: all 0.3s ease;
 }
 
-.social-button:hover {
+.social-button:hover:not(:disabled) {
   border-color: #667eea;
   background: #f8f9fa;
   transform: translateY(-1px);
+}
+
+.social-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .social-button span {
   font-size: 1.1rem;
 }
 
-.social-button.google:hover {
+.social-button.google:hover:not(:disabled) {
   border-color: #ea4335;
   color: #ea4335;
 }
 
-.social-button.facebook:hover {
+.social-button.facebook:hover:not(:disabled) {
   border-color: #1877f2;
   color: #1877f2;
 }
@@ -399,10 +514,10 @@
 }
 
 /* Hover effects for interactive elements */
-.form-group:hover input {
+.form-group:hover input:not(:disabled) {
   border-color: #cbd5e0;
 }
 
-.checkbox-wrapper:hover .checkmark {
+.checkbox-wrapper:hover .checkmark:not(:has(input:disabled)) {
   border-color: #667eea;
 }

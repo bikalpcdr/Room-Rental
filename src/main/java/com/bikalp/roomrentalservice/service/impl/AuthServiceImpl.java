@@ -4,6 +4,7 @@ import com.bikalp.roomrentalservice.dto.request.LoginRequest;
 import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
 import com.bikalp.roomrentalservice.dto.response.AuthResponse;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
+import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.model.User;
 import com.bikalp.roomrentalservice.repository.UserRepo;
 import com.bikalp.roomrentalservice.service.AuthService;
@@ -33,10 +34,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void register(RegisterRequest request) {
         if (userRepo.existsByEmail(request.getEmail())) {
-            throw new AlreadyExistFoundException("Email already exists");
+            throw new AlreadyExistFoundException("Email already exists..!!");
         }
         if (userRepo.existsByUsername(request.getUsername())) {
-            throw new AlreadyExistFoundException("Username already exists");
+            throw new AlreadyExistFoundException("Username already exists..!!");
         }
 
         User user = User.builder()
@@ -54,6 +55,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(LoginRequest request) {
         try {
+            if (request.getUsername() == null || request.getUsername().isBlank() || request.getPassword() == null || request.getPassword().isBlank()) {
+                throw new CustomizeException("Username and password must be provided..!!");
+            }
             // authenticate username and password
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -61,7 +65,11 @@ public class AuthServiceImpl implements AuthService {
 
             // loading user details
             User user = userRepo.findByUsername(request.getUsername())
-                    .orElseThrow(() -> new BadCredentialsException("Username or password is incorrect"));
+                    .orElseThrow(() -> new CustomizeException("Username or password is incorrect..!!"));
+
+            if (!user.getIsActive()) {
+                throw new CustomizeException("Your account is inactive..!!");
+            }
 
             // generating token
             String token = jwtUtil.generateToken(user.getUsername(), user.getUserRole().name());
@@ -76,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
                     .phoneNumber(user.getPhoneNumber())
                     .build();
         } catch (BadCredentialsException ex) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new CustomizeException("Invalid username or password..!!");
         }
     }
 }
