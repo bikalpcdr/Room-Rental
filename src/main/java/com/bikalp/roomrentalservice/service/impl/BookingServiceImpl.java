@@ -15,6 +15,7 @@ import com.bikalp.roomrentalservice.repository.PropertyRepo;
 import com.bikalp.roomrentalservice.repository.UserRepo;
 import com.bikalp.roomrentalservice.service.BookingService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepo bookingRepo;
@@ -85,6 +87,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public void rejectBooking(Long bookingId) {
+        updateStatus(bookingId,BookingStatus.REJECTED);
+    }
+
+    @Override
     @Transactional
     public void updatePaymentStatus(String orderNumber, String status) {
         // Find booking by order number and update payment status
@@ -93,7 +100,7 @@ public class BookingServiceImpl implements BookingService {
         // In a real implementation, you'd want to store the order number with the booking
         
         // For demonstration, we'll just log the payment status
-        System.out.println("Payment status updated for order: " + orderNumber + " with status: " + status);
+        log.info("Payment status updated for order: {} with status: {}", orderNumber, status);
     }
 
     @Override

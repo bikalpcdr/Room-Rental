@@ -1,38 +1,38 @@
 import axios from "axios";
-import { getToken, logout } from "./utils/auth";
+import {getToken, logout} from "./utils/auth";
 
 const API_BASE_URL = "http://localhost:7777/api";
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
 // Add request interceptor to include token
 apiClient.interceptors.request.use(
-  (config) => {
-    const token = getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
+    (config) => {
+        const token = getToken();
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
 );
 
 // Add response interceptor to handle authentication errors
 apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      logout();
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Token expired or invalid
+            logout();
+        }
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
-  }
 );
 
 /**
@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
  * @returns {Promise}
  */
 export const loginUser = (username, password) =>
-  apiClient.post(`/auth/login`, { username, password });
+    apiClient.post(`/auth/login`, {username, password});
 
 /**
  * Register API call
@@ -55,7 +55,7 @@ export const loginUser = (username, password) =>
  * @returns {Promise}
  */
 export const registerUser = (username, email, password, fullName, phoneNumber, role) =>
-  apiClient.post(`/auth/register`, { username, email, password, fullName, phoneNumber, role });
+    apiClient.post(`/auth/register`, {username, email, password, fullName, phoneNumber, role});
 
 /**
  * Create a new user (admin)
@@ -68,7 +68,7 @@ export const registerUser = (username, email, password, fullName, phoneNumber, r
  * @returns {Promise}
  */
 export const createUser = (username, email, password, fullName, phoneNumber, role) =>
-  apiClient.post(`/users`, { username, email, password, fullName, phoneNumber, role });
+    apiClient.post(`/users`, {username, email, password, fullName, phoneNumber, role});
 
 /**
  * Update user details
@@ -80,7 +80,7 @@ export const createUser = (username, email, password, fullName, phoneNumber, rol
  * @returns {Promise}
  */
 export const updateUser = (id, username, fullName, phoneNumber, role) =>
-  apiClient.put(`/users`, { id, username, fullName, phoneNumber, role });
+    apiClient.put(`/users`, {id, username, fullName, phoneNumber, role});
 
 /**
  * Get all users
@@ -109,14 +109,14 @@ export const deleteUserById = (userId) => apiClient.delete(`/users/${userId}`);
  * @returns {Promise}
  */
 export const uploadProfilePicture = (userId, file) => {
-  const formData = new FormData();
-  formData.append("file", file);
-  return apiClient.post(`/users/${userId}/profile-picture`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data"
-      // Authorization header is set by interceptor
-    },
-  });
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiClient.post(`/users/${userId}/profile-picture`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data"
+            // Authorization header is set by interceptor
+        },
+    });
 };
 
 // Property APIs
@@ -132,8 +132,8 @@ export const getOwnerProperties = () => apiClient.get('/property/get-all-owner-p
  * @returns {Promise} - resolves to propertyId
  */
 export const createProperty = (data) => {
-  return apiClient.post('/property', data)
-    .then(res => res.data.data); // assuming propertyId is in data
+    return apiClient.post('/property', data)
+        .then(res => res.data.data); // assuming propertyId is in data
 };
 
 /**
@@ -143,13 +143,13 @@ export const createProperty = (data) => {
  * @returns {Promise}
  */
 export const uploadPropertyImages = (propertyId, images = []) => {
-  const formData = new FormData();
-  images.forEach((img) => formData.append('images', img));
-  return apiClient.post(`/property/${propertyId}/images`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    },
-  });
+    const formData = new FormData();
+    images.forEach((img) => formData.append('images', img));
+    return apiClient.post(`/property/${propertyId}/images`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+    });
 };
 
 /**
@@ -250,12 +250,19 @@ export const cancelBooking = (bookingId) => apiClient.put(`/booking/cancel/${boo
 export const approveBooking = (bookingId) => apiClient.put(`/booking/approve/${bookingId}`);
 
 /**
+ * reject a booking
+ * @param {string} bookingId
+ * @returns {Promise}
+ */
+export const rejectBooking = (bookingId) => apiClient.put(`/booking/reject/${bookingId}`);
+
+/**
  * Delete a property image by imageId
  * @param {string|number} imageId
  * @returns {Promise}
  */
 export const deletePropertyImage = (imageId) =>
-  apiClient.delete(`/property/delete-image/${imageId}`);
+    apiClient.delete(`/property/delete-image/${imageId}`);
 
 // Fetch booking requests for owner
 export const fetchBookingRequests = () => apiClient.get('/property/fetch-booking-request');
@@ -265,20 +272,20 @@ export const fetchBookingRequests = () => apiClient.get('/property/fetch-booking
  * @param {object} params - { amount, referenceId, productId, successUrl, failureUrl }
  * @returns {Promise}
  */
-export const initiateEsewaPayment = ({ amount, referenceId, productId, successUrl, failureUrl }) =>
-  apiClient.post(`/payment/initiate`, null, {
-    params: { amount, referenceId, productId, successUrl, failureUrl }
-  });
+export const initiateEsewaPayment = ({amount, referenceId, productId, successUrl, failureUrl}) =>
+    apiClient.post(`/payment/initiate`, null, {
+        params: {amount, referenceId, productId, successUrl, failureUrl}
+    });
 
 /**
  * Verify eSewa payment
  * @param {object} params - { amt, rid, pid }
  * @returns {Promise}
  */
-export const verifyEsewaPayment = ({ amt, rid, pid }) =>
-  apiClient.post(`/payment/verify`, null, {
-    params: { amt, rid, pid }
-  });
+export const verifyEsewaPayment = ({amt, rid, pid}) =>
+    apiClient.post(`/payment/verify`, null, {
+        params: {amt, rid, pid}
+    });
 
 /**
  * eSewa Token-based Inquiry
@@ -286,20 +293,20 @@ export const verifyEsewaPayment = ({ amt, rid, pid }) =>
  * @returns {Promise}
  */
 export const esewaInquiry = (requestId) =>
-  apiClient.get(`/payment/inquiry/${requestId}`);
+    apiClient.get(`/payment/inquiry/${requestId}`);
 
 /**
  * eSewa Token-based Payment
  * @param {object} params - { request_id, amount, transaction_code, package_id }
  * @returns {Promise}
  */
-export const esewaTokenPayment = ({ request_id, amount, transaction_code, package_id }) =>
-  apiClient.post(`/payment/payment`, { request_id, amount, transaction_code, package_id });
+export const esewaTokenPayment = ({request_id, amount, transaction_code, package_id}) =>
+    apiClient.post(`/payment/payment`, {request_id, amount, transaction_code, package_id});
 
 /**
  * eSewa Token-based Status Check
  * @param {object} params - { request_id, amount, transaction_code }
  * @returns {Promise}
  */
-export const esewaStatusCheck = ({ request_id, amount, transaction_code }) =>
-  apiClient.post(`/payment/status`, { request_id, amount, transaction_code });
+export const esewaStatusCheck = ({request_id, amount, transaction_code}) =>
+    apiClient.post(`/payment/status`, {request_id, amount, transaction_code});
