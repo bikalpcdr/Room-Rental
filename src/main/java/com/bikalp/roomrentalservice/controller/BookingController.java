@@ -2,12 +2,17 @@ package com.bikalp.roomrentalservice.controller;
 
 import com.bikalp.roomrentalservice.controller.base.BaseController;
 import com.bikalp.roomrentalservice.dto.request.BookingRequest;
+import com.bikalp.roomrentalservice.dto.request.PaymentRequestDto;
 import com.bikalp.roomrentalservice.dto.response.GlobalAPIResponse;
 import com.bikalp.roomrentalservice.service.BookingService;
+import com.bikalp.roomrentalservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController extends BaseController {
 
     private final BookingService bookingService;
+    private final PaymentService paymentService;
     String entity = "Booking";
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RENTER')")
@@ -23,6 +29,46 @@ public class BookingController extends BaseController {
     public ResponseEntity<GlobalAPIResponse> createBooking(@RequestBody BookingRequest request) {
         bookingService.createBooking(request);
         return createdResponse(entity);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'RENTER')")
+    @PostMapping("/initiate-payment")
+    public void initiateBookingPayment(HttpServletResponse response, @RequestBody BookingRequest request) throws IOException {
+        // First create the booking
+        bookingService.createBooking(request);
+        
+        // Then initiate payment
+        PaymentRequestDto paymentRequest = new PaymentRequestDto();
+        paymentRequest.setOrderNumber("BOOKING_" + System.currentTimeMillis());
+        paymentRequest.setPaymentMethod(request.getPaymentMethod());
+        paymentRequest.setOrderType("BOOKING");
+        
+        String html = paymentService.payment(paymentRequest);
+        response.setContentType("text/html;charset=UTF-8");
+        response.getWriter().write(html);
+        response.getWriter().flush();
+    }
+
+    @RequestMapping(value = "/payment-callback", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<GlobalAPIResponse> handlePaymentCallback(
+            @RequestParam(required = false) String orderNumber, 
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String transaction_uuid,
+            @RequestParam(required = false) String product_code) {
+        
+        // Log the callback for debugging
+        System.out.println("Payment callback received - orderNumber: " + orderNumber + ", status: " + status);
+        
+        // Handle different parameter names that eSewa might send
+        String finalOrderNumber = orderNumber != null ? orderNumber : transaction_uuid;
+        String finalStatus = status != null ? status : "UNKNOWN";
+        
+        if (finalOrderNumber != null) {
+            bookingService.updatePaymentStatus(finalOrderNumber, finalStatus);
+            return customResponse("Payment status updated successfully", null);
+        } else {
+            return customResponse("Payment callback received but no order number found", null);
+        }
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")

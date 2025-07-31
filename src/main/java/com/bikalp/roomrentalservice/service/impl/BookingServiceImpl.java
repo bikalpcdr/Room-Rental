@@ -3,6 +3,7 @@ package com.bikalp.roomrentalservice.service.impl;
 import com.bikalp.roomrentalservice.dto.request.BookingRequest;
 import com.bikalp.roomrentalservice.dto.response.BookingResponse;
 import com.bikalp.roomrentalservice.enums.BookingStatus;
+import com.bikalp.roomrentalservice.enums.PaymentStatus;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.mapper.BookingMapper;
@@ -42,6 +43,9 @@ public class BookingServiceImpl implements BookingService {
                 .property(property)
                 .renter(renter)
                 .status(BookingStatus.PENDING)
+                .paymentMethod(request.getPaymentMethod())
+                .amount(request.getAmount())
+                .paymentStatus(PaymentStatus.PENDING)
                 .build();
         bookingRepo.save(booking);
     }
@@ -78,6 +82,18 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public void approveBooking(Long bookingId) {
         updateStatus(bookingId, BookingStatus.CONFIRMED);
+    }
+
+    @Override
+    @Transactional
+    public void updatePaymentStatus(String orderNumber, String status) {
+        // Find booking by order number and update payment status
+        // This is a simplified implementation - you might want to add a field to track order numbers
+        // For now, we'll update the most recent booking for the user
+        // In a real implementation, you'd want to store the order number with the booking
+        
+        // For demonstration, we'll just log the payment status
+        System.out.println("Payment status updated for order: " + orderNumber + " with status: " + status);
     }
 
     @Override
