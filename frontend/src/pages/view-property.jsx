@@ -3,8 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { getPropertyById } from "../api";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import "../style/view-property.css";
 
 function ViewProperty() {
@@ -118,7 +117,6 @@ function ViewProperty() {
         </div>
       </main>
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

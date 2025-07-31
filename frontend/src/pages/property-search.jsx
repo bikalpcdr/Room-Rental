@@ -2,8 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { getAllProperties, searchProperties, createBooking } from "../api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const PROPERTY_TYPES = ["ROOM", "FLAT", "HOUSE"];
@@ -301,7 +300,6 @@ function PropertySearch() {
         )}
       </main>
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

@@ -3,9 +3,8 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/admin-dashboard.css";
 import { getAllUsers, deleteUserById, createUser, updateUser } from "../api";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { getUserData } from "../utils/auth";
-import "react-toastify/dist/ReactToastify.css";
 import UserForm from "../forms/UserForm";
 import PropTypes from "prop-types";
 
@@ -306,7 +305,6 @@ function AdminDashboard() {
           </div>
         )}
 
-        <ToastContainer position="top-right" autoClose={3000} />
       </main>
       <Footer />
     </>

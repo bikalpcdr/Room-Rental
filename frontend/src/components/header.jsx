@@ -2,8 +2,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { isAuthenticated, getUserData, logout, isAdmin, isOwner, isRenter } from "../utils/auth";
 import { uploadProfilePicture } from "../api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -221,7 +220,6 @@ function Header() {
           </div>
         </div>
       )}
-      <ToastContainer position="top-right" autoClose={3000} />
     </header>
   );
 }

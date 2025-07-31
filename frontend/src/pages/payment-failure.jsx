@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
 function PaymentFailure() {
   const [searchParams] = useSearchParams();
@@ -122,7 +121,6 @@ function PaymentFailure() {
         )}
       </main>
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

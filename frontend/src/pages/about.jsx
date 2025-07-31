@@ -1,6 +1,6 @@
 import React from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
+
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/about.css";
@@ -205,7 +205,6 @@ function About() {
         </section>
       </main>
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

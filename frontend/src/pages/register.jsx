@@ -4,8 +4,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/register.css";
 import { registerUser } from "../api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
 function Register() {
@@ -286,7 +285,6 @@ function Register() {
             </div>
           </div>
         </div>
-        <ToastContainer position="top-right" autoClose={3000} />
       </main>
       <Footer />
     </>
