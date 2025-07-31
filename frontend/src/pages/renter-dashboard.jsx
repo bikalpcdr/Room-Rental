@@ -4,11 +4,9 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/admin-dashboard.css";
-import { getBookingsByRenterId, getAllProperties, cancelBooking } from "../api";
+import { getBookingsByRenterId, getAllProperties } from "../api";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import RenterBookingTable from "../components/RenterBookingTable";
-import { ViewPropertyModal } from "../pages/view-property";
 
 function RenterDashboard() {
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -19,7 +17,6 @@ function RenterDashboard() {
   const [showPropertyModal, setShowPropertyModal] = useState(false);
   const [propertyList, setPropertyList] = useState([]);
   const [propertyLoading, setPropertyLoading] = useState(false);
-  const [propertyModalId, setPropertyModalId] = useState(null);
 
   const [stats, setStats] = useState({
     rentals: 0,
@@ -87,21 +84,6 @@ function RenterDashboard() {
   const handleViewSpending = useCallback(() => {
     handleViewBookings('spending');
   }, [handleViewBookings]);
-
-  const handleCancelBooking = useCallback(async (bookingId) => {
-    try {
-      await cancelBooking(bookingId);
-      toast.success("Booking cancelled successfully!");
-      fetchBookings();
-    } catch (err) {
-      toast.error("Failed to cancel booking");
-    }
-  }, [fetchBookings]);
-
-  const handleViewPropertyModal = useCallback((propertyId) => {
-    setPropertyModalId(propertyId);
-    setShowPropertyModal(true);
-  }, []);
 
   const getFilteredBookings = useCallback(() => {
     switch (selectedBookingType) {
@@ -211,12 +193,63 @@ function RenterDashboard() {
                 </button>
               </div>
               <div className="modal-content">
-                <RenterBookingTable
-                  bookings={getFilteredBookings()}
-                  loading={loading}
-                  onCancel={handleCancelBooking}
-                  onViewProperty={handleViewPropertyModal}
-                />
+                {getFilteredBookings().length === 0 ? (
+                  <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
+                    No bookings found.
+                  </p>
+                ) : (
+                  <div className="table-container">
+                    <table className="users-table">
+                      <thead>
+                        <tr>
+                          <th>Property</th>
+                          <th>Address</th>
+                          <th>Status</th>
+                          <th>Rent Price</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getFilteredBookings().map((booking) => (
+                          <tr key={booking.id}>
+                            <td>{booking.property?.title || booking.property?.roomTitle || 'N/A'}</td>
+                            <td>{booking.property?.address || 'N/A'}</td>
+                            <td>
+                              <span className={`role-badge role-${booking.status?.toLowerCase()}`}>
+                                {booking.status}
+                              </span>
+                            </td>
+                            <td>${booking.property?.rentPrice || 0}</td>
+                            <td>
+                              <div className="action-buttons">
+                                {booking.status === 'PENDING' && (
+                                  <button 
+                                    className="delete-btn" 
+                                    onClick={() => {
+                                      // TODO: Implement cancel booking
+                                      toast.info("Cancel booking feature coming soon!");
+                                    }}
+                                  >
+                                    Cancel
+                                  </button>
+                                )}
+                                <button 
+                                  className="view-btn" 
+                                  onClick={() => {
+                                    // TODO: Navigate to property view
+                                    toast.info("Property view feature coming soon!");
+                                  }}
+                                >
+                                  View Property
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -224,11 +257,55 @@ function RenterDashboard() {
 
         {/* Property Search Modal */}
         {showPropertyModal && (
-          <ViewPropertyModal
-            propertyId={propertyModalId}
-            isOpen={showPropertyModal}
-            onClose={() => setShowPropertyModal(false)}
-          />
+          <div className="modal-overlay">
+            <div className="modal">
+              <div className="modal-header">
+                <h2>All Properties</h2>
+                <button className="close-btn" onClick={() => setShowPropertyModal(false)}>
+                  ×
+                </button>
+              </div>
+              <div className="modal-content">
+                {propertyLoading ? (
+                  <div className="admin-loading">
+                    <div className="loading-spinner"></div>
+                    <p>Loading properties...</p>
+                  </div>
+                ) : propertyList.length === 0 ? (
+                  <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
+                    No properties found.
+                  </p>
+                ) : (
+                  <div className="table-container">
+                    <table className="users-table">
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>Type</th>
+                          <th>Address</th>
+                          <th>Rooms</th>
+                          <th>Rent Price</th>
+                          <th>Available</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {propertyList.map((property) => (
+                          <tr key={property.id}>
+                            <td>{property.title || property.roomTitle || 'N/A'}</td>
+                            <td>{property.propertyType}</td>
+                            <td>{property.address}</td>
+                            <td>{property.roomCount}</td>
+                            <td>{property.rentPrice}</td>
+                            <td>{property.isAvailable ? 'Yes' : 'No'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </main>
       <Footer />

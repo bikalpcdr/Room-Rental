@@ -1,0 +1,16 @@
+<body>
+<form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST">
+    <input type="text" name="tax_amount" value="10" required>
+    <input type="text" name="amount" value="990.00" required>
+    <input type="text" name="total_amount" value="1000.00" required>
+    <input type="text" name="signature" value="cUZpMIsTztMLRtRiWXL8CsF0+hwL30fwQ+gXevR58Ok=" required>
+    <input type="text" name="product_service_charge" value="0" required>
+    <input type="text" name="product_delivery_charge" value="0" required>
+    <input type="text" name="transaction_uuid" value="2025-07-08-648919" required>
+    <input type="text" name="failure_url" value="https://developer.esewa.com.np/failure" required>
+    <input type="text" name="product_code" value="EPAYTEST" required>
+    <input type="text" name="signed_field_names" value="total_amount,transaction_uuid,product_code" required>
+    <input type="text" name="success_url" value="https://developer.esewa.com.np/success" required>
+    <input value="Submit" type="submit">
+</form>
+</body>

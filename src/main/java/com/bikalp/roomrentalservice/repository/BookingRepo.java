@@ -2,12 +2,10 @@ package com.bikalp.roomrentalservice.repository;
 
 import com.bikalp.roomrentalservice.enums.BookingStatus;
 import com.bikalp.roomrentalservice.model.Booking;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository

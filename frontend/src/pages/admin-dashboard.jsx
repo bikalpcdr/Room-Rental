@@ -2,27 +2,18 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/admin-dashboard.css";
-import { getAllUsers, deleteUserById, createUser, updateUser, getAllProperties, deleteProperty } from "../api";
+import { getAllUsers, deleteUserById, createUser, updateUser } from "../api";
 import { ToastContainer, toast } from "react-toastify";
 import { getUserData } from "../utils/auth";
 import "react-toastify/dist/ReactToastify.css";
 import UserForm from "../forms/UserForm";
 import PropTypes from "prop-types";
-import UsersTable from "../components/UserTable";
-import PropertiesTable from "../components/PropertyTable";
-import FloatingTableModal from "../components/FloatingTableModal";
 
-const StatsCards = React.memo(({ stats, onViewUsers, onViewProperties }) => (
+const StatsCards = React.memo(({ stats }) => (
   <div className="stats-container">
-    <div className="stat-card" onClick={onViewUsers} style={{ cursor: 'pointer' }}>
+    <div className="stat-card">
       <h3>Total Users</h3>
       <p className="stat-number">{stats.totalUsers}</p>
-      <small>Click to manage users</small>
-    </div>
-    <div className="stat-card" onClick={onViewProperties} style={{ cursor: 'pointer' }}>
-      <h3>Total Properties</h3>
-      <p className="stat-number">{stats.totalProperties}</p>
-      <small>Click to manage properties</small>
     </div>
     <div className="stat-card">
       <h3>Admins</h3>
@@ -42,13 +33,62 @@ const StatsCards = React.memo(({ stats, onViewUsers, onViewProperties }) => (
 StatsCards.propTypes = {
   stats: PropTypes.shape({
     totalUsers: PropTypes.number,
-    totalProperties: PropTypes.number,
     admins: PropTypes.number,
     owners: PropTypes.number,
     renters: PropTypes.number,
   }).isRequired,
-  onViewUsers: PropTypes.func.isRequired,
-  onViewProperties: PropTypes.func.isRequired,
+};
+
+const UsersTable = React.memo(({ users, onEdit, onDelete }) => (
+  <div className="table-container">
+    <table className="users-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>UserID</th>
+          <th>Username</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {users.map((user, index) => (
+          <tr key={user.id}>
+            <td>{index + 1}</td>
+            <td>{user.userId}</td>
+            <td>{user.username}</td>
+            <td>{user.fullName}</td>
+            <td>{user.email}</td>
+            <td>{user.phoneNumber}</td>
+            <td>
+              <span className={`role-badge role-${user.role.toLowerCase()}`}>
+                {user.role}
+              </span>
+            </td>
+            <td>
+              <div className="action-buttons">
+                <button className="edit-btn" onClick={() => onEdit(user)}>
+                  Edit
+                </button>
+                <button className="delete-btn" onClick={() => onDelete(user.userId)}>
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+));
+
+UsersTable.propTypes = {
+  users: PropTypes.array.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 function AdminDashboard() {
@@ -57,13 +97,6 @@ function AdminDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [showUserTable, setShowUserTable] = useState(false);
-  
-  // Property management states
-  const [properties, setProperties] = useState([]);
-  const [propertiesLoading, setPropertiesLoading] = useState(false);
-  const [showPropertyTable, setShowPropertyTable] = useState(false);
-  
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -74,6 +107,16 @@ function AdminDashboard() {
   });
 
   const userData = getUserData();
+
+  useEffect(() => {
+    fetchUsers();
+    const showWelcomeToast = localStorage.getItem('showWelcomeToast');
+    if (showWelcomeToast === 'true') {
+      toast.success(`Welcome back, ${userData.fullName}! 🎉`);
+      localStorage.removeItem('showWelcomeToast');
+    }
+    // eslint-disable-next-line
+  }, []);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -88,38 +131,13 @@ function AdminDashboard() {
     }
   }, []);
 
-  const fetchProperties = useCallback(async () => {
-    try {
-      setPropertiesLoading(true);
-      const response = await getAllProperties();
-      setProperties(response.data?.data || []);
-    } catch (error) {
-      toast.error("Failed to fetch properties");
-      console.error("Error fetching properties:", error);
-    } finally {
-      setPropertiesLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchUsers();
-    fetchProperties();
-    const showWelcomeToast = localStorage.getItem('showWelcomeToast');
-    if (showWelcomeToast === 'true') {
-      toast.success(`Welcome back, ${userData.fullName}! 🎉`);
-      localStorage.removeItem('showWelcomeToast');
-    }
-    // eslint-disable-next-line
-  }, []);
-
   const stats = useMemo(() => {
     const totalUsers = users.length;
-    const totalProperties = properties.length;
     const admins = users.filter(user => user.role === "ADMIN").length;
     const owners = users.filter(user => user.role === "OWNER").length;
     const renters = users.filter(user => user.role === "RENTER").length;
-    return { totalUsers, totalProperties, admins, owners, renters };
-  }, [users, properties]);
+    return { totalUsers, admins, owners, renters };
+  }, [users]);
 
   const handleCreateUser = useCallback(async (e) => {
     e.preventDefault();
@@ -171,18 +189,6 @@ function AdminDashboard() {
       }
     }
   }, [fetchUsers]);
-
-  const handleDeleteProperty = useCallback(async (propertyId) => {
-    if (window.confirm("Are you sure you want to delete this property?")) {
-      try {
-        await deleteProperty(propertyId);
-        toast.success("Property deleted successfully!");
-        fetchProperties();
-      } catch (err) {
-        toast.error("Failed to delete property");
-      }
-    }
-  }, [fetchProperties]);
 
   const resetForm = useCallback(() => {
     setFormData({
@@ -244,38 +250,13 @@ function AdminDashboard() {
         </div>
 
         {/* Statistics Cards */}
-        <StatsCards stats={stats} onViewUsers={() => setShowUserTable(true)} onViewProperties={() => setShowPropertyTable(true)} />
+        <StatsCards stats={stats} />
 
         {/* Users Table */}
-        <FloatingTableModal
-          isOpen={showUserTable}
-          onClose={() => setShowUserTable(false)}
-          title="User Management"
-        >
+        <div className="users-section">
+          <h2>User Management</h2>
           <UsersTable users={users} onEdit={openEditModal} onDelete={handleDeleteUser} />
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-            <button className="create-user-btn" onClick={openCreateModal}>
-              + Add User
-            </button>
-          </div>
-        </FloatingTableModal>
-
-        {/* Property Management Section */}
-        <FloatingTableModal
-          isOpen={showPropertyTable}
-          onClose={() => setShowPropertyTable(false)}
-          title="Property Management"
-        >
-          {propertiesLoading ? (
-            <p>Loading properties...</p>
-          ) : properties.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#666', fontSize: '1.1rem' }}>
-              No properties found.
-            </p>
-          ) : (
-            <PropertiesTable properties={properties} onDelete={handleDeleteProperty} />
-          )}
-        </FloatingTableModal>
+        </div>
 
         {/* Create User Modal */}
         {showCreateModal && (

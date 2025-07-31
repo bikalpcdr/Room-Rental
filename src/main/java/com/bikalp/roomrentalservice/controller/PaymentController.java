@@ -1,66 +1,53 @@
 package com.bikalp.roomrentalservice.controller;
 
-import com.bikalp.roomrentalservice.service.EsewaPaymentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bikalp.roomrentalservice.controller.base.BaseController;
+import com.bikalp.roomrentalservice.dto.request.PaymentRequestDto;
+import com.bikalp.roomrentalservice.dto.response.GlobalAPIResponse;
+import com.bikalp.roomrentalservice.service.PaymentService;
+import com.bikalp.roomrentalservice.service.impl.PaymentServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/payment")
-public class PaymentController {
+@RequestMapping("/api/v1/payment")
+public class PaymentController extends BaseController {
+    private final PaymentService paymentService;
 
-    private final EsewaPaymentService esewaPaymentService;
-
-    public PaymentController(EsewaPaymentService esewaPaymentService) {
-        this.esewaPaymentService = esewaPaymentService;
+    public PaymentController(PaymentServiceImpl esewaService) {
+        this.paymentService = esewaService;
     }
 
     @PostMapping("/initiate")
-    public Map<String, String> initiatePayment(@RequestParam String amount,
-                                               @RequestParam String referenceId,
-                                               @RequestParam String productId,
-                                               @RequestParam String successUrl,
-                                               @RequestParam String failureUrl) {
-        return esewaPaymentService.initiatePayment(amount, referenceId, productId, successUrl, failureUrl);
-    }
-
-    @PostMapping("/verify")
-    public boolean verifyPayment(@RequestParam String amt,
-                                 @RequestParam String rid,
-                                 @RequestParam String pid) {
-        return esewaPaymentService.verifyPayment(amt, rid, pid);
-    }
-
-    @GetMapping("/inquiry/{requestId}")
-    public Map<String, Object> inquiry(@PathVariable String requestId) {
-        return esewaPaymentService.inquiry(requestId);
-    }
-
-    @PostMapping("/payment")
-    public Map<String, Object> payment(@RequestBody Map<String, Object> body) {
-        String requestId = (String) body.get("request_id");
-        double amount = Double.parseDouble(body.get("amount").toString());
-        String transactionCode = (String) body.get("transaction_code");
-        Integer packageId = body.get("package_id") != null ? Integer.parseInt(body.get("package_id").toString()) : null;
-        return esewaPaymentService.payment(requestId, amount, transactionCode, packageId);
+    public void initiatePayment(HttpServletResponse response, @RequestBody PaymentRequestDto requestDto) throws IOException {
+        String html = paymentService.payment(requestDto);
+        response.setContentType("text/html;charset=UTF-8");
+        response.getWriter().write(html);
+        response.getWriter().flush();
     }
 
     @PostMapping("/status")
-    public Map<String, Object> statusCheck(@RequestBody Map<String, Object> body) {
-        String requestId = (String) body.get("request_id");
-        double amount = Double.parseDouble(body.get("amount").toString());
-        String transactionCode = (String) body.get("transaction_code");
-        return esewaPaymentService.statusCheck(requestId, amount, transactionCode);
+    @ResponseBody
+    public ResponseEntity<GlobalAPIResponse> handleSuccess(@RequestParam String orderNumber, @RequestParam String orderType) {
+        return customResponse("Payment status handle Successfully..!!", paymentService.checkEsewaPaymentStatus(orderNumber, orderType));
     }
 
-    // Optional: Expose token for testing
-    @GetMapping("/token")
-    public Map<String, String> getToken() {
-        String token = esewaPaymentService.getEsewaAccessToken();
-        Map<String, String> map = new HashMap<>();
-        map.put("access_token", token);
-        return map;
+    @PostMapping("/failure")
+    @ResponseBody
+    public ResponseEntity<GlobalAPIResponse> handleFailure() {
+        return customResponse("Payment failed or canceled...!!", null);
     }
-} 
+
+    @PostMapping("/update-cash-on-delivery-status")
+    public ResponseEntity<GlobalAPIResponse> updateCashOnDeliveryStatus(@RequestBody PaymentRequestDto paymentRequestDto) {
+        paymentService.updateCashOnDeliveryStatus(paymentRequestDto);
+        return updateResponse("Payment");
+    }
+
+    @PostMapping("/request-details")
+    public ResponseEntity<GlobalAPIResponse> paymentRequestDetails(@RequestBody PaymentRequestDto requestDto) {
+        return fetchResponse("Payment", paymentService.paymentRequestDetails(requestDto));
+    }
+}
