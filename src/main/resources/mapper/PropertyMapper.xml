@@ -61,6 +61,7 @@
                  left join property_amenities pa on p.id = pa.property_id
                  left join users u on p.owner_id = u.id
                  left join property_image pi on p.id = pi.property_id
+        where p.is_available
     </select>
 
     <select id="getAllPropertiesByOwnerId" resultMap="PropertyResponseMap">
@@ -106,6 +107,7 @@
                  left join users u on p.owner_id = u.id
                  left join property_image pi on p.id = pi.property_id
         <where>
+            p.is_available = true
             <if test="propertyType != null">
                 AND p.property_type = #{propertyType}
             </if>

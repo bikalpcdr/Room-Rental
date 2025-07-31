@@ -6,16 +6,18 @@ import com.bikalp.roomrentalservice.dto.request.PaymentRequestDto;
 import com.bikalp.roomrentalservice.dto.response.GlobalAPIResponse;
 import com.bikalp.roomrentalservice.service.BookingService;
 import com.bikalp.roomrentalservice.service.PaymentService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @PreAuthorize("hasAnyRole('ADMIN', 'OWNER','RENTER')")
 @RequestMapping("/api/booking")
 public class BookingController extends BaseController {
@@ -36,13 +38,13 @@ public class BookingController extends BaseController {
     public void initiateBookingPayment(HttpServletResponse response, @RequestBody BookingRequest request) throws IOException {
         // First create the booking
         bookingService.createBooking(request);
-        
+
         // Then initiate payment
         PaymentRequestDto paymentRequest = new PaymentRequestDto();
         paymentRequest.setOrderNumber("BOOKING_" + System.currentTimeMillis());
         paymentRequest.setPaymentMethod(request.getPaymentMethod());
         paymentRequest.setOrderType("BOOKING");
-        
+
         String html = paymentService.payment(paymentRequest);
         response.setContentType("text/html;charset=UTF-8");
         response.getWriter().write(html);
@@ -51,18 +53,18 @@ public class BookingController extends BaseController {
 
     @RequestMapping(value = "/payment-callback", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<GlobalAPIResponse> handlePaymentCallback(
-            @RequestParam(required = false) String orderNumber, 
+            @RequestParam(required = false) String orderNumber,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String transaction_uuid,
             @RequestParam(required = false) String product_code) {
-        
+
         // Log the callback for debugging
-        System.out.println("Payment callback received - orderNumber: " + orderNumber + ", status: " + status);
-        
+        log.info("Payment callback received - orderNumber: {}, status: {}", orderNumber, status);
+
         // Handle different parameter names that eSewa might send
         String finalOrderNumber = orderNumber != null ? orderNumber : transaction_uuid;
         String finalStatus = status != null ? status : "UNKNOWN";
-        
+
         if (finalOrderNumber != null) {
             bookingService.updatePaymentStatus(finalOrderNumber, finalStatus);
             return customResponse("Payment status updated successfully", null);
@@ -113,6 +115,13 @@ public class BookingController extends BaseController {
     @PutMapping("/cancel/{bookingId}")
     public ResponseEntity<GlobalAPIResponse> cancelBooking(@PathVariable Long bookingId) {
         bookingService.cancelBooking(bookingId);
+        return updateResponse(entity);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PutMapping("/reject/{bookingId}")
+    public ResponseEntity<GlobalAPIResponse> rejectBooking(@PathVariable Long bookingId) {
+        bookingService.rejectBooking(bookingId);
         return updateResponse(entity);
     }
 
