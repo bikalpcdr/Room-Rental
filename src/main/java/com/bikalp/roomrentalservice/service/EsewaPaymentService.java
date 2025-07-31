@@ -9,11 +9,21 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class EsewaPaymentService {
 
     private final EsewaConfig esewaConfig;
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final AtomicReference<String> cachedAccessToken = new AtomicReference<>(null);
+    private final AtomicReference<String> cachedRefreshToken = new AtomicReference<>(null);
+    private final ReentrantLock tokenLock = new ReentrantLock();
 
     public EsewaPaymentService(EsewaConfig esewaConfig) {
         this.esewaConfig = esewaConfig;
@@ -69,6 +79,136 @@ public class EsewaPaymentService {
             return Base64.getEncoder().encodeToString(hash);
         } catch (Exception e) {
             throw new CustomizeException("Failed to generate eSewa signature");
+        }
+    }
+
+    // 1. Authenticate and get/refresh access token
+    public String getEsewaAccessToken() {
+        tokenLock.lock();
+        try {
+            String accessToken = cachedAccessToken.get();
+            if (accessToken != null) {
+                return accessToken;
+            }
+            // Prepare authentication request
+            String url = esewaConfig.getBaseUrl() + "/access-token";
+            Map<String, String> body = new HashMap<>();
+            body.put("grant_type", "password");
+            body.put("client_secret", esewaConfig.getClientSecret());
+            body.put("username", esewaConfig.getEsewaId());
+            body.put("password", esewaConfig.getPassword());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Map<String, Object> resp = objectMapper.readValue(response.getBody(), Map.class);
+                String token = (String) resp.get("access_token");
+                String refreshToken = (String) resp.get("refresh_token");
+                cachedAccessToken.set(token);
+                cachedRefreshToken.set(refreshToken);
+                return token;
+            } else {
+                throw new CustomizeException("Failed to get eSewa access token");
+            }
+        } catch (Exception e) {
+            throw new CustomizeException("Failed to get eSewa access token: " + e.getMessage());
+        } finally {
+            tokenLock.unlock();
+        }
+    }
+
+    public String refreshEsewaAccessToken() {
+        tokenLock.lock();
+        try {
+            String url = esewaConfig.getBaseUrl() + "/access-token";
+            Map<String, String> body = new HashMap<>();
+            body.put("grant_type", "refresh_token");
+            body.put("refresh_token", cachedRefreshToken.get());
+            body.put("client_secret", esewaConfig.getClientSecret());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Map<String, Object> resp = objectMapper.readValue(response.getBody(), Map.class);
+                String token = (String) resp.get("access_token");
+                String refreshToken = (String) resp.get("refresh_token");
+                cachedAccessToken.set(token);
+                cachedRefreshToken.set(refreshToken);
+                return token;
+            } else {
+                throw new CustomizeException("Failed to refresh eSewa access token");
+            }
+        } catch (Exception e) {
+            throw new CustomizeException("Failed to refresh eSewa access token: " + e.getMessage());
+        } finally {
+            tokenLock.unlock();
+        }
+    }
+
+    // 2. Inquiry (GET)
+    public Map<String, Object> inquiry(String requestId) {
+        String url = esewaConfig.getBaseUrl() + "/inquiry/" + requestId;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(getEsewaAccessToken());
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            try {
+                return objectMapper.readValue(response.getBody(), Map.class);
+            } catch (Exception e) {
+                throw new CustomizeException("Failed to parse inquiry response");
+            }
+        } else {
+            throw new CustomizeException("Failed to perform inquiry");
+        }
+    }
+
+    // 3. Payment (POST)
+    public Map<String, Object> payment(String requestId, double amount, String transactionCode, Integer packageId) {
+        String url = esewaConfig.getBaseUrl() + "/payment";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(getEsewaAccessToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, Object> body = new HashMap<>();
+        body.put("request_id", requestId);
+        body.put("amount", amount);
+        body.put("transaction_code", transactionCode);
+        if (packageId != null) body.put("package_id", packageId);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            try {
+                return objectMapper.readValue(response.getBody(), Map.class);
+            } catch (Exception e) {
+                throw new CustomizeException("Failed to parse payment response");
+            }
+        } else {
+            throw new CustomizeException("Failed to perform payment");
+        }
+    }
+
+    // 4. Status Check (POST)
+    public Map<String, Object> statusCheck(String requestId, double amount, String transactionCode) {
+        String url = esewaConfig.getBaseUrl() + "/status";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(getEsewaAccessToken());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Map<String, Object> body = new HashMap<>();
+        body.put("request_id", requestId);
+        body.put("amount", amount);
+        body.put("transaction_code", transactionCode);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            try {
+                return objectMapper.readValue(response.getBody(), Map.class);
+            } catch (Exception e) {
+                throw new CustomizeException("Failed to parse status check response");
+            }
+        } else {
+            throw new CustomizeException("Failed to perform status check");
         }
     }
 } 

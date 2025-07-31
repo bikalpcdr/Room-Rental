@@ -279,3 +279,27 @@ export const verifyEsewaPayment = ({ amt, rid, pid }) =>
   apiClient.post(`/payment/verify`, null, {
     params: { amt, rid, pid }
   });
+
+/**
+ * eSewa Token-based Inquiry
+ * @param {string} requestId
+ * @returns {Promise}
+ */
+export const esewaInquiry = (requestId) =>
+  apiClient.get(`/payment/inquiry/${requestId}`);
+
+/**
+ * eSewa Token-based Payment
+ * @param {object} params - { request_id, amount, transaction_code, package_id }
+ * @returns {Promise}
+ */
+export const esewaTokenPayment = ({ request_id, amount, transaction_code, package_id }) =>
+  apiClient.post(`/payment/payment`, { request_id, amount, transaction_code, package_id });
+
+/**
+ * eSewa Token-based Status Check
+ * @param {object} params - { request_id, amount, transaction_code }
+ * @returns {Promise}
+ */
+export const esewaStatusCheck = ({ request_id, amount, transaction_code }) =>
+  apiClient.post(`/payment/status`, { request_id, amount, transaction_code });
