@@ -256,3 +256,50 @@ export const approveBooking = (bookingId) => apiClient.put(`/booking/approve/${b
  */
 export const deletePropertyImage = (imageId) =>
   apiClient.delete(`/property/delete-image/${imageId}`);
+
+// Fetch booking requests for owner
+export const fetchBookingRequests = () => apiClient.get('/property/fetch-booking-request');
+
+/**
+ * Initiate eSewa payment
+ * @param {object} params - { amount, referenceId, productId, successUrl, failureUrl }
+ * @returns {Promise}
+ */
+export const initiateEsewaPayment = ({ amount, referenceId, productId, successUrl, failureUrl }) =>
+  apiClient.post(`/payment/initiate`, null, {
+    params: { amount, referenceId, productId, successUrl, failureUrl }
+  });
+
+/**
+ * Verify eSewa payment
+ * @param {object} params - { amt, rid, pid }
+ * @returns {Promise}
+ */
+export const verifyEsewaPayment = ({ amt, rid, pid }) =>
+  apiClient.post(`/payment/verify`, null, {
+    params: { amt, rid, pid }
+  });
+
+/**
+ * eSewa Token-based Inquiry
+ * @param {string} requestId
+ * @returns {Promise}
+ */
+export const esewaInquiry = (requestId) =>
+  apiClient.get(`/payment/inquiry/${requestId}`);
+
+/**
+ * eSewa Token-based Payment
+ * @param {object} params - { request_id, amount, transaction_code, package_id }
+ * @returns {Promise}
+ */
+export const esewaTokenPayment = ({ request_id, amount, transaction_code, package_id }) =>
+  apiClient.post(`/payment/payment`, { request_id, amount, transaction_code, package_id });
+
+/**
+ * eSewa Token-based Status Check
+ * @param {object} params - { request_id, amount, transaction_code }
+ * @returns {Promise}
+ */
+export const esewaStatusCheck = ({ request_id, amount, transaction_code }) =>
+  apiClient.post(`/payment/status`, { request_id, amount, transaction_code });

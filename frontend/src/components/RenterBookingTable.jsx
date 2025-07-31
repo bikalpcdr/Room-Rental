@@ -59,8 +59,9 @@ class RenterBookingTable extends React.Component {
                           productId={booking.property?.id?.toString()}
                           successUrl={`${window.location.origin}/payment-success`}
                           failureUrl={`${window.location.origin}/payment-failure`}
+                          useTokenApi={true}
                         >
-                          Pay with eSewa
+                          Pay with eSewa (Token)
                         </EsewaPaymentButton>
                       </>
                     )}
