@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/admin-dashboard.css";
@@ -142,7 +141,7 @@ function RenterDashboard() {
           </div>
           <div className="stat-card" onClick={handleViewSpending} style={{ cursor: 'pointer' }}>
             <h3>Total Spent</h3>
-            <p className="stat-number">${stats.totalSpent}</p>
+            <p className="stat-number">Rs.{stats.totalSpent}</p>
             <small>Click to view details</small>
           </div>
           <div className="stat-card" onClick={handleViewSaved} style={{ cursor: 'pointer' }}>
@@ -309,7 +308,6 @@ function RenterDashboard() {
         )}
       </main>
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

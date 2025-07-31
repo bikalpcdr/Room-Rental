@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/contact.css";
@@ -340,7 +339,6 @@ function Contact() {
         </section>
       </main>
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

@@ -1,7 +1,6 @@
 import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { isAuthenticated, getUserData } from "../utils/auth";
@@ -232,7 +231,6 @@ function Home() {
         </section>
       </main>
       <Footer />
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }

@@ -4,8 +4,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import "../style/login.css";
 import { loginUser } from "../api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 
 function Login() {
@@ -170,7 +169,6 @@ function Login() {
             </div>
           </div>
         </div>
-        <ToastContainer position="top-right" autoClose={3000} />
       </main>
       <Footer />
     </>
