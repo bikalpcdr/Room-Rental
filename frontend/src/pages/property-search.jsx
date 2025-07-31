@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const PROPERTY_TYPES = ["ROOM", "FLAT", "HOUSE"];
+const PAYMENT_METHODS = ["E_SEWA", "KHALTI", "CASH"];
 
 function PropertySearch() {
   const [properties, setProperties] = useState([]);
@@ -17,6 +18,7 @@ function PropertySearch() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingProperty, setBookingProperty] = useState(null);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("E_SEWA");
   const navigate = useNavigate();
   const userData = JSON.parse(localStorage.getItem('userData') || '{}');
 
@@ -86,12 +88,41 @@ function PropertySearch() {
     e.preventDefault();
     setBookingLoading(true);
     try {
-      await createBooking({
+      const bookingData = {
         propertyId: bookingProperty.id,
         userId: userData.id,
-      });
-      toast.success("Booking request sent!");
-      setShowBookingModal(false);
+        paymentMethod: paymentMethod,
+        amount: bookingProperty.rentPrice
+      };
+
+      if (paymentMethod === "CASH") {
+        // For cash payments, create booking directly
+        await createBooking(bookingData);
+        toast.success("Booking created successfully! Please pay in cash.");
+        setShowBookingModal(false);
+      } else {
+        // For online payments, redirect to payment gateway
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:7777'}/api/booking/initiate-payment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(bookingData)
+        });
+
+        if (response.ok) {
+          const html = await response.text();
+          // Create a new window/tab with the payment form
+          const paymentWindow = window.open('', '_blank');
+          paymentWindow.document.write(html);
+          paymentWindow.document.close();
+          toast.success("Redirecting to payment gateway...");
+          setShowBookingModal(false);
+        } else {
+          throw new Error('Payment initiation failed');
+        }
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to book property");
     } finally {
@@ -185,7 +216,7 @@ function PropertySearch() {
         {/* Booking Modal */}
         {showBookingModal && (
           <div className="modal-overlay">
-            <div className="modal">
+            <div className="modal" style={{ width: '500px', maxWidth: '90vw' }}>
               <div className="modal-header">
                 <h2>Book Property</h2>
                 <button className="close-btn" onClick={() => setShowBookingModal(false)}>
@@ -193,12 +224,77 @@ function PropertySearch() {
                 </button>
               </div>
               <form className="modal-content" onSubmit={handleBooking}>
-                <div style={{ marginBottom: 16 }}>
-                  <strong>Property:</strong> {bookingProperty?.title || bookingProperty?.roomTitle || 'N/A'}
+                <div style={{ marginBottom: 20, padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                  <h3 style={{ marginBottom: 10, color: '#333' }}>Property Details</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '14px' }}>
+                    <div><strong>Title:</strong> {bookingProperty?.title || bookingProperty?.roomTitle || 'N/A'}</div>
+                    <div><strong>Type:</strong> {bookingProperty?.propertyType}</div>
+                    <div><strong>Address:</strong> {bookingProperty?.address}</div>
+                    <div><strong>Rooms:</strong> {bookingProperty?.roomCount}</div>
+                    <div><strong>Rent Price:</strong> Rs. {bookingProperty?.rentPrice}</div>
+                    <div><strong>Available:</strong> {bookingProperty?.isAvailable ? 'Yes' : 'No'}</div>
+                  </div>
                 </div>
-                <button type="submit" className="create-user-btn" disabled={bookingLoading}>
-                  {bookingLoading ? "Booking..." : "Book Now"}
-                </button>
+                
+                <div style={{ marginBottom: 20 }}>
+                  <label htmlFor="payment-method" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    Payment Method:
+                  </label>
+                  <select
+                    id="payment-method"
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '10px', 
+                      border: '1px solid #ddd', 
+                      borderRadius: '4px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    {PAYMENT_METHODS.map(method => (
+                      <option key={method} value={method}>
+                        {method === 'E_SEWA' ? 'eSewa' : 
+                         method === 'KHALTI' ? 'Khalti' : 
+                         method === 'CASH' ? 'Cash Payment' : method}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: 20, padding: '15px', backgroundColor: '#e8f5e8', borderRadius: '8px', border: '1px solid #d4edda' }}>
+                  <h4 style={{ marginBottom: 10, color: '#155724' }}>Payment Summary</h4>
+                  <div style={{ fontSize: '14px' }}>
+                    <div><strong>Amount to Pay:</strong> Rs. {bookingProperty?.rentPrice}</div>
+                    <div><strong>Payment Method:</strong> {paymentMethod === 'E_SEWA' ? 'eSewa' : 
+                                                           paymentMethod === 'KHALTI' ? 'Khalti' : 
+                                                           paymentMethod === 'CASH' ? 'Cash Payment' : paymentMethod}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowBookingModal(false)}
+                    style={{
+                      padding: '10px 20px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      backgroundColor: '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="create-user-btn" 
+                    disabled={bookingLoading}
+                    style={{ minWidth: '120px' }}
+                  >
+                    {bookingLoading ? "Processing..." : "Confirm Booking"}
+                  </button>
+                </div>
               </form>
             </div>
           </div>

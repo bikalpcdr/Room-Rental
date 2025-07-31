@@ -16,6 +16,8 @@ public interface BookingService {
 
     void approveBooking(Long bookingId);
 
+    void updatePaymentStatus(String orderNumber, String status);
+
     BookingResponse getBookingById(Long bookingId);
 
     List<BookingResponse> getAllBookedPropertyByRenterId(Long renterId);
