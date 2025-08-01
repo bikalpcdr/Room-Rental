@@ -4,6 +4,8 @@ import com.bikalp.roomrentalservice.controller.base.BaseController;
 import com.bikalp.roomrentalservice.dto.request.BookingRequest;
 import com.bikalp.roomrentalservice.dto.request.PaymentRequestDto;
 import com.bikalp.roomrentalservice.dto.response.GlobalAPIResponse;
+import com.bikalp.roomrentalservice.enums.OrderType;
+import com.bikalp.roomrentalservice.enums.PaymentStatus;
 import com.bikalp.roomrentalservice.service.BookingService;
 import com.bikalp.roomrentalservice.service.PaymentService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +45,7 @@ public class BookingController extends BaseController {
         PaymentRequestDto paymentRequest = new PaymentRequestDto();
         paymentRequest.setOrderNumber("BOOKING_" + System.currentTimeMillis());
         paymentRequest.setPaymentMethod(request.getPaymentMethod());
-        paymentRequest.setOrderType("BOOKING");
+        paymentRequest.setOrderType(OrderType.BOOKING);
 
         String html = paymentService.payment(paymentRequest);
         response.setContentType("text/html;charset=UTF-8");
@@ -51,23 +53,31 @@ public class BookingController extends BaseController {
         response.getWriter().flush();
     }
 
-    @RequestMapping(value = "/payment-callback", method = {RequestMethod.GET, RequestMethod.POST})
+    @PostMapping("/payment-callback")
     public ResponseEntity<GlobalAPIResponse> handlePaymentCallback(
             @RequestParam(required = false) String orderNumber,
-            @RequestParam(required = false) String status,
+            @RequestParam(required = false) PaymentStatus paymentStatus,
             @RequestParam(required = false) String transaction_uuid,
-            @RequestParam(required = false) String product_code) {
+            @RequestParam(required = false) String booking_code,
+            @RequestParam(required = false) String status) {
 
         // Log the callback for debugging
-        log.info("Payment callback received - orderNumber: {}, status: {}", orderNumber, status);
+        log.info("Payment callback received - orderNumber: {}, status: {}, transaction_uuid: {}", 
+                orderNumber, paymentStatus, transaction_uuid);
 
         // Handle different parameter names that eSewa might send
-        String finalOrderNumber = orderNumber != null ? orderNumber : transaction_uuid;
-        String finalStatus = status != null ? status : "UNKNOWN";
+        String finalOrderNumber = orderNumber != null ? orderNumber : booking_code;
+        PaymentStatus finalStatus = paymentStatus != null ? paymentStatus : 
+                ("SUCCESS".equalsIgnoreCase(status) ? PaymentStatus.PAID : PaymentStatus.FAILED);
 
         if (finalOrderNumber != null) {
-            bookingService.updatePaymentStatus(finalOrderNumber, finalStatus);
-            return customResponse("Payment status updated successfully", null);
+            try {
+                bookingService.updatePaymentStatus(finalOrderNumber, finalStatus);
+                return customResponse("Payment status updated successfully", null);
+            } catch (Exception e) {
+                log.error("Error updating payment status for order: {}", finalOrderNumber, e);
+                return customResponse("Error updating payment status", null);
+            }
         } else {
             return customResponse("Payment callback received but no order number found", null);
         }

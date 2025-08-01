@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 public class PropertyResponse {
     private Long id;
-    private String roomTitle;
+    private String title;
     private String description;
     private PropertyType propertyType;
     private String address;

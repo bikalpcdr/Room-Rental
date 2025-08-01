@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookingRepo extends JpaRepository<Booking, Long> {
@@ -29,4 +30,7 @@ public interface BookingRepo extends JpaRepository<Booking, Long> {
     // Find active bookings (not cancelled or completed)
     @Query("SELECT b FROM Booking b WHERE b.status IN ('PENDING', 'CONFIRMED')")
     List<Booking> findActiveBookings();
+
+    // Find booking by order number
+    Optional<Booking> findByOrderNumber(String orderNumber);
 }

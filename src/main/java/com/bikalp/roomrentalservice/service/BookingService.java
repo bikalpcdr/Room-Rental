@@ -2,6 +2,7 @@ package com.bikalp.roomrentalservice.service;
 
 import com.bikalp.roomrentalservice.dto.request.BookingRequest;
 import com.bikalp.roomrentalservice.dto.response.BookingResponse;
+import com.bikalp.roomrentalservice.enums.PaymentStatus;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface BookingService {
 
     void rejectBooking(Long bookingId);
 
-    void updatePaymentStatus(String orderNumber, String status);
+    void updatePaymentStatus(String bookingId, PaymentStatus paymentStatus);
 
     BookingResponse getBookingById(Long bookingId);
 

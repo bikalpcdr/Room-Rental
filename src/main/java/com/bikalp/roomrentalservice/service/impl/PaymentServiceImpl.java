@@ -4,6 +4,9 @@ import com.bikalp.roomrentalservice.config.EsewaConfig;
 import com.bikalp.roomrentalservice.dto.request.PaymentRequestDto;
 import com.bikalp.roomrentalservice.dto.response.PaymentResponseDto;
 import com.bikalp.roomrentalservice.dto.response.PaymentStatusResponseDto;
+import com.bikalp.roomrentalservice.enums.OrderType;
+import com.bikalp.roomrentalservice.enums.PaymentMethod;
+import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.service.PaymentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,28 +27,49 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String payment(PaymentRequestDto paymentRequestDto) {
-        log.info("payment() initiated for : {}", paymentRequestDto.getOrderNumber());
-        switch (paymentRequestDto.getPaymentMethod()) {
-            case "E_SEWA":
-                log.info("payment() initiated from : {} for order number {}", paymentRequestDto.getPaymentMethod(), paymentRequestDto.getOrderNumber());
-                PaymentResponseDto paymentResponseDto = initiateEsewaPayment(paymentRequestDto);
-                return this.generateEsewaPaymentForm(paymentResponseDto);
-            case "KHALTI":
-                log.info("payment() initiated from : {} for order number {}", paymentRequestDto.getPaymentMethod(), paymentRequestDto.getOrderNumber());
-                return "Work in Progress";
-            default:
-                log.info("payment() initiated from : {} for order number {}", paymentRequestDto.getPaymentMethod(), paymentRequestDto.getOrderNumber());
-                //todo:: in case of transaction
-                break;
+        String orderNumber = paymentRequestDto.getOrderNumber();
+        PaymentMethod paymentMethod = paymentRequestDto.getPaymentMethod();
+
+        log.info("payment() initiated for order number: {}", orderNumber);
+
+        if (paymentMethod == null) {
+            log.warn("No payment method provided for order number: {}", orderNumber);
+            throw new CustomizeException("Payment method must not be null..!!");
         }
-        return "";
+
+        switch (paymentMethod) {
+            case E_SEWA -> {
+                log.info("Processing eSewa payment for order: {}", orderNumber);
+                PaymentResponseDto paymentResponseDto = initiateEsewaPayment(paymentRequestDto);
+                return generateEsewaPaymentForm(paymentResponseDto);
+            }
+
+            case KHALTI -> {
+                log.info("Processing Khalti payment for order: {}", orderNumber);
+                // TODO: Replace with real Khalti integration
+                return "Khalti payment integration is in progress.";
+            }
+
+            case CASH -> {
+                log.info("Processing Cash payment for order: {}", orderNumber);
+                // TODO: Add logic to record cash transaction
+                return "Cash payment acknowledged. Please confirm with finance team.";
+            }
+
+            default -> {
+                log.warn("Unsupported payment method: {} for order number: {}", paymentMethod, orderNumber);
+                throw new UnsupportedOperationException("Unsupported payment method: " + paymentMethod);
+            }
+        }
     }
 
     @Override
     public PaymentResponseDto initiateEsewaPayment(PaymentRequestDto dto) {
-        // For testing: use a real test amount and a unique transaction UUID
-        Double totalOrderAmount = 110.0; // Example test amount, change as needed
-        String transactionUuid = String.valueOf(System.currentTimeMillis()); // Unique per request
+        // For testing:real test amount and a unique transaction UUID
+        //test amount
+        Double totalOrderAmount = 110.0;
+        // generating unique transaction UUID
+        String transactionUuid = String.valueOf(System.currentTimeMillis());
 
         String signedFields = "total_amount,transaction_uuid,product_code";
 
@@ -77,7 +101,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentStatusResponseDto checkEsewaPaymentStatus(String orderNumber, String orderType) {
+    public PaymentStatusResponseDto checkEsewaPaymentStatus(String orderNumber, OrderType orderType) {
         return null;
     }
 
@@ -113,20 +137,34 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponseDto paymentRequestDetails(PaymentRequestDto paymentRequestDto) {
-        log.info("payment() initiated for : {}", paymentRequestDto.getOrderNumber());
-        return switch (paymentRequestDto.getPaymentMethod()) {
-            case "ESEWA" -> {
-                log.info("payment() initiated from : {} for order number {}", paymentRequestDto.getPaymentMethod(), paymentRequestDto.getOrderNumber());
+        String orderNumber = paymentRequestDto.getOrderNumber();
+        PaymentMethod paymentMethod = paymentRequestDto.getPaymentMethod();
+
+        log.info("paymentRequestDetails() initiated for order number: {}", orderNumber);
+
+        if (paymentMethod == null) {
+            log.warn("No payment method provided for order: {}", orderNumber);
+            throw new IllegalArgumentException("Payment method must not be null");
+        }
+
+        return switch (paymentMethod) {
+            case E_SEWA -> {
+                log.info("Processing eSewa payment request for order: {}", orderNumber);
                 yield initiateEsewaPayment(paymentRequestDto);
             }
-            case "KHALTI" -> {
-                log.info("payment() initiated from : {} for order number {}", paymentRequestDto.getPaymentMethod(), paymentRequestDto.getOrderNumber());
+            case KHALTI -> {
+                log.info("Processing Khalti payment request for order: {}", orderNumber);
+                // TODO: Implement Khalti integration logic in future
+                yield null;
+            }
+            case CASH -> {
+                log.info("Processing Cash payment request for order: {}", orderNumber);
+                // TODO: Handle offline payment details
                 yield null;
             }
             default -> {
-                log.info("payment() initiated from : {} for order number {}", paymentRequestDto.getPaymentMethod(), paymentRequestDto.getOrderNumber());
-                //todo:: in case of transaction
-                yield null;
+                log.warn("Unsupported payment method '{}' for order number: {}", paymentMethod, orderNumber);
+                throw new UnsupportedOperationException("Unsupported payment method: " + paymentMethod);
             }
         };
     }
