@@ -17,4 +17,5 @@ public class PaymentCallbackRequest {
     private String orderNumber;
     private String paymentMethod;
     private OrderType orderType;
+    private Long bookingId;
 }
