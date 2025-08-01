@@ -277,10 +277,10 @@ function PropertySearch() {
 
                 if (response.ok) {
                     const html = await response.text();
-                    // Create a new window/tab with the payment form
-                    const paymentWindow = window.open('', '_blank');
-                    paymentWindow.document.write(html);
-                    paymentWindow.document.close();
+                    // Open payment form in the same tab
+                    document.open();
+                    document.write(html);
+                    document.close();
                     toast.success("Redirecting to payment gateway...");
                     setShowBookingModal(false);
                 } else {

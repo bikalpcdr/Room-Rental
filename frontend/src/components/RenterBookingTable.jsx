@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import EsewaPaymentButton from "./EsewaPaymentButton";
 
 class RenterBookingTable extends React.Component {
   render() {
@@ -46,24 +45,12 @@ class RenterBookingTable extends React.Component {
                 <td>
                   <div className="action-buttons">
                     {booking.status === 'PENDING' && (
-                      <>
-                        <button 
-                          className="delete-btn" 
-                          onClick={() => onCancel(booking.id)}
-                        >
-                          Cancel
-                        </button>
-                        <EsewaPaymentButton
-                          amount={booking.property?.rentPrice}
-                          referenceId={booking.id.toString()}
-                          productId={booking.property?.id?.toString()}
-                          successUrl={`${window.location.origin}/payment-success`}
-                          failureUrl={`${window.location.origin}/payment-failure`}
-                          useTokenApi={true}
-                        >
-                          Pay with eSewa (Token)
-                        </EsewaPaymentButton>
-                      </>
+                      <button 
+                        className="delete-btn" 
+                        onClick={() => onCancel(booking.id)}
+                      >
+                        Cancel
+                      </button>
                     )}
                     <button 
                       className="view-btn" 
