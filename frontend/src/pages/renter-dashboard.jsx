@@ -276,7 +276,7 @@ function RenterDashboard() {
                                     <tbody>
                                     {propertyList.map((property) => (
                                         <tr key={property.id}>
-                                            <td>{property.title || property.roomTitle || 'N/A'}</td>
+                                            <td>{property.title || 'N/A'}</td>
                                             <td>{property.propertyType}</td>
                                             <td>{property.address}</td>
                                             <td>{property.roomCount}</td>

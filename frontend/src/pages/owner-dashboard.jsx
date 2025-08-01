@@ -95,7 +95,7 @@ function OwnerDashboard() {
     const [selectedProperty, setSelectedProperty] = useState(null);
     const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'properties', 'bookings'
     const [formData, setFormData] = useState({
-        roomTitle: "",
+        title: "",
         description: "",
         propertyType: "",
         address: "",
@@ -156,7 +156,7 @@ function OwnerDashboard() {
 
     const handleAddProperty = useCallback(() => {
         setFormData({
-            roomTitle: "",
+            title: "",
             description: "",
             propertyType: "",
             address: "",
@@ -171,8 +171,14 @@ function OwnerDashboard() {
 
     const handleEditProperty = useCallback((property) => {
         setFormData({
-            ...property,
             title: property.title || property.roomTitle || "",
+            description: property.description || "",
+            propertyType: property.propertyType || "",
+            address: property.address || "",
+            roomCount: property.roomCount || 1,
+            rentPrice: property.rentPrice || 0,
+            isAvailable: property.isAvailable !== undefined ? property.isAvailable : true,
+            amenities: property.amenities || [],
         });
         setSelectedProperty(property);
         setIsEdit(true);
@@ -191,20 +197,9 @@ function OwnerDashboard() {
         }
     }, [fetchProperties]);
 
-    const handleViewProperty = useCallback(async (property) => {
-        try {
-            const res = await getPropertyById(property.id || property.propertyId);
-            const details = res.data?.data;
-            // Show all property info and images in a modal or alert
-            let info = `Title: ${details.roomTitle || details.title}\nAddress: ${details.address}\nType: ${details.propertyType}\nRooms: ${details.roomCount}\nRent: ${details.rentPrice}\nAvailable: ${details.isAvailable ? "Yes" : "No"}\nAmenities: ${(details.amenities || []).join(", ")}`;
-            if (details.images && details.images.length > 0) {
-                info += `\nImages:\n` + details.images.map(img => (img.url ? (window.location.origin + img.url) : (window.location.origin + img))).join("\n");
-            }
-            alert(info);
-        } catch (err) {
-            toast.error("Failed to fetch property details");
-        }
-    }, []);
+    const handleViewProperty = useCallback((property) => {
+        navigate(`/property/${property.id || property.propertyId}`);
+    }, [navigate]);
 
     const handleFormSubmit = useCallback(async (e) => {
         e.preventDefault();

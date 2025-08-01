@@ -41,6 +41,10 @@ public class BookingServiceImpl implements BookingService {
 
         checkPropertyIsAvailable(property);
 
+        // Generate order number and transaction UUID
+        String orderNumber = "BOOKING_" + System.currentTimeMillis();
+        String transactionUuid = "TXN_" + System.currentTimeMillis();
+
         Booking booking = Booking.builder()
                 .property(property)
                 .renter(renter)
@@ -48,6 +52,8 @@ public class BookingServiceImpl implements BookingService {
                 .paymentMethod(request.getPaymentMethod())
                 .amount(request.getAmount())
                 .paymentStatus(PaymentStatus.PENDING)
+                .orderNumber(orderNumber)
+                .transactionUuid(transactionUuid)
                 .build();
         bookingRepo.save(booking);
     }
@@ -93,14 +99,29 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public void updatePaymentStatus(String orderNumber, String status) {
-        // Find booking by order number and update payment status
-        // This is a simplified implementation - you might want to add a field to track order numbers
-        // For now, we'll update the most recent booking for the user
-        // In a real implementation, you'd want to store the order number with the booking
+    public void updatePaymentStatus(String orderNumber, PaymentStatus paymentStatus) {
+        log.info("Updating payment status for order: {} with status: {}", orderNumber, paymentStatus);
         
-        // For demonstration, we'll just log the payment status
-        log.info("Payment status updated for order: {} with status: {}", orderNumber, status);
+        // Find booking by order number
+        Booking booking = bookingRepo.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new DataNotFoundException("Booking not found with order number: " + orderNumber));
+        
+        // Update payment status
+        booking.setPaymentStatus(paymentStatus);
+        
+        // If payment is successful, update booking status to confirmed
+        if (PaymentStatus.PAID.equals(paymentStatus)) {
+            booking.setStatus(BookingStatus.CONFIRMED);
+            // Mark property as unavailable
+            Property property = booking.getProperty();
+            property.setIsAvailable(Boolean.FALSE);
+            propertyRepo.save(property);
+        } else if (PaymentStatus.FAILED.equals(paymentStatus)) {
+            booking.setStatus(BookingStatus.REJECTED);
+        }
+        
+        bookingRepo.save(booking);
+        log.info("Payment status updated successfully for order: {}", orderNumber);
     }
 
     @Override
@@ -147,7 +168,6 @@ public class BookingServiceImpl implements BookingService {
     private void updateStatus(Long bookingId, BookingStatus status) {
         Booking booking = getBookingByBookingId(bookingId);
         booking.setStatus(status);
-        bookingRepo.save(booking);
         if (status.equals(BookingStatus.CONFIRMED)){
             Property property = booking.getProperty();
             property.setIsAvailable(Boolean.FALSE);

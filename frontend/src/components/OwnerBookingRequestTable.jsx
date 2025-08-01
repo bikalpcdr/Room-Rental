@@ -35,7 +35,7 @@ class OwnerBookingRequestTable extends React.Component {
           <tbody>
             {bookings.map((booking) => (
               <tr key={booking.id}>
-                <td>{booking.property?.roomTitle || 'N/A'}</td>
+                <td>{booking.property?.title || 'N/A'}</td>
                 <td>{booking.property?.address || 'N/A'}</td>
                 <td>
                   {booking.renter?.fullName}
