@@ -4,6 +4,7 @@ import com.bikalp.roomrentalservice.dto.request.PaginatedRequestDto;
 import com.bikalp.roomrentalservice.dto.request.PaymentCallbackRequest;
 import com.bikalp.roomrentalservice.enums.OrderType;
 import com.bikalp.roomrentalservice.enums.PaymentStatus;
+import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.model.Booking;
 import com.bikalp.roomrentalservice.model.PaymentTransaction;
 import com.bikalp.roomrentalservice.repository.BookingRepo;
@@ -33,29 +34,36 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     @Override
     public void savePaymentResponseTransaction(PaymentCallbackRequest request) {
         log.info("savePaymentResponseTransaction() START: {}", request);
-        
-        PaymentTransaction paymentTransaction = new PaymentTransaction();
-        paymentTransaction.setOrderNumber(request.getOrderNumber());
-        paymentTransaction.setTransactionCode(request.getTransactionCode());
-        paymentTransaction.setTransactionUuid(request.getTransactionUuid());
-        paymentTransaction.setTotalAmount(request.getTotalAmount());
-        paymentTransaction.setStatus(request.getStatus());
-        paymentTransaction.setProductCode(request.getProductCode());
-        paymentTransaction.setSignature(request.getSignature());
-        paymentTransaction.setSignedFieldNames(request.getSignedFieldName());
-        paymentTransaction.setPaymentMethod(request.getPaymentMethod());
-        paymentTransaction.setOrderType(request.getOrderType());
+
+        Booking booking = bookingRepo.findById(request.getBookingId())
+                .orElseThrow(() -> new DataNotFoundException("Booking is not found"));
+
+        PaymentTransaction.PaymentTransactionBuilder builder = PaymentTransaction.builder()
+                .orderNumber(request.getOrderNumber())
+                .transactionCode(request.getTransactionCode())
+                .transactionUuid(request.getTransactionUuid())
+                .totalAmount(request.getTotalAmount())
+                .status(request.getStatus())
+                .productCode(request.getProductCode())
+                .signature(request.getSignature())
+                .signedFieldNames(request.getSignedFieldName())
+                .paymentMethod(request.getPaymentMethod())
+                .orderType(request.getOrderType())
+                // setting initial booking reference..!!
+                .booking(booking);
+
+        PaymentTransaction paymentTransaction = builder.build();
 
         // Link with booking if it's a booking transaction
+        // if transaction is related to BOOKING linking with booking entity
         if (OrderType.BOOKING.equals(request.getOrderType())) {
-            bookingRepo.findByOrderNumber(request.getOrderNumber()).ifPresent(booking -> {
-                paymentTransaction.setBooking(booking);
-                
-                // Update booking payment status based on transaction status
+            bookingRepo.findByOrderNumber(request.getOrderNumber()).ifPresent(existingBooking -> {
+                paymentTransaction.setBooking(existingBooking);
+
                 PaymentStatus paymentStatus = PaymentStatus.SUCCESS.name().equalsIgnoreCase(request.getStatus())
-                    ? PaymentStatus.PAID 
-                    : PaymentStatus.FAILED;
-                
+                        ? PaymentStatus.PAID
+                        : PaymentStatus.FAILED;
+
                 bookingService.updatePaymentStatus(request.getOrderNumber(), paymentStatus);
             });
         }
