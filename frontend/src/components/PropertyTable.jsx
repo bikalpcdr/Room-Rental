@@ -29,7 +29,7 @@ class PropertiesTable extends React.Component {
             {properties.map((property, index) => (
               <tr key={property.id || property.propertyId}>
                 <td>{index + 1}</td>
-                <td>{property.roomTitle || property.title}</td>
+                <td>{property.title}</td>
                 <td>{property.propertyType}</td>
                 <td>{property.address}</td>
                 <td>{property.roomCount}</td>

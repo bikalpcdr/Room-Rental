@@ -129,23 +129,11 @@ export const getOwnerProperties = () => apiClient.get('/property/get-all-owner-p
 
 /**
  * Create a new property
- * @param {object} data - property fields
+ * @param {object} data
  * @returns {Promise}
  */
 export const createProperty = (data) => {
-    const formData = new FormData();
-    Object.keys(data).forEach(key => {
-        if (key === 'images') {
-            data[key].forEach(image => formData.append('images', image));
-        } else {
-            formData.append(key, data[key]);
-        }
-    });
-    return apiClient.post('/property', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
+    return apiClient.post('/property', data);
 };
 
 /**

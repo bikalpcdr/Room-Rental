@@ -27,7 +27,7 @@ const PropertyCard = React.memo(({property, onBook, onView}) => (
         </div>
 
         <div className="property-card-content">
-            <h3 className="property-title">{property.title || property.roomTitle || 'N/A'}</h3>
+            <h3 className="property-title">{property.title || 'N/A'}</h3>
             <p className="property-address">📍 {property.address}</p>
 
             <div className="property-details">
@@ -389,7 +389,7 @@ function PropertySearch() {
                                     <tbody>
                                     {properties.map((property) => (
                                         <tr key={property.id}>
-                                            <td>{property.title || property.roomTitle || 'N/A'}</td>
+                                            <td>{property.title || 'N/A'}</td>
                                             <td>
                                                 <span className="property-type-badge">{property.propertyType}</span>
                                             </td>
@@ -442,7 +442,7 @@ function PropertySearch() {
                                     <h3>Property Details</h3>
                                     <div className="property-summary-grid">
                                         <div>
-                                            <strong>Title:</strong> {bookingProperty?.title || bookingProperty?.roomTitle || 'N/A'}
+                                            <strong>Title:</strong> {bookingProperty?.title || 'N/A'}
                                         </div>
                                         <div><strong>Type:</strong> {bookingProperty?.propertyType}</div>
                                         <div><strong>Address:</strong> {bookingProperty?.address}</div>

@@ -1,6 +1,7 @@
 package com.bikalp.roomrentalservice.model;
 
 import com.bikalp.roomrentalservice.enums.BookingStatus;
+import com.bikalp.roomrentalservice.enums.PaymentMethod;
 import com.bikalp.roomrentalservice.enums.PaymentStatus;
 import com.bikalp.roomrentalservice.model.base.BaseEntity;
 import jakarta.persistence.*;
@@ -27,8 +28,9 @@ public class Booking extends BaseEntity {
     @Column(name = "status", nullable = false)
     private BookingStatus status;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @Column(name = "amount")
     private Double amount;
@@ -36,4 +38,10 @@ public class Booking extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
+
+    @Column(name = "transaction_uuid")
+    private String transactionUuid;
+
+    @Column(name = "order_number")
+    private String orderNumber;
 }

@@ -3,11 +3,11 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
 class OwnerPropertyTable extends React.Component {
-  handleView = (propertyId) => {
+  handleView = (property) => {
     if (this.props.onViewProperty) {
-      this.props.onViewProperty(propertyId);
+      this.props.onViewProperty(property);
     } else {
-      this.props.navigate(`/property/${propertyId}`);
+      this.props.navigate(`/property/${property.id || property.propertyId}`);
     }
   };
 
@@ -34,7 +34,7 @@ class OwnerPropertyTable extends React.Component {
             {properties.map((property, index) => (
               <tr key={property.id || property.propertyId}>
                 <td>{index + 1}</td>
-                <td>{property.roomTitle || property.title}</td>
+                <td>{property.title}</td>
                 <td>{property.propertyType}</td>
                 <td>{property.address}</td>
                 <td>{property.roomCount}</td>
@@ -47,7 +47,7 @@ class OwnerPropertyTable extends React.Component {
                   <div className="action-buttons">
                     <button
                       className="view-btn"
-                      onClick={() => this.handleView(property.id || property.propertyId)}
+                      onClick={() => this.handleView(property)}
                     >
                       View
                     </button>

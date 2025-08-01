@@ -1,5 +1,6 @@
 package com.bikalp.roomrentalservice.dto.request;
 
+import com.bikalp.roomrentalservice.enums.OrderType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,5 +16,5 @@ public class PaymentCallbackRequest {
     private String signature;
     private String orderNumber;
     private String paymentMethod;
-    private String orderType;
+    private OrderType orderType;
 }
