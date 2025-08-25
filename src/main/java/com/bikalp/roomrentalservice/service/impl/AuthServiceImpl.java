@@ -2,14 +2,19 @@ package com.bikalp.roomrentalservice.service.impl;
 
 import com.bikalp.roomrentalservice.dto.request.LoginRequest;
 import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
+import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
 import com.bikalp.roomrentalservice.dto.response.AuthResponse;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
+import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
+import com.bikalp.roomrentalservice.model.PasswordResetOtp;
 import com.bikalp.roomrentalservice.model.User;
+import com.bikalp.roomrentalservice.repository.PasswordResetOtpRepo;
 import com.bikalp.roomrentalservice.repository.UserRepo;
 import com.bikalp.roomrentalservice.service.AuthService;
-import com.bikalp.roomrentalservice.security.CustomUserDetailsService;
+import com.bikalp.roomrentalservice.service.EmailService;
 import com.bikalp.roomrentalservice.utils.JwtUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,16 +24,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final CustomUserDetailsService customUserDetailsService;
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
+    private final PasswordResetOtpRepo passwordResetOtpRepo;
 
 
     @Override
@@ -50,6 +58,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         userRepo.save(user);
         log.info("User register successfully..!! {}", user);
+        emailService.sendWelcomeEmail(user, request.getPassword());
     }
 
     @Override
@@ -86,5 +95,44 @@ public class AuthServiceImpl implements AuthService {
         } catch (BadCredentialsException ex) {
             throw new CustomizeException("Invalid username or password..!!");
         }
+    }
+
+    @Transactional
+    @Override
+    public void requestOtp(String emailOrUsername) {
+        emailService.sendOtpForResetPassword(emailOrUsername);
+    }
+
+    @Override
+    public void verifyOtp(String emailOrUsername, String otp) {
+        User user = userRepo.findByUsernameOrEmail(emailOrUsername,emailOrUsername).orElseThrow(
+                ()-> new DataNotFoundException("User doesn't exist by username or email..!!"+emailOrUsername)
+        );
+
+        // fetch latest otp
+        PasswordResetOtp passwordResetOtp = passwordResetOtpRepo.findLatestActiveOtpByUser(user.getId());
+
+        // check otp is already used or not
+        if (passwordResetOtp.getIsAlreadyUsed().equals(Boolean.TRUE)) {
+            throw new CustomizeException("The provided otp is already used. Please request new one..!!");
+        }
+
+        // check if otp is expire or not
+        if (passwordResetOtp.getExpiryDate().isBefore(LocalDateTime.now())){
+            throw new CustomizeException("The provided otp is already expired. Please request new one..!!");
+        }
+
+        // last one check otp matched or not
+        if (!passwordResetOtp.getOtp().equals(otp)){
+            throw new CustomizeException("The provided otp doesn't match. Please try again..!!");
+        }
+
+        passwordResetOtp.setIsAlreadyUsed(Boolean.TRUE);
+        passwordResetOtpRepo.save(passwordResetOtp);
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequest request) {
+
     }
 }
