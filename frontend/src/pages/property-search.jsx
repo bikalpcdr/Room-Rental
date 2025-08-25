@@ -167,7 +167,7 @@ function PropertySearch() {
     const [bookingProperty, setBookingProperty] = useState(null);
     const [bookingLoading, setBookingLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("E_SEWA");
-    const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'table'
+    const [viewMode, setViewMode] = useState('table'); // 'cards' or 'table'
 
     const navigate = useNavigate();
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
