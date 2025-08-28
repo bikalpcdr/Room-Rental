@@ -1,9 +1,12 @@
 package com.bikalp.roomrentalservice.controller;
 
 import com.bikalp.roomrentalservice.controller.base.BaseController;
+import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
 import com.bikalp.roomrentalservice.dto.request.UserCreationRequest;
+import com.bikalp.roomrentalservice.dto.request.UserSettingRequest;
 import com.bikalp.roomrentalservice.dto.request.UserUpdateRequest;
 import com.bikalp.roomrentalservice.dto.response.GlobalAPIResponse;
+import com.bikalp.roomrentalservice.service.AuthService;
 import com.bikalp.roomrentalservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController extends BaseController {
 
     private final UserService userService;
+    private final AuthService authService;
     String entity = "User";
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")
@@ -33,6 +37,7 @@ public class UserController extends BaseController {
         userService.updateUser(request);
         return updateResponse(entity);
     }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")
     @GetMapping("/{userId}")
     public ResponseEntity<GlobalAPIResponse> getUserByUserId(@PathVariable Long userId) {
@@ -57,5 +62,19 @@ public class UserController extends BaseController {
     public ResponseEntity<GlobalAPIResponse> uploadProfilePicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
         String url = userService.uploadProfilePicture(userId, file);
         return customResponse("Profile picture uploaded successfully..", url);
+    }
+
+    // user setting related things
+    @PostMapping("/change-password")
+    public ResponseEntity<GlobalAPIResponse> changePassword(@RequestBody ResetPasswordRequest request) {
+        userService.changePassword(request);
+        return passwordChangeResponse();
+    }
+
+    // update username , email, name , phone numbers
+    @PostMapping("/update-info")
+    public ResponseEntity<GlobalAPIResponse> updateInfo(@RequestBody UserSettingRequest request){
+        userService.updateInfo(request);
+        return updateResponse(entity);
     }
 }

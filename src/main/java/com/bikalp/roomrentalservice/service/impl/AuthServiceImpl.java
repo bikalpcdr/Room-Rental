@@ -1,5 +1,6 @@
 package com.bikalp.roomrentalservice.service.impl;
 
+import com.bikalp.roomrentalservice.config.UserDataConfig;
 import com.bikalp.roomrentalservice.dto.request.LoginRequest;
 import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
 import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
@@ -37,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
     private final PasswordResetOtpRepo passwordResetOtpRepo;
+    private final UserDataConfig userDataConfig;
 
 
     @Override
@@ -105,25 +107,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void verifyOtp(String emailOrUsername, String otp) {
-        User user = userRepo.findByUsernameOrEmail(emailOrUsername,emailOrUsername).orElseThrow(
-                ()-> new DataNotFoundException("User doesn't exist by username or email..!!"+emailOrUsername)
+        User user = userRepo.findByUsernameOrEmail(emailOrUsername, emailOrUsername).orElseThrow(
+                () -> new DataNotFoundException("User doesn't exist by username or email..!!" + emailOrUsername)
         );
 
-        // fetch latest otp
         PasswordResetOtp passwordResetOtp = passwordResetOtpRepo.findLatestActiveOtpByUser(user.getId());
 
-        // check otp is already used or not
         if (passwordResetOtp.getIsAlreadyUsed().equals(Boolean.TRUE)) {
             throw new CustomizeException("The provided otp is already used. Please request new one..!!");
         }
 
-        // check if otp is expire or not
-        if (passwordResetOtp.getExpiryDate().isBefore(LocalDateTime.now())){
+        if (passwordResetOtp.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new CustomizeException("The provided otp is already expired. Please request new one..!!");
         }
 
-        // last one check otp matched or not
-        if (!passwordResetOtp.getOtp().equals(otp)){
+        if (!passwordResetOtp.getOtp().equals(otp)) {
             throw new CustomizeException("The provided otp doesn't match. Please try again..!!");
         }
 
@@ -133,6 +131,18 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepo.findByUsernameOrEmail(request.getEmailOrUsername(), request.getEmailOrUsername()).orElseThrow(
+                () -> new DataNotFoundException("User not found with provided username or email: " + request.getEmailOrUsername())
+        );
 
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new CustomizeException("New password and confirm password do not match!");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepo.save(user);
+
+        passwordResetOtpRepo.deactivateAllActiveOtpsByUserId(user.getId());
+        log.info("Password reset successful for user: {}", user.getUsername());
     }
 }

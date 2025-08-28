@@ -6,9 +6,9 @@ import Footer from '../components/footer';
 import '../style/payment-failure.css';
 
 function PaymentFailure() {
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
     const [errorDetails, setErrorDetails] = useState(null);
 
     // Function to decode base64 string
@@ -21,7 +21,7 @@ function PaymentFailure() {
         }
     };
 
-    useEffect(() => {
+  useEffect(() => {
         const handlePaymentFailure = async () => {
             try {
                 // Get eSewa data from URL parameter
@@ -97,19 +97,19 @@ function PaymentFailure() {
 
                 // Save failed transaction to backend
                 const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:7777'}/api/v1/payment-transaction/callback`, {
-                    method: 'POST',
-                    headers: {
+        method: 'POST',
+        headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
+        },
                     body: JSON.stringify(transactionRequest)
                 });
 
-                if (response.ok) {
+        if (response.ok) {
                     console.log('Failed transaction saved');
-                } else {
+        } else {
                     console.error('Failed to save failed transaction:', response.status, response.statusText);
-                }
+        }
 
             } catch (error) {
                 console.error('Error handling payment failure:', error);
@@ -118,36 +118,36 @@ function PaymentFailure() {
                     orderNumber: 'N/A',
                     errorMessage: 'Error processing payment failure',
                     amount: 'N/A'
-                });
+      });
             } finally {
-                setLoading(false);
-            }
+      setLoading(false);
+    }
         };
 
         handlePaymentFailure();
-    }, [searchParams]);
+  }, [searchParams]);
 
     const handleRetryPayment = () => {
         navigate('/property-search');
     };
 
-    const handleGoToDashboard = () => {
+  const handleGoToDashboard = () => {
         navigate('/renter-dashboard');
-    };
+  };
 
     const handleContactSupport = () => {
         // You can implement contact support functionality
         toast.info('Contact support at bikalpcdr@roomrental.com');
-    };
+  };
 
     if (loading) {
-        return (
-            <>
-                <Header />
+  return (
+    <>
+      <Header />
                 <div className="payment-failure-container">
-                    <div className="loading-spinner"></div>
-                    <p>Processing payment status...</p>
-                </div>
+            <div className="loading-spinner"></div>
+            <p>Processing payment status...</p>
+          </div>
                 <Footer />
             </>
         );
@@ -176,8 +176,8 @@ function PaymentFailure() {
                             <div className="detail-row">
                                 <span>Error:</span>
                                 <span className="error-message">{errorDetails.errorMessage}</span>
-                            </div>
-                        </div>
+            </div>
+            </div>
                     )}
 
                     <div className="action-buttons">
@@ -185,17 +185,17 @@ function PaymentFailure() {
                             Try Again
                         </button>
                         <button className="dashboard-btn" onClick={handleGoToDashboard}>
-                            Go to Dashboard
-                        </button>
+                Go to Dashboard
+              </button>
                         <button className="support-btn" onClick={handleContactSupport}>
                             Contact Support
-                        </button>
-                    </div>
-                </div>
+              </button>
             </div>
-            <Footer />
-        </>
-    );
+          </div>
+            </div>
+      <Footer />
+    </>
+  );
 }
 
 export default PaymentFailure; 

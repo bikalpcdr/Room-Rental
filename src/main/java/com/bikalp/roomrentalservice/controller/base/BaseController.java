@@ -34,21 +34,39 @@ public class BaseController {
                         .build());
     }
 
-    protected ResponseEntity<GlobalAPIResponse> verifyOTPResponse(Object data) {
+    protected ResponseEntity<GlobalAPIResponse> verifyOTPResponse() {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(GlobalAPIResponse.builder()
                         .status(true)
                         .message("OTP verified successfully..!!")
-                        .data(data)
+                        .data(null)
                         .build());
     }
 
-    protected ResponseEntity<GlobalAPIResponse> forgotPasswordResponse(Object data) {
+        protected ResponseEntity<GlobalAPIResponse> passwordChangeResponse() {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(GlobalAPIResponse.builder()
+                        .status(true)
+                        .message("Password changed successfully..!!")
+                        .data(null)
+                        .build());
+    }
+
+    protected ResponseEntity<GlobalAPIResponse> forgotPasswordResponse() {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(GlobalAPIResponse.builder()
                         .status(true)
                         .message("Password reset OTP sent successfully..!!")
-                        .data(data)
+                        .data(null)
+                        .build());
+    }
+
+    protected ResponseEntity<GlobalAPIResponse> resetPasswordResponse() {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(GlobalAPIResponse.builder()
+                        .status(true)
+                        .message("Password reset successfully..!!")
+                        .data(null)
                         .build());
     }
 

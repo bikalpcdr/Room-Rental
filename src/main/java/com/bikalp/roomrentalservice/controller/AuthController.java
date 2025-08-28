@@ -32,13 +32,13 @@ public class AuthController extends BaseController {
     @PostMapping("/request-otp")
     public ResponseEntity<GlobalAPIResponse> requestOtpForPasswordReset(@RequestParam String emailOrUsername){
         authService.requestOtp(emailOrUsername);
-        return  forgotPasswordResponse(null);
+        return  forgotPasswordResponse();
     }
 
     @PostMapping("/verify-otp")
     public ResponseEntity<GlobalAPIResponse> verifyOtp(@RequestParam String emailOrUsername, @RequestParam String otp){
         authService.verifyOtp(emailOrUsername, otp);
-        return verifyOTPResponse(null);
+        return verifyOTPResponse();
     }
 
     @PostMapping("/reset-password")
