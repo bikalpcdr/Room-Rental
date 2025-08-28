@@ -77,4 +77,9 @@ public class UserController extends BaseController {
         userService.updateInfo(request);
         return updateResponse(entity);
     }
+
+    @GetMapping("/user-info")
+    public ResponseEntity<GlobalAPIResponse> getLoggedInUserInfo(){
+        return fetchResponse(entity,userService.getLoggedInUserInfo());
+    }
 }
