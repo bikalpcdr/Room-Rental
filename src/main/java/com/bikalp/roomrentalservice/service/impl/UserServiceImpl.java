@@ -1,6 +1,9 @@
 package com.bikalp.roomrentalservice.service.impl;
 
+import com.bikalp.roomrentalservice.config.UserDataConfig;
+import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
 import com.bikalp.roomrentalservice.dto.request.UserCreationRequest;
+import com.bikalp.roomrentalservice.dto.request.UserSettingRequest;
 import com.bikalp.roomrentalservice.dto.request.UserUpdateRequest;
 import com.bikalp.roomrentalservice.dto.response.UserResponse;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
@@ -22,6 +25,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final UserDataConfig userDataConfig;
 
     @Override
     public void createUser(UserCreationRequest request) {
@@ -116,6 +122,38 @@ public class UserServiceImpl implements UserService {
         } catch (IOException e) {
             throw new CustomizeException("Failed to upload profile picture");
         }
+    }
+
+    @Override
+    public void changePassword(ResetPasswordRequest request) {
+        User loggedInUser = userDataConfig.getLoggedInUser();
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), loggedInUser.getPassword())) {
+            throw new CustomizeException("Current password is incorrect..!!");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new CustomizeException("New password and confirm password do not match!!!");
+        }
+
+        loggedInUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepo.save(loggedInUser);
+        log.info("Password changed successfully for user: {}", loggedInUser.getUsername());
+    }
+
+    @Override
+    public void updateInfo(UserSettingRequest request) {
+        User loggedInUser = userDataConfig.getLoggedInUser();
+        if (request == null) {
+            throw new CustomizeException("Data must be provide to update..!!");
+        }
+
+        Optional.ofNullable(request.getEmail()).ifPresent(loggedInUser::setEmail);
+        Optional.ofNullable(request.getName()).ifPresent(loggedInUser::setFullName);
+        Optional.ofNullable(request.getUsername()).ifPresent(loggedInUser::setUsername);
+        Optional.ofNullable(request.getPhoneNumber()).ifPresent(loggedInUser::setPhoneNumber);
+
+        userRepo.save(loggedInUser);
     }
 
     public User findUserById(Long userId) {

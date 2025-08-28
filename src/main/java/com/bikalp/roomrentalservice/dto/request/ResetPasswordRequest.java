@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 public class ResetPasswordRequest {
 
+    private String emailOrUsername;
+
     // if user want to change password
     private String currentPassword;
 

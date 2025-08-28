@@ -6,9 +6,9 @@ import Footer from '../components/footer';
 import '../style/payment-success.css';
 
 function PaymentSuccess() {
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
     const [transactionData, setTransactionData] = useState(null);
 
     // Function to decode base64 string
@@ -21,7 +21,7 @@ function PaymentSuccess() {
         }
     };
 
-    useEffect(() => {
+  useEffect(() => {
         const handlePaymentSuccess = async () => {
             try {
                 // Get eSewa data from URL parameter
@@ -85,27 +85,27 @@ function PaymentSuccess() {
 
                 // Save transaction to backend
                 const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || 'http://localhost:7777'}/api/v1/payment-transaction/callback`, {
-                    method: 'POST',
-                    headers: {
+        method: 'POST',
+        headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
+        },
                     body: JSON.stringify(transactionRequest)
                 });
 
-                if (response.ok) {
+        if (response.ok) {
                     toast.success('Payment successful! Transaction saved.');
-                } else {
+        } else {
                     console.error('Failed to save transaction:', response.status, response.statusText);
                     toast.warning('Payment successful but transaction could not be saved. Please contact support.');
-                }
+        }
 
             } catch (error) {
                 console.error('Error handling payment success:', error);
                 toast.error('Error processing payment success. Please contact support.');
             } finally {
-                setLoading(false);
-            }
+      setLoading(false);
+    }
         };
 
         handlePaymentSuccess();
@@ -113,20 +113,20 @@ function PaymentSuccess() {
 
     const handleContinue = () => {
         navigate('/property-search');
-    };
+  };
 
     const handleViewBookings = () => {
         navigate('/renter-dashboard');
-    };
+  };
 
     if (loading) {
-        return (
-            <>
-                <Header />
+  return (
+    <>
+      <Header />
                 <div className="payment-success-container">
                     <div className="loading-spinner"></div>
                     <p>Processing your payment...</p>
-                </div>
+        </div>
                 <Footer />
             </>
         );
@@ -159,27 +159,27 @@ function PaymentSuccess() {
                             <div className="detail-row">
                                 <span>Amount:</span>
                                 <span>Rs. {transactionData.totalAmount}</span>
-                            </div>
+          </div>
                             <div className="detail-row">
                                 <span>Status:</span>
                                 <span className="status-success">{transactionData.status}</span>
-                            </div>
-                        </div>
+            </div>
+            </div>
                     )}
 
                     <div className="action-buttons">
                         <button className="continue-btn" onClick={handleContinue}>
                             Continue Browsing
-                        </button>
+              </button>
                         <button className="view-bookings-btn" onClick={handleViewBookings}>
-                            View My Bookings
-                        </button>
-                    </div>
-                </div>
+                View My Bookings
+              </button>
             </div>
-            <Footer />
-        </>
-    );
+          </div>
+            </div>
+      <Footer />
+    </>
+  );
 }
 
 export default PaymentSuccess; 
