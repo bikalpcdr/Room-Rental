@@ -5,6 +5,7 @@ import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
 import com.bikalp.roomrentalservice.dto.request.UserCreationRequest;
 import com.bikalp.roomrentalservice.dto.request.UserSettingRequest;
 import com.bikalp.roomrentalservice.dto.request.UserUpdateRequest;
+import com.bikalp.roomrentalservice.dto.response.LoggedInUserInfo;
 import com.bikalp.roomrentalservice.dto.response.UserResponse;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
@@ -154,6 +155,11 @@ public class UserServiceImpl implements UserService {
         Optional.ofNullable(request.getPhoneNumber()).ifPresent(loggedInUser::setPhoneNumber);
 
         userRepo.save(loggedInUser);
+    }
+
+    @Override
+    public LoggedInUserInfo getLoggedInUserInfo() {
+        return userMapper.getLoggedInUserInfoByUserId(userDataConfig.getLoggedInUser().getId());
     }
 
     public User findUserById(Long userId) {

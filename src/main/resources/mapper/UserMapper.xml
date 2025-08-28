@@ -23,4 +23,15 @@
                is_active    as isActive
         from users where is_active order by updated_at desc
     </select>
+    <select id="getLoggedInUserInfoByUserId" resultType="com.bikalp.roomrentalservice.dto.response.LoggedInUserInfo">
+        select id           as userId,
+               full_name    as fullName,
+               email        as email,
+               username     as username,
+               phone_number as phoneNumber,
+               user_role    as role,
+               is_active    as isActive
+        from users
+        where id = #{userId} and is_active
+    </select>
 </mapper>
