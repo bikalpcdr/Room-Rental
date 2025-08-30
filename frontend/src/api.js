@@ -310,3 +310,33 @@ export const esewaTokenPayment = ({request_id, amount, transaction_code, package
  */
 export const esewaStatusCheck = ({request_id, amount, transaction_code}) =>
     apiClient.post(`/payment/status`, {request_id, amount, transaction_code});
+
+// request otp for forget password
+export const requestOpt = (emailOrUsername) => {
+    return apiClient.post(`/auth/request-otp?emailOrUsername=${encodeURIComponent(emailOrUsername)}`);
+};
+
+// verify otp
+
+export const verifyOtp = (emailOrUsername, otp) => {
+    return apiClient.post(`/auth/verify-otp?emailOrUsername=${encodeURIComponent(emailOrUsername)}&otp=${encodeURIComponent(otp)}`);
+};
+
+// For forgot password / OTP flow
+export const resetPassword = ({ emailOrUsername, newPassword, confirmPassword }) => {
+    return apiClient.post('/auth/reset-password', {
+        emailOrUsername,
+        newPassword,
+        confirmPassword
+    });
+};
+
+// For logged-in users (change password)
+export const changePassword = ({ emailOrUsername, currentPassword, newPassword, confirmPassword }) => {
+    return apiClient.post('/user/change-password', {
+        emailOrUsername,
+        currentPassword,
+        newPassword,
+        confirmPassword
+    });
+};
