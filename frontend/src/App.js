@@ -19,6 +19,8 @@ import PaymentSuccess from "./pages/payment-success";
 import PaymentFailure from "./pages/payment-failure";
 import "./App.css";
 import PropTypes from "prop-types";
+import OtpRequestPage from "./pages/OtpRequestPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
 function NotFound() {
   return (
@@ -45,7 +47,9 @@ function App() {
         <Route path="/property-search" element={<PropertySearch />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failure" element={<PaymentFailure />} />
-        <Route 
+        <Route path="/forgot-password" element={<OtpRequestPage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route
           path="/admin" 
           element={
             <ProtectedRoute requiredRole="ADMIN">

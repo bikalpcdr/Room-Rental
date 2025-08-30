@@ -1,0 +1,184 @@
+/* OptRequestPage.css */
+
+.otp-request-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.otp-form-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.otp-form-container h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.otp-message {
+    background: rgba(255, 255, 255, 0.9);
+    color: #667eea;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.otp-form-container form {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 100%;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.otp-form-container form:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.otp-form-container input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+.otp-form-container input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.otp-form-container input::placeholder {
+    color: #999;
+}
+
+.otp-form-container button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.otp-form-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.otp-form-container button:active {
+    transform: translateY(0);
+}
+
+.otp-verify-form {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .otp-form-container {
+        padding: 1rem;
+    }
+
+    .otp-form-container form {
+        padding: 1.5rem;
+        margin: 0 0.5rem 1rem 0.5rem;
+    }
+
+    .otp-form-container h2 {
+        font-size: 1.5rem;
+    }
+
+    .otp-message {
+        margin: 0 0.5rem 1.5rem 0.5rem;
+        padding: 0.8rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .otp-form-container form {
+        padding: 1.2rem;
+        border-radius: 12px;
+    }
+
+    .otp-form-container h2 {
+        font-size: 1.3rem;
+    }
+
+    .otp-form-container input {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .otp-form-container button {
+        padding: 0.6rem 1.2rem;
+    }
+
+    .otp-message {
+        padding: 0.7rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Focus states for accessibility */
+.otp-form-container button:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}

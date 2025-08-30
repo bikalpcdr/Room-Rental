@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PasswordResetOtpRepo extends JpaRepository<PasswordResetOtp, Long> {
     @Query(value = "select * from password_reset_otp " +
-            "where user_id = :userId and is_already_used = false and is_active" +
+            "where user_id = :userId " +
+            "and is_already_used = false " +
+            "and is_active = true " +
             "order by id desc limit 1",
             nativeQuery = true)
     PasswordResetOtp findLatestActiveOtpByUser(@Param("userId") Long userId);
