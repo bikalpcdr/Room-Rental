@@ -5,9 +5,13 @@ import com.bikalp.roomrentalservice.dto.request.LoginRequest;
 import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
 import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
 import com.bikalp.roomrentalservice.dto.response.AuthResponse;
+import com.bikalp.roomrentalservice.dto.response.UserResponse;
+import com.bikalp.roomrentalservice.enums.AccountStatus;
+import com.bikalp.roomrentalservice.enums.UserRole;
 import com.bikalp.roomrentalservice.exception.custom.AlreadyExistFoundException;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
+import com.bikalp.roomrentalservice.mapper.UserMapper;
 import com.bikalp.roomrentalservice.model.PasswordResetOtp;
 import com.bikalp.roomrentalservice.model.User;
 import com.bikalp.roomrentalservice.repository.PasswordResetOtpRepo;
@@ -26,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
     private final PasswordResetOtpRepo passwordResetOtpRepo;
-    private final UserDataConfig userDataConfig;
+    private final UserMapper userMapper;
 
 
     @Override
@@ -57,10 +62,13 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phoneNumber(request.getPhoneNumber())
                 .userRole(request.getRole())
+                .accountStatus(request.getRole().equals(UserRole.RENTER) ? AccountStatus.ACTIVE : AccountStatus.PENDING)
                 .build();
         userRepo.save(user);
         log.info("User register successfully..!! {}", user);
-        emailService.sendWelcomeEmail(user, request.getPassword());
+        if (user.getAccountStatus().equals(AccountStatus.ACTIVE)) {
+            emailService.sendWelcomeEmail(user, request.getPassword());
+        }
     }
 
     @Override
@@ -80,6 +88,10 @@ public class AuthServiceImpl implements AuthService {
 
             if (!user.getIsActive()) {
                 throw new CustomizeException("Your account is inactive..!!");
+            }
+
+            if (user.getAccountStatus().equals(AccountStatus.PENDING)) {
+                throw new CustomizeException("Your account is pending approval by admin..!!");
             }
 
             // generating token
@@ -144,5 +156,21 @@ public class AuthServiceImpl implements AuthService {
 
         passwordResetOtpRepo.deactivateAllActiveOtpsByUserId(user.getId());
         log.info("Password reset successful for user: {}", user.getUsername());
+    }
+
+    @Override
+    public List<UserResponse> getPendingApprovalsForRegistrations() {
+        return userMapper.getPendingApprovalsForRegistrations();
+    }
+
+    @Override
+    public void approveRegistration(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(
+                () -> new CustomizeException("User not found with provided id: " + userId));
+
+        user.setAccountStatus(AccountStatus.ACTIVE);
+        userRepo.save(user);
+        log.info("User has been approved for user: {}", user.getUsername());
+        emailService.sendRegistrationEmail(user);
     }
 }

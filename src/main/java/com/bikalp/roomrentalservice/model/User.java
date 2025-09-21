@@ -1,5 +1,6 @@
 package com.bikalp.roomrentalservice.model;
 
+import com.bikalp.roomrentalservice.enums.AccountStatus;
 import com.bikalp.roomrentalservice.enums.UserRole;
 import com.bikalp.roomrentalservice.model.base.BaseEntity;
 import jakarta.persistence.*;
@@ -43,4 +44,7 @@ public class User extends BaseEntity {
 
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
+
+    @Column(name = "account_status",nullable = false)
+    private AccountStatus accountStatus = AccountStatus.PENDING;
 }

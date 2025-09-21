@@ -30,20 +30,31 @@ public class AuthController extends BaseController {
     }
 
     @PostMapping("/request-otp")
-    public ResponseEntity<GlobalAPIResponse> requestOtpForPasswordReset(@RequestParam String emailOrUsername){
+    public ResponseEntity<GlobalAPIResponse> requestOtpForPasswordReset(@RequestParam String emailOrUsername) {
         authService.requestOtp(emailOrUsername);
-        return  forgotPasswordResponse();
+        return forgotPasswordResponse();
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<GlobalAPIResponse> verifyOtp(@RequestParam String emailOrUsername, @RequestParam String otp){
+    public ResponseEntity<GlobalAPIResponse> verifyOtp(@RequestParam String emailOrUsername, @RequestParam String otp) {
         authService.verifyOtp(emailOrUsername, otp);
         return verifyOTPResponse();
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<GlobalAPIResponse> resetPassword(@RequestBody ResetPasswordRequest request){
+    public ResponseEntity<GlobalAPIResponse> resetPassword(@RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
         return resetPasswordResponse(null);
+    }
+
+    @GetMapping("/pending-approvals")
+    public ResponseEntity<GlobalAPIResponse> getPendingApprovalsForRegistrations() {
+        return fetchListResponse("Pending approval", authService.getPendingApprovalsForRegistrations());
+    }
+
+    @PostMapping("/approve/pending-registration/{userId}")
+    public ResponseEntity<GlobalAPIResponse> approveRegistration(@PathVariable Long userId) {
+        authService.approveRegistration(userId);
+        return approveResponse("Pending approval");
     }
 }
