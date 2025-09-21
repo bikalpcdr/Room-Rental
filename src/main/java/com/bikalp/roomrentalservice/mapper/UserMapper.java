@@ -9,7 +9,10 @@ import java.util.List;
 @Mapper
 public interface UserMapper {
     UserResponse getUserById(Long userId);
+
     List<UserResponse> getAllUsers();
 
     LoggedInUserInfo getLoggedInUserInfoByUserId(Long userId);
+
+    List<UserResponse> getPendingApprovalsForRegistrations();
 }

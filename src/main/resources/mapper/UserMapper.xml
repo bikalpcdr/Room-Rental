@@ -34,4 +34,16 @@
         from users
         where id = #{userId} and is_active
     </select>
+    <select id="getPendingApprovalsForRegistrations" resultType="com.bikalp.roomrentalservice.dto.response.UserResponse">
+        select id             as userId,
+               full_name      as fullName,
+               email          as email,
+               username       as username,
+               phone_number   as phoneNumber,
+               user_role      as role,
+               is_active      as isActive,
+               account_status as accountStatus
+        from users
+        where is_active and account_status='PENDING'
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.bikalp.roomrentalservice.dto.response;
 
+import com.bikalp.roomrentalservice.enums.AccountStatus;
 import com.bikalp.roomrentalservice.enums.UserRole;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,4 +24,6 @@ public class UserResponse {
     private Boolean isActive;
 
     private String profilePictureUrl;
+
+    private AccountStatus accountStatus;
 }

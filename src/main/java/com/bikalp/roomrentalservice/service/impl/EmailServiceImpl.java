@@ -66,6 +66,27 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public void sendRegistrationEmail(User user) {
+        try{
+            Context context = new Context();
+            context.setVariable("name", user.getFullName());
+
+            String htmlContent = templateEngine.process("owner-activation", context);
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message,true);
+            helper.setTo(user.getEmail());
+            helper.setSubject("Your registration is pending approval!!");
+            helper.setText(htmlContent,true);
+
+            mailSender.send(message);
+        }catch (MessagingException e) {
+            log.error("Failed to send registration email to user: {}", user.getEmail(), e);
+            throw new EmailException("Error sending registration email", e);
+        }
+    }
+
+    @Override
     public void sendOtpForResetPassword(String emailOrUsername) {
         User user = userRepo.findByUsernameOrEmail(emailOrUsername, emailOrUsername)
                 .orElseThrow(() -> new CustomizeException("User not found with provided username or email"));
