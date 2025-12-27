@@ -1,5 +1,6 @@
 package com.bikalp.roomrentalservice.config;
 
+import com.bikalp.roomrentalservice.enums.AccountStatus;
 import com.bikalp.roomrentalservice.enums.UserRole;
 import com.bikalp.roomrentalservice.model.User;
 import com.bikalp.roomrentalservice.repository.UserRepo;
@@ -26,13 +27,14 @@ public class DataInitializer implements CommandLineRunner {
             User adminUser = new User();
             adminUser.setUsername("admin");
             adminUser.setFullName("Admin User");
-            adminUser.setEmail("admin@yopmail.com");
+            adminUser.setEmail("admin1@yopmail.com");
             adminUser.setPassword(passwordEncoder.encode("Test@1234"));
             adminUser.setPhoneNumber("9863261000");
             adminUser.setUserRole(UserRole.ADMIN);
             adminUser.setCreatedAt(LocalDateTime.now());
             adminUser.setIsActive(Boolean.TRUE);
             adminUser.setUpdatedAt(LocalDateTime.now());
+            adminUser.setAccountStatus(AccountStatus.ACTIVE);
             userRepo.save(adminUser);
             log.info("Admin created successfully..!!");
         } else {

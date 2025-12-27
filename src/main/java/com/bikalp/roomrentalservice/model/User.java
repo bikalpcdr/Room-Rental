@@ -45,6 +45,7 @@ public class User extends BaseEntity {
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "account_status",nullable = false)
     private AccountStatus accountStatus = AccountStatus.PENDING;
 }

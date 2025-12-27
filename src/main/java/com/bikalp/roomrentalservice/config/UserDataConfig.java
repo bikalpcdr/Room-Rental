@@ -21,6 +21,10 @@ public class UserDataConfig {
         );
     }
 
+    public Long getCurrentUserId(){
+        return getLoggedInUser().getId();
+    }
+
     public UserRole getUserRole() {
         return getLoggedInUser().getUserRole();
     }
