@@ -21,7 +21,7 @@ public interface UserService {
 
     List<UserResponse> getAllUsers();
 
-    String uploadProfilePicture(Long userId, MultipartFile file);
+    void uploadProfilePicture(MultipartFile file);
 
     void changePassword(ResetPasswordRequest request);
 
