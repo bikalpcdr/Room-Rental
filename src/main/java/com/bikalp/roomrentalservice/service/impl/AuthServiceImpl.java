@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new CustomizeException("Username and password must be provided..!!");
             }
             // authenticate username and password
-            Authentication authentication = authenticationManager.authenticate(
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
 
@@ -86,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
             User user = userRepo.findByUsername(request.getUsername())
                     .orElseThrow(() -> new CustomizeException("Username or password is incorrect..!!"));
 
-            if (!user.getIsActive()) {
+            if (Boolean.FALSE.equals(user.getIsActive())) {
                 throw new CustomizeException("Your account is inactive..!!");
             }
 

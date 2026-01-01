@@ -5,7 +5,6 @@ import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
 import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
 import com.bikalp.roomrentalservice.dto.response.AuthResponse;
 import com.bikalp.roomrentalservice.dto.response.UserResponse;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
