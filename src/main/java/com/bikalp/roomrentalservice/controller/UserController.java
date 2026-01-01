@@ -58,10 +58,10 @@ public class UserController extends BaseController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'RENTER')")
-    @PostMapping("/{userId}/profile-picture")
-    public ResponseEntity<GlobalAPIResponse> uploadProfilePicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
-        String url = userService.uploadProfilePicture(userId, file);
-        return customResponse("Profile picture uploaded successfully..", url);
+    @PostMapping("/upload/profile-picture")
+    public ResponseEntity<GlobalAPIResponse> uploadProfilePicture(@RequestParam("file") MultipartFile file) {
+        userService.uploadProfilePicture(file);
+        return customResponse("Profile picture uploaded successfully..", null);
     }
 
     // user setting related things
@@ -73,13 +73,13 @@ public class UserController extends BaseController {
 
     // update username , email, name , phone numbers
     @PostMapping("/update-info")
-    public ResponseEntity<GlobalAPIResponse> updateInfo(@RequestBody UserSettingRequest request){
+    public ResponseEntity<GlobalAPIResponse> updateInfo(@RequestBody UserSettingRequest request) {
         userService.updateInfo(request);
         return updateResponse(entity);
     }
 
     @GetMapping("/user-info")
-    public ResponseEntity<GlobalAPIResponse> getLoggedInUserInfo(){
-        return fetchResponse(entity,userService.getLoggedInUserInfo());
+    public ResponseEntity<GlobalAPIResponse> getLoggedInUserInfo() {
+        return fetchResponse(entity, userService.getLoggedInUserInfo());
     }
 }
