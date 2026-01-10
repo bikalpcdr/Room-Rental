@@ -14,6 +14,8 @@
 
     <resultMap id="PropertyResponseMap" type="com.bikalp.roomrentalservice.dto.response.PropertyResponse" autoMapping="true">
         <id column="id" property="id"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
 
         <collection property="amenities" ofType="com.bikalp.roomrentalservice.enums.Amenities" resultMap="AmenitiesEnumMap"/>
 
@@ -24,6 +26,8 @@
         select p.id            as id,
                p.is_active     as is_active,
                p.address       as address,
+               p.latitude      as latitude,
+               p.longitude     as longitude,
                p.description   as description,
                p.is_available  as is_available,
                p.property_type as property_type,
@@ -46,6 +50,8 @@
         select p.id            as id,
                p.is_active     as is_active,
                p.address       as address,
+               p.latitude      as latitude,
+               p.longitude     as longitude,
                p.description   as description,
                p.is_available  as is_available,
                p.property_type as property_type,
@@ -68,6 +74,8 @@
         select p.id            as id,
                p.is_active     as is_active,
                p.address       as address,
+               p.latitude      as latitude,
+               p.longitude     as longitude,
                p.description   as description,
                p.is_available  as is_available,
                p.property_type as property_type,
@@ -91,6 +99,8 @@
         select p.id            as id,
                p.is_active     as is_active,
                p.address       as address,
+               p.latitude      as latitude,
+               p.longitude     as longitude,
                p.description   as description,
                p.is_available  as is_available,
                p.property_type as property_type,

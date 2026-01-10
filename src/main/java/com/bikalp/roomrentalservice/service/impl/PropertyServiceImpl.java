@@ -17,6 +17,7 @@ import com.bikalp.roomrentalservice.repository.PropertyImageRepo;
 import com.bikalp.roomrentalservice.repository.PropertyRepo;
 import com.bikalp.roomrentalservice.service.PropertyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,11 +43,27 @@ public class PropertyServiceImpl implements PropertyService {
     private final PropertyImageRepo propertyImageRepo;
     private final BookingMapper bookingMapper;
 
+    @Value("${app.upload.property-images-dir:uploads/property-images/}")
+    private String propertyImagesDir;
+
     @Override
     @Transactional
     public void createProperty(PropertyRequest request) {
         Property property = mapToEntity(request, userDataConfig.getLoggedInUser());
         propertyRepo.save(property);
+    }
+
+    @Override
+    @Transactional
+    public Long createPropertyWithImages(PropertyRequest request, List<MultipartFile> images) {
+        Property property = mapToEntity(request, userDataConfig.getLoggedInUser());
+        Property saved = propertyRepo.save(property);
+
+        if (images != null && !images.isEmpty()) {
+            uploadImagesForProperty(saved.getId(), images);
+        }
+
+        return saved.getId();
     }
 
     @Override
@@ -62,7 +79,7 @@ public class PropertyServiceImpl implements PropertyService {
         Property property = getPropertyByIdOrThrow(propertyId);
         // Delete associated image files from the filesystem
         if (property.getImages() != null) {
-            String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/property-images";
+            String uploadDir = propertyImagesDir;
             for (PropertyImage image : property.getImages()) {
                 if (image.getImageUrl() != null) {
                     String fileName = image.getImageUrl().replace("/property-images/", "");
@@ -103,7 +120,7 @@ public class PropertyServiceImpl implements PropertyService {
             throw new MultipartException("You can upload a maximum of 20 images per property.");
         }
         Property property = getPropertyByIdOrThrow(propertyId);
-        String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/property-images";
+        String uploadDir = propertyImagesDir;
         File dir = new File(uploadDir);
         if (!dir.exists()) dir.mkdirs();
         for (MultipartFile file : images) {
@@ -138,7 +155,7 @@ public class PropertyServiceImpl implements PropertyService {
         PropertyImage image = propertyImageRepo.findById(imageId)
                 .orElseThrow(() -> new DataNotFoundException("Image not found"));
         // Delete file from filesystem
-        String uploadDir = "/home/yenyasof/Downloads/room-rental/frontend/public/property-images";
+        String uploadDir = propertyImagesDir;
         if (image.getImageUrl() != null) {
             String fileName = image.getImageUrl().replace("/property-images/", "");
             java.io.File file = new java.io.File(uploadDir, fileName);
@@ -169,6 +186,8 @@ public class PropertyServiceImpl implements PropertyService {
                 .description(request.getDescription())
                 .propertyType(request.getPropertyType())
                 .address(request.getAddress())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
                 .roomCount(request.getRoomCount())
                 .rentPrice(request.getRentPrice())
                 .isAvailable(request.getIsAvailable())
@@ -182,6 +201,8 @@ public class PropertyServiceImpl implements PropertyService {
         property.setDescription(request.getDescription());
         property.setPropertyType(request.getPropertyType());
         property.setAddress(request.getAddress());
+        property.setLatitude(request.getLatitude());
+        property.setLongitude(request.getLongitude());
         property.setRoomCount(request.getRoomCount());
         property.setRentPrice(request.getRentPrice());
         property.setAmenities(request.getAmenities());
