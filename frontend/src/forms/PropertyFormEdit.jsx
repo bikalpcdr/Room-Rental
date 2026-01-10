@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import "../style/PropertyForm.css";
 import { getPropertyById, deletePropertyImage } from "../api";
+import LocationPicker from "../components/LocationPicker";
 
 const PROPERTY_TYPES = ["ROOM", "FLAT", "HOUSE"];
 const AMENITIES = [
@@ -46,6 +47,12 @@ function PropertyFormEdit({ formData, setFormData, onSubmit, onCancel, propertyI
   const amenityRows = useMemo(() => [AMENITIES.slice(0, 4), AMENITIES.slice(4, 8)], []);
 
   const API_BASE_URL = "http://localhost:7777";
+
+  const toImageSrc = useCallback((img) => {
+    const raw = img?.url || img?.imageUrl;
+    if (!raw) return "";
+    return raw.startsWith("http") ? raw : API_BASE_URL + raw;
+  }, []);
 
   return (
     <form onSubmit={onSubmit} autoComplete="off">
@@ -96,6 +103,13 @@ function PropertyFormEdit({ formData, setFormData, onSubmit, onCancel, propertyI
           placeholder="e.g. 123 Main St, Kathmandu"
         />
       </div>
+
+      <LocationPicker
+        formData={formData}
+        setFormData={setFormData}
+        address={formData.address}
+      />
+
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="property-roomCount">Room Count</label>
@@ -159,7 +173,7 @@ function PropertyFormEdit({ formData, setFormData, onSubmit, onCancel, propertyI
             {existingImages.map((img) => (
               <div key={img.id} style={{ position: 'relative', display: 'inline-block' }}>
                 <img
-                  src={img.url && img.url.startsWith('http') ? img.url : API_BASE_URL + img.url}
+                  src={toImageSrc(img)}
                   alt="property"
                   style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 4, border: '1px solid #ccc' }}
                 />
