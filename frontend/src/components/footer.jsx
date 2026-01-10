@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "../style/footer.css";
 
 const quickLinks = [
   { to: "/", label: "🏠 Home" },
@@ -35,25 +36,26 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="site-footer">
-      <div className="footer-container">
-        <div className="footer-content">
+    <footer className="footer  pt-4 pb-3">
+      <div className="container">
+        <div className="row g-4">
           {/* Company Info */}
-          <section className="footer-section" aria-label="Company Info">
-            <div className="footer-brand">
-              <div className="footer-logo">🏠</div>
-              <h3>Room Rental Service</h3>
+          <section className="col-md-6 col-lg-3" aria-label="Company Info">
+            <div className="d-flex align-items-center mb-3">
+              <div className="fs-2 me-2">🏠</div>
+              <h3 className="h5 mb-0">Room Rental Service</h3>
             </div>
-            <p className="footer-description">
+            <p className="text-muted small mb-3">
               Your trusted platform for finding and renting rooms. 
               Connect with verified landlords and find your perfect living space.
             </p>
-            <nav className="social-links" aria-label="Social Media Links">
+            <nav className="d-flex gap-2" aria-label="Social Media Links">
               {socialLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  className="social-link"
+                  className="text-decoration-none text-dark bg-white rounded-circle d-flex align-items-center justify-content-center"
+                  style={{width: '36px', height: '36px'}}
                   aria-label={link.label}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -65,32 +67,38 @@ function Footer() {
           </section>
 
           {/* Quick Links */}
-          <section className="footer-section" aria-label="Quick Links">
-            <h4>Quick Links</h4>
-            <ul className="footer-links">
+          <section className="col-md-6 col-lg-3" aria-label="Quick Links">
+            <h4 className="h5 mb-3">Quick Links</h4>
+            <ul className="list-unstyled">
               {quickLinks.map((link) => (
-                <li key={link.to}><Link to={link.to}>{link.label}</Link></li>
+                <li key={link.to} className="mb-2">
+                  <Link to={link.to} className="text-decoration-none text-muted small">
+                    {link.label}
+                  </Link>
+                </li>
               ))}
             </ul>
           </section>
 
           {/* Services */}
-          <section className="footer-section" aria-label="Services">
-            <h4>Services</h4>
-            <ul className="footer-links">
+          <section className="col-md-6 col-lg-3" aria-label="Services">
+            <h4 className="h5 mb-3">Services</h4>
+            <ul className="list-unstyled">
               {services.map((service, idx) => (
-                <li key={idx}><span>{service.label}</span></li>
+                <li key={idx} className="mb-2">
+                  <span className="text-muted small">{service.label}</span>
+                </li>
               ))}
             </ul>
           </section>
 
           {/* Contact Info */}
-          <section className="footer-section contact-card" aria-label="Contact Info">
-            <h4>Contact Us</h4>
-            <address className="contact-info">
+          <section className="col-md-6 col-lg-3" aria-label="Contact Info">
+            <h4 className="h5 mb-3">Contact Us</h4>
+            <address className="text-muted small">
               {contactInfo.map((item, idx) => (
-                <div className="contact-item" key={idx}>
-                  <span className="contact-icon">{item.icon}</span>
+                <div key={idx} className="d-flex align-items-start mb-2">
+                  <span className="me-2">{item.icon}</span>
                   <span>{item.text}</span>
                 </div>
               ))}
@@ -98,16 +106,16 @@ function Footer() {
           </section>
         </div>
       </div>
-      <div className="footer-bottom">
-        <div className="footer-bottom-content">
-          <div className="copyright">
-            <p>&copy; {currentYear} Room Rental Service. All rights reserved.</p>
+      <div className="border-top mt-4 pt-3">
+        <div className="container">
+          <div className="d-md-flex justify-content-between align-items-center">
+            <p className="text-muted small mb-2 mb-md-0">&copy; {currentYear} Room Rental Service. All rights reserved.</p>
+            <nav className="d-flex gap-3" aria-label="Footer Policies">
+              <Link to="/privacy" className="text-decoration-none text-muted small">Privacy Policy</Link>
+              <Link to="/terms" className="text-decoration-none text-muted small">Terms of Service</Link>
+              <Link to="/cookies" className="text-decoration-none text-muted small">Cookie Policy</Link>
+            </nav>
           </div>
-          <nav className="footer-bottom-links" aria-label="Footer Policies">
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Service</Link>
-            <Link to="/cookies">Cookie Policy</Link>
-          </nav>
         </div>
       </div>
     </footer>
