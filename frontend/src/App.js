@@ -50,7 +50,7 @@ function App() {
         <Route path="/forgot-password" element={<OtpRequestPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
         <Route
-          path="/admin" 
+          path="/admin-dashboard"
           element={
             <ProtectedRoute requiredRole="ADMIN">
               <AdminDashboard />

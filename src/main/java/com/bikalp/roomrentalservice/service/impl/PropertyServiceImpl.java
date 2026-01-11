@@ -1,6 +1,7 @@
 package com.bikalp.roomrentalservice.service.impl;
 
 import com.bikalp.roomrentalservice.config.UserDataConfig;
+import com.bikalp.roomrentalservice.dto.CloudinaryUploadResponse;
 import com.bikalp.roomrentalservice.dto.request.FilterRequest;
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
 import com.bikalp.roomrentalservice.dto.response.BookingRequestResponse;
@@ -15,6 +16,7 @@ import com.bikalp.roomrentalservice.model.PropertyImage;
 import com.bikalp.roomrentalservice.model.User;
 import com.bikalp.roomrentalservice.repository.PropertyImageRepo;
 import com.bikalp.roomrentalservice.repository.PropertyRepo;
+import com.bikalp.roomrentalservice.service.CloudinaryService;
 import com.bikalp.roomrentalservice.service.PropertyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +44,7 @@ public class PropertyServiceImpl implements PropertyService {
     private final UserDataConfig userDataConfig;
     private final PropertyImageRepo propertyImageRepo;
     private final BookingMapper bookingMapper;
+    private final CloudinaryService cloudinaryService;
 
     @Value("${app.upload.property-images-dir:uploads/property-images/}")
     private String propertyImagesDir;
@@ -112,55 +115,51 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     @Transactional
     public void uploadImagesForProperty(Long propertyId, List<MultipartFile> images) {
+
         if (images == null || images.isEmpty()) {
-            throw new CustomizeException("No images provided for upload.");
+            throw new CustomizeException("No images provided");
         }
-        long nonEmptyCount = images.stream().filter(f -> !f.isEmpty()).count();
-        if (nonEmptyCount > 20) {
-            throw new MultipartException("You can upload a maximum of 20 images per property.");
+
+        long count = images.stream().filter(f -> !f.isEmpty()).count();
+        if (count > 20) {
+            throw new MultipartException("Maximum 20 images allowed");
         }
+
         Property property = getPropertyByIdOrThrow(propertyId);
-        String uploadDir = propertyImagesDir;
-        File dir = new File(uploadDir);
-        if (!dir.exists()) dir.mkdirs();
+
         for (MultipartFile file : images) {
             if (file.isEmpty()) continue;
-            String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
-                    ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'))
-                    : "";
-            String filename = "property-" + property.getId() + "-" + UUID.randomUUID() + ext;
-            Path filePath = Paths.get(uploadDir, filename);
-            try {
-                Files.write(filePath, file.getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new CustomizeException("Failed to save property image");
-            }
-            String url = "/property-images/" + filename;
+
+            CloudinaryUploadResponse response =
+                    cloudinaryService.uploadImage(file);
+
             PropertyImage propertyImage = PropertyImage.builder()
-                    .imageUrl(url)
+                    .imageUrl(response.getImageUrl())
+                    .publicId(response.getPublicId())
                     .property(property)
                     .build();
+
             propertyImageRepo.save(propertyImage);
+
             if (property.getImages() == null) {
                 property.setImages(new ArrayList<>());
             }
             property.getImages().add(propertyImage);
         }
+
         propertyRepo.save(property);
     }
 
+
     @Override
+    @Transactional
     public void deletePropertyImagesByImageId(Long imageId) {
+
         PropertyImage image = propertyImageRepo.findById(imageId)
                 .orElseThrow(() -> new DataNotFoundException("Image not found"));
-        // Delete file from filesystem
-        String uploadDir = propertyImagesDir;
-        if (image.getImageUrl() != null) {
-            String fileName = image.getImageUrl().replace("/property-images/", "");
-            java.io.File file = new java.io.File(uploadDir, fileName);
-            if (file.exists()) file.delete();
-        }
+
+        cloudinaryService.deleteImage(image.getPublicId());
+
         propertyImageRepo.delete(image);
     }
 

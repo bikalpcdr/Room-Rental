@@ -211,8 +211,16 @@ function OwnerDashboard() {
         e.preventDefault();
         try {
             if (isEdit) {
-                await updateProperty({...formData, propertyId: selectedProperty.propertyId || selectedProperty.id});
-                toast.success("Property updated successfully!");
+                const propertyId = selectedProperty?.propertyId || selectedProperty?.id;
+                await updateProperty({...formData, propertyId});
+                
+                // Upload new images if any are selected
+                if (selectedImages && selectedImages.length > 0) {
+                    await uploadPropertyImages(propertyId, selectedImages);
+                    toast.success("Property and images updated successfully!");
+                } else {
+                    toast.success("Property updated successfully!");
+                }
                 setShowFormModal(false);
                 fetchProperties();
             } else {
