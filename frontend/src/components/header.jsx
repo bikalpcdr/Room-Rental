@@ -1,10 +1,8 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { isAuthenticated, getUserData, logout, isAdmin, isOwner, isRenter } from "../utils/auth";
 import { uploadProfilePicture } from "../api";
 import { toast } from "react-toastify";
-import "../style/header.css";
-import logo from "../assets/logo1.png";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,10 +10,8 @@ function Header() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const prevScrollY = useRef(0);
 
   // Memoize userData to avoid unnecessary re-renders
   const userData = useMemo(() => getUserData(), [location.pathname, isAuthenticated()]);
@@ -75,50 +71,26 @@ function Header() {
     }
   }, [selectedImage, userData, updateUserProfilePictureUrl]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > prevScrollY.current && currentScrollY > 80) {
-        setIsHidden(true);
-      } else if (currentScrollY < prevScrollY.current) {
-        setIsHidden(false);
-      }
-      prevScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <header className={`site-header ${isHidden ? "site-header--hidden" : ""}`}>
-      <div className="header-container container-fluid">
-
+    <header className="site-header">
+      <div className="header-container">
         {/* Logo/Brand */}
         <div className="header-brand">
           <Link to="/" className="brand-link">
-            <div className="brand-icon">
-              <img src={logo} alt="logo" className="logo1" />
-            </div>
-            <h1 className="brand-title">Rent Hub</h1>
+            <div className="brand-icon">🏠</div>
+            <h1 className="brand-title">Room Rental Service</h1>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className={`header-nav ${isMenuOpen ? 'nav-open' : ''} nav`} aria-label="Main Navigation">
+        <nav className={`header-nav ${isMenuOpen ? 'nav-open' : ''}`} aria-label="Main Navigation">
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/about" className="nav-link">About</Link>
           <Link to="/contact" className="nav-link">Contact</Link>
           {!isAuthenticated() || !userData ? (
             <div className="auth-buttons">
-              <Link to="/login" className=" login-link btn btn-outline-light px-3 py-1 rounded-pill">
-                Login
-              </Link>
-              <Link to="/register" className=" register-link btn btn-warning text-dark px-3 py-1 rounded-pill fw-bold">
-                Register
-              </Link>
+              <Link to="/login" className="nav-link login-link">Login</Link>
+              <Link to="/register" className="nav-link register-link">Register</Link>
             </div>
           ) : (
             <div className="user-section">

@@ -342,6 +342,18 @@
   font-size: 0.95rem;
 }
 
+.login-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.login-link:hover {
+  color: #5a67d8;
+  text-decoration: underline;
+}
+
 /* Divider */
 .register-divider {
   text-align: center;

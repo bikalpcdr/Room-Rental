@@ -360,7 +360,7 @@
 
 .register-link:hover {
   color: #5a67d8;
- 
+  text-decoration: underline;
 }
 
 /* Divider */
