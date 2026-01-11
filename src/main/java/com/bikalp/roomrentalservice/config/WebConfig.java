@@ -1,19 +1,12 @@
 package com.bikalp.roomrentalservice.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.nio.file.Paths;
-
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-    @Value("${app.upload.property-images-dir:uploads/property-images/}")
-    private String propertyImagesDir;
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -30,6 +23,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:uploads/");
         // Serve property images from absolute path
         registry.addResourceHandler("/property-images/**")
-                .addResourceLocations(Paths.get(propertyImagesDir).toAbsolutePath().normalize().toUri().toString());
+                .addResourceLocations("file:/home/yenyasof/Downloads/room-rental/frontend/public/property-images/");
     }
 }

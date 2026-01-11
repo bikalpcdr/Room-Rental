@@ -33,12 +33,6 @@ public class Property extends BaseEntity {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "latitude")
-    private Double latitude;
-
-    @Column(name = "longitude")
-    private Double longitude;
-
     @Column(name = "room_count", nullable = false)
     private Long roomCount;
 

@@ -152,23 +152,6 @@ export const uploadPropertyImages = (propertyId, images = []) => {
     });
 };
 
-export const createPropertyWithImages = (propertyData, images = []) => {
-    const formData = new FormData();
-
-    formData.append(
-        "property",
-        new Blob([JSON.stringify(propertyData)], { type: "application/json" })
-    );
-
-    (images || []).forEach((img) => formData.append("images", img));
-
-    return apiClient.post('/property/with-images', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
-};
-
 /**
  * Update a property
  * @param {object} data

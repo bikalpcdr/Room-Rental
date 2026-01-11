@@ -4,13 +4,14 @@ import {useNavigate} from "react-router-dom";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import PropertyForm from "../forms/PropertyForm";
+import PropertyFormEdit from "../forms/PropertyFormEdit";
 import PropertyImageUploadForm from "../forms/PropertyImageUploadForm";
 import OwnerPropertyTable from "../components/OwnerPropertyTable";
 import OwnerBookingRequestTable from "../components/OwnerBookingRequestTable";
 import "../style/admin-dashboard.css";
 import {
     approveBooking,
-    createPropertyWithImages,
+    createProperty,
     deleteProperty,
     fetchBookingRequests,
     getOwnerProperties,
@@ -98,8 +99,6 @@ function OwnerDashboard() {
         description: "",
         propertyType: "",
         address: "",
-        latitude: null,
-        longitude: null,
         roomCount: 1,
         rentPrice: 0,
         isAvailable: true,
@@ -161,14 +160,11 @@ function OwnerDashboard() {
             description: "",
             propertyType: "",
             address: "",
-            latitude: null,
-            longitude: null,
             roomCount: 1,
             rentPrice: 0,
             isAvailable: true,
             amenities: [],
         });
-        setSelectedImages([]);
         setIsEdit(false);
         setShowFormModal(true);
     }, []);
@@ -179,8 +175,6 @@ function OwnerDashboard() {
             description: property.description || "",
             propertyType: property.propertyType || "",
             address: property.address || "",
-            latitude: property.latitude ?? null,
-            longitude: property.longitude ?? null,
             roomCount: property.roomCount || 1,
             rentPrice: property.rentPrice || 0,
             isAvailable: property.isAvailable !== undefined ? property.isAvailable : true,
@@ -216,7 +210,8 @@ function OwnerDashboard() {
                 setShowFormModal(false);
                 fetchProperties();
             } else {
-                await createPropertyWithImages(formData, selectedImages);
+                // 1. Create property (no images)
+                await createProperty(formData);
                 setShowFormModal(false);
                 toast.success("Property created successfully!");
                 fetchProperties();
@@ -225,7 +220,7 @@ function OwnerDashboard() {
         } catch (err) {
             toast.error("Failed to save property");
         }
-    }, [isEdit, formData, selectedProperty, fetchProperties, selectedImages]);
+    }, [isEdit, formData, selectedProperty, fetchProperties]);
 
     const handleImageUpload = async () => {
         if (selectedImages.length === 0) {
@@ -384,16 +379,23 @@ function OwnerDashboard() {
                                     ×
                                 </button>
                             </div>
-                            <PropertyForm
-                                formData={formData}
-                                setFormData={setFormData}
-                                onSubmit={handleFormSubmit}
-                                onCancel={() => setShowFormModal(false)}
-                                isEdit={isEdit}
-                                propertyId={selectedProperty?.propertyId || selectedProperty?.id}
-                                selectedImages={selectedImages}
-                                setSelectedImages={setSelectedImages}
-                            />
+                            {isEdit ? (
+                                <PropertyFormEdit
+                                    formData={formData}
+                                    setFormData={setFormData}
+                                    onSubmit={handleFormSubmit}
+                                    onCancel={() => setShowFormModal(false)}
+                                    propertyId={selectedProperty?.propertyId || selectedProperty?.id}
+                                />
+                            ) : (
+                                <PropertyForm
+                                    formData={formData}
+                                    setFormData={setFormData}
+                                    onSubmit={handleFormSubmit}
+                                    onCancel={() => setShowFormModal(false)}
+                                    isEdit={isEdit}
+                                />
+                            )}
                         </div>
                     </div>
                 )}

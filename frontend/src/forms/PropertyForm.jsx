@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import "../style/PropertyForm.css";
 import { getPropertyById, deletePropertyImage } from "../api";
-import LocationPicker from "../components/LocationPicker";
 
 const PROPERTY_TYPES = ["ROOM", "FLAT", "HOUSE"];
 const AMENITIES = [
@@ -16,7 +15,7 @@ const AMENITIES = [
   "COMMERCIAL_SPACE"
 ];
 
-function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, propertyId, selectedImages, setSelectedImages }) {
+function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, propertyId }) {
   const [existingImages, setExistingImages] = useState([]);
 
   // Fetch property details and images on edit
@@ -45,14 +44,6 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
   };
 
   const amenityRows = useMemo(() => [AMENITIES.slice(0, 4), AMENITIES.slice(4, 8)], []);
-
-  const API_BASE_URL = "http://localhost:7777";
-
-  const toImageSrc = useCallback((img) => {
-    const raw = img?.url || img?.imageUrl;
-    if (!raw) return "";
-    return raw.startsWith("http") ? raw : API_BASE_URL + raw;
-  }, []);
 
   return (
     <form onSubmit={onSubmit} autoComplete="off">
@@ -103,13 +94,6 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
           placeholder="e.g. 123 Main St, Kathmandu"
         />
       </div>
-
-      <LocationPicker
-        formData={formData}
-        setFormData={setFormData}
-        address={formData.address}
-      />
-
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="property-roomCount">Room Count</label>
@@ -173,11 +157,10 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
             {existingImages.map((img) => (
               <div key={img.id} style={{ position: 'relative', display: 'inline-block' }}>
                 <img
-                  src={toImageSrc(img)}
+                  src={img.imageUrl}
                   alt="property"
                   style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 4, border: '1px solid #ccc' }}
                 />
-
                 <button
                   type="button"
                   onClick={() => handleDeleteImage(img.id)}
@@ -207,24 +190,6 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
           </div>
         </div>
       )}
-
-      {!isEdit && setSelectedImages && (
-        <div className="form-group">
-          <label htmlFor="property-images">Property Images</label>
-          <input
-            id="property-images"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setSelectedImages(Array.from(e.target.files || []))}
-          />
-          {!!selectedImages?.length && (
-            <div style={{ marginTop: 8, fontSize: 13, color: '#555' }}>
-              Selected: {selectedImages.length}
-            </div>
-          )}
-        </div>
-      )}
       <div className="modal-actions">
         <button type="button" onClick={onCancel}>
           Cancel
@@ -242,8 +207,6 @@ PropertyForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   isEdit: PropTypes.bool,
   propertyId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  selectedImages: PropTypes.array,
-  setSelectedImages: PropTypes.func,
 };
 
 export default PropertyForm;

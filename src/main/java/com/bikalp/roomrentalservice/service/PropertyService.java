@@ -11,8 +11,6 @@ import java.util.List;
 public interface PropertyService {
     void createProperty(PropertyRequest request);
 
-    Long createPropertyWithImages(PropertyRequest request, List<MultipartFile> images);
-
     void updateProperty(PropertyRequest request);
 
     void deleteProperty(Long propertyId);
@@ -30,4 +28,4 @@ public interface PropertyService {
     List<PropertyResponse> searchProperty(FilterRequest request);
 
     List<BookingResponse> fetchBookingRequest();
-}
+} 
