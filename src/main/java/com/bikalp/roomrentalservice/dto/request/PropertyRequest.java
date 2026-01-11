@@ -4,7 +4,6 @@ import com.bikalp.roomrentalservice.enums.Amenities;
 import com.bikalp.roomrentalservice.enums.PropertyType;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,10 +15,12 @@ public class PropertyRequest {
     private String description;
     private PropertyType propertyType;
     private String address;
+    private Double latitude;
+    private Double longitude;
     private Long roomCount;
     private double rentPrice;
     private Boolean isAvailable;
     private Long ownerId;
     private List<Amenities> amenities;
 //    private List<MultipartFile> images;
-} 
+}

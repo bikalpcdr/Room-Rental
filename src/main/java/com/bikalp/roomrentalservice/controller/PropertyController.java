@@ -31,6 +31,16 @@ public class PropertyController extends BaseController {
         return createdResponse(entity);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PostMapping(value = "/with-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GlobalAPIResponse> createPropertyWithImages(
+            @RequestPart("property") PropertyRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) {
+        Long propertyId = propertyService.createPropertyWithImages(request, images);
+        return customResponse("Property created successfully..!!", propertyId);
+    }
+
     @PostMapping(value = "/{propertyId}/images",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GlobalAPIResponse> uploadImagesForProperty(@PathVariable("propertyId") Long propertyId, @RequestParam List<MultipartFile> images) {
         propertyService.uploadImagesForProperty(propertyId, images);

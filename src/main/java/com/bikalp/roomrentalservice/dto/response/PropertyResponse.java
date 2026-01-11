@@ -15,6 +15,8 @@ public class PropertyResponse {
     private String description;
     private PropertyType propertyType;
     private String address;
+    private Double latitude;
+    private Double longitude;
     private Long roomCount;
     private String status;
     private double rentPrice;
@@ -24,4 +26,4 @@ public class PropertyResponse {
     private String ownerName;
     private List<Amenities> amenities;
     private List<ImageDto> images;
-} 
+}
