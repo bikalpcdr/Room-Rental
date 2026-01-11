@@ -19,4 +19,7 @@ public class PropertyImage extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
+
+    @Column(name = "public_id", nullable = false)
+    private String publicId;
 } 

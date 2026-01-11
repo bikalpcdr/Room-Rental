@@ -16,7 +16,13 @@ public class AuditorConfig {
     private final UserDataConfig userDataConfig;
 
     @Bean
-    public AuditorAware<Integer> auditorProvider() {
-        return () -> Optional.ofNullable(userDataConfig.getCurrentUserId().intValue());
+    public AuditorAware<Long> auditorProvider() {
+        return () -> {
+            try {
+                return Optional.ofNullable(userDataConfig.getCurrentUserId());
+            } catch (Exception e) {
+                return Optional.of(1L);
+            }
+        };
     }
 }

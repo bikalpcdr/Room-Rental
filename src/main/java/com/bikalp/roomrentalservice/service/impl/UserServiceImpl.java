@@ -1,6 +1,7 @@
 package com.bikalp.roomrentalservice.service.impl;
 
 import com.bikalp.roomrentalservice.config.UserDataConfig;
+import com.bikalp.roomrentalservice.dto.CloudinaryUploadResponse;
 import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
 import com.bikalp.roomrentalservice.dto.request.UserCreationRequest;
 import com.bikalp.roomrentalservice.dto.request.UserSettingRequest;
@@ -88,9 +89,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void uploadProfilePicture(MultipartFile file) {
-     String url = cloudinaryService.uploadImage(file);
+        CloudinaryUploadResponse cloudinaryUploadResponse = cloudinaryService.uploadImage(file);
      var user = userDataConfig.getLoggedInUser();
-     user.setProfilePictureUrl(url);
+     user.setProfilePictureUrl(cloudinaryUploadResponse.getImageUrl());
      userRepo.save(user);
     }
 

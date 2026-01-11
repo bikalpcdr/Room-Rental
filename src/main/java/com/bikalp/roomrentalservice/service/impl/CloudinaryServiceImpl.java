@@ -1,5 +1,6 @@
 package com.bikalp.roomrentalservice.service.impl;
 
+import com.bikalp.roomrentalservice.dto.CloudinaryUploadResponse;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.service.CloudinaryService;
 import com.cloudinary.Cloudinary;
@@ -18,23 +19,29 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     private final Cloudinary cloudinary;
 
     @Override
-    public String uploadImage(MultipartFile file) {
+    public CloudinaryUploadResponse uploadImage(MultipartFile file) {
         try {
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-            return uploadResult.get("secure_url").toString();
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("folder", "room-rental/properties")
+            );
+
+            return new CloudinaryUploadResponse(
+                    uploadResult.get("secure_url").toString(),
+                    uploadResult.get("public_id").toString()
+            );
+
         } catch (IOException e) {
-            throw new CustomizeException("Cloudinary upload failed: " + e.getMessage());
+            throw new CustomizeException("Cloudinary upload failed");
         }
     }
 
     @Override
-    public void deleteImage(String imageUrl) {
+    public void deleteImage(String publicId) {
         try {
-            // Extract public_id from URL
-            String publicId = imageUrl.substring(imageUrl.lastIndexOf("/") + 1, imageUrl.lastIndexOf("."));
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
         } catch (Exception e) {
-            throw new CustomizeException("Cloudinary delete failed: " + e.getMessage());
+            throw new CustomizeException("Cloudinary delete failed");
         }
     }
 }

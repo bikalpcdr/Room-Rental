@@ -40,9 +40,42 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
   }, [setFormData]);
 
   const handleDeleteImage = async (imageId) => {
-    await deletePropertyImage(imageId);
-    setExistingImages(prev => prev.filter(img => img.id !== imageId));
+    try {
+      await deletePropertyImage(imageId);
+      setExistingImages(prev => prev.filter(img => img.id !== imageId));
+    } catch (error) {
+      console.error("Failed to delete image:", error);
+    }
   };
+
+  const handleFileChange = useCallback((e) => {
+    if (!setSelectedImages) return;
+    
+    const files = Array.from(e.target.files || []);
+    // Combine previous and new files, avoid duplicates by name and size
+    let combined = [...(selectedImages || []), ...files];
+    combined = combined.filter((file, idx, arr) =>
+      arr.findIndex(f => f.name === file.name && f.size === file.size) === idx
+    );
+    
+    // Limit to 20 total images (existing + new)
+    const maxNewImages = isEdit ? 20 - existingImages.length : 20;
+    if (combined.length > maxNewImages) {
+      alert(`You can only upload ${maxNewImages} more images for this property.`);
+      setSelectedImages(combined.slice(0, maxNewImages));
+    } else {
+      setSelectedImages(combined);
+    }
+    
+    // Reset the input so the same file can be selected again
+    e.target.value = '';
+  }, [selectedImages, setSelectedImages, isEdit, existingImages.length]);
+
+  // Remove a selected image by index
+  const handleRemoveSelectedImage = useCallback((idx) => {
+    if (!setSelectedImages) return;
+    setSelectedImages((prev) => prev.filter((_, i) => i !== idx));
+  }, [setSelectedImages]);
 
   const amenityRows = useMemo(() => [AMENITIES.slice(0, 4), AMENITIES.slice(4, 8)], []);
 
@@ -53,6 +86,24 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
     if (!raw) return "";
     return raw.startsWith("http") ? raw : API_BASE_URL + raw;
   }, []);
+
+  // Generate previews for selected images
+  const imagePreviews = useMemo(() => {
+    if (!selectedImages || selectedImages.length === 0) return [];
+    return selectedImages.map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+  }, [selectedImages]);
+
+  // Cleanup preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      imagePreviews.forEach(({ preview }) => {
+        URL.revokeObjectURL(preview);
+      });
+    };
+  }, [imagePreviews]);
 
   return (
       <form onSubmit={onSubmit} autoComplete="off">
@@ -166,38 +217,23 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
             ))}
           </div>
         </div>
+
+        {/* Existing Images (Edit Mode) */}
         {isEdit && existingImages.length > 0 && (
             <div className="form-group">
               <label>Existing Images</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+              <div className="image-preview-container">
                 {existingImages.map((img) => (
-                    <div key={img.id} style={{ position: 'relative', display: 'inline-block' }}>
+                    <div key={img.id} className="image-preview-item">
                       <img
                           src={toImageSrc(img)}
                           alt="property"
-                          style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 4, border: '1px solid #ccc' }}
+                          className="image-preview-thumbnail"
                       />
-
                       <button
                           type="button"
                           onClick={() => handleDeleteImage(img.id)}
-                          style={{
-                            position: 'absolute',
-                            top: -8,
-                            right: -8,
-                            background: '#f44336',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: 20,
-                            height: 20,
-                            cursor: 'pointer',
-                            fontSize: 14,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 0
-                          }}
+                          className="image-delete-btn"
                           aria-label="Delete image"
                       >
                         ×
@@ -208,23 +244,64 @@ function PropertyForm({ formData, setFormData, onSubmit, onCancel, isEdit, prope
             </div>
         )}
 
-        {!isEdit && setSelectedImages && (
+        {/* Image Upload Section (Both Create and Edit) */}
+        {setSelectedImages && (
             <div className="form-group">
-              <label htmlFor="property-images">Property Images</label>
+              <label htmlFor="property-images">
+                {isEdit ? "Add More Images" : "Property Images"}
+              </label>
               <input
                   id="property-images"
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setSelectedImages(Array.from(e.target.files || []))}
+                  onChange={handleFileChange}
               />
-              {!!selectedImages?.length && (
-                  <div style={{ marginTop: 8, fontSize: 13, color: '#555' }}>
-                    Selected: {selectedImages.length}
+              {isEdit && existingImages.length > 0 && (
+                  <div className="image-upload-hint">
+                    {existingImages.length} image(s) already uploaded. You can upload up to {20 - existingImages.length} more.
+                  </div>
+              )}
+              {!isEdit && (
+                  <div className="image-upload-hint">
+                    You can upload up to 20 images.
+                  </div>
+              )}
+
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                  <div className="image-preview-container" style={{ marginTop: 12 }}>
+                    {imagePreviews.map(({ file, preview }, idx) => (
+                        <div key={idx} className="image-preview-item">
+                          <img
+                              src={preview}
+                              alt={`preview-${idx}`}
+                              className="image-preview-thumbnail"
+                          />
+                          <button
+                              type="button"
+                              onClick={() => handleRemoveSelectedImage(idx)}
+                              className="image-delete-btn"
+                              aria-label="Remove image"
+                          >
+                            ×
+                          </button>
+                          <div className="image-preview-name" title={file.name}>
+                            {file.name.length > 15 ? `${file.name.substring(0, 15)}...` : file.name}
+                          </div>
+                        </div>
+                    ))}
+                  </div>
+              )}
+
+              {selectedImages && selectedImages.length > 0 && (
+                  <div className="selected-images-count">
+                    {selectedImages.length} image{selectedImages.length !== 1 ? 's' : ''} selected
                   </div>
               )}
             </div>
         )}
+
         <div className="modal-actions">
           <button type="button" onClick={onCancel}>
             Cancel
