@@ -342,18 +342,6 @@
   font-size: 0.95rem;
 }
 
-.login-link {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.login-link:hover {
-  color: #5a67d8;
-  text-decoration: underline;
-}
-
 /* Divider */
 .register-divider {
   text-align: center;
@@ -451,29 +439,29 @@
   .register-container {
     padding: 1.5rem 1rem;
   }
-  
+
   .register-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .register-logo {
     font-size: 2.5rem;
   }
-  
+
   .form-group input,
   .form-group select {
     padding: 0.875rem 2.5rem 0.875rem 0.875rem;
   }
-  
+
   .input-icon1,
   .input-icon {
     right: 0.875rem;
   }
-  
+
   .password-toggle {
     right: 2.5rem;
   }
-  
+
   .form-group select {
     padding-right: 2rem;
   }

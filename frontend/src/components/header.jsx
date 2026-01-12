@@ -1,8 +1,10 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { isAuthenticated, getUserData, logout, isAdmin, isOwner, isRenter } from "../utils/auth";
 import { uploadProfilePicture } from "../api";
 import { toast } from "react-toastify";
+import "../style/header.css";
+import logo from "../assets/logo1.png";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,8 +12,10 @@ function Header() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const prevScrollY = useRef(0);
 
   // Memoize userData to avoid unnecessary re-renders
   const userData = useMemo(() => getUserData(), [location.pathname, isAuthenticated()]);
@@ -71,156 +75,180 @@ function Header() {
     }
   }, [selectedImage, userData, updateUserProfilePictureUrl]);
 
-  return (
-    <header className="site-header">
-      <div className="header-container">
-        {/* Logo/Brand */}
-        <div className="header-brand">
-          <Link to="/" className="brand-link">
-            <div className="brand-icon">🏠</div>
-            <h1 className="brand-title">Room Rental Service</h1>
-          </Link>
-        </div>
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > prevScrollY.current && currentScrollY > 80) {
+        setIsHidden(true);
+      } else if (currentScrollY < prevScrollY.current) {
+        setIsHidden(false);
+      }
+      prevScrollY.current = currentScrollY;
+    };
 
-        {/* Desktop Navigation */}
-        <nav className={`header-nav ${isMenuOpen ? 'nav-open' : ''}`} aria-label="Main Navigation">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/about" className="nav-link">About</Link>
-          <Link to="/contact" className="nav-link">Contact</Link>
-          {!isAuthenticated() || !userData ? (
-            <div className="auth-buttons">
-              <Link to="/login" className="nav-link login-link">Login</Link>
-              <Link to="/register" className="nav-link register-link">Register</Link>
-            </div>
-          ) : (
-            <div className="user-section">
-              {/* User Menu */}
-              <div className="user-menu-container">
-                <button 
-                  className="user-menu-trigger"
-                  onClick={toggleUserMenu}
-                  aria-label="User menu"
-                  aria-haspopup="true"
-                  aria-expanded={isUserMenuOpen}
-                >
-                  <div className="user-avatar">
-                    {userData?.profilePictureUrl ? (
-                      <img src={getProfileImageUrl(userData.profilePictureUrl)} alt="avatar" className="avatar-img" />
-                    ) : (
-                      userData?.fullName?.charAt(0) || 'U'
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  return (
+      <header className={`site-header ${isHidden ? "site-header--hidden" : ""}`}>
+        <div className="header-container container-fluid">
+
+          {/* Logo/Brand */}
+          <div className="header-brand">
+            <Link to="/" className="brand-link">
+              <div className="brand-icon">
+                <img src={logo} alt="logo" className="logo1" />
+              </div>
+              <h1 className="brand-title">Rent Hub</h1>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className={`header-nav ${isMenuOpen ? 'nav-open' : ''} nav`} aria-label="Main Navigation">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/about" className="nav-link">About</Link>
+            <Link to="/contact" className="nav-link">Contact</Link>
+            {!isAuthenticated() || !userData ? (
+                <div className="auth-buttons">
+                  <Link to="/login" className=" login-link btn btn-outline-light px-3 py-1 rounded-pill">
+                    Login
+                  </Link>
+                  <Link to="/register" className=" register-link btn btn-warning text-dark px-3 py-1 rounded-pill fw-bold">
+                    Register
+                  </Link>
+                </div>
+            ) : (
+                <div className="user-section">
+                  {/* User Menu */}
+                  <div className="user-menu-container">
+                    <button
+                        className="user-menu-trigger"
+                        onClick={toggleUserMenu}
+                        aria-label="User menu"
+                        aria-haspopup="true"
+                        aria-expanded={isUserMenuOpen}
+                    >
+                      <div className="user-avatar">
+                        {userData?.profilePictureUrl ? (
+                            <img src={getProfileImageUrl(userData.profilePictureUrl)} alt="avatar" className="avatar-img" />
+                        ) : (
+                            userData?.fullName?.charAt(0) || 'U'
+                        )}
+                      </div>
+                      <span className="user-name">{userData?.fullName}</span>
+                      <span className="dropdown-arrow">▼</span>
+                    </button>
+                    {isUserMenuOpen && (
+                        <div className="user-dropdown">
+                          <div className="user-info">
+                            <div className="user-avatar-large" style={{ position: 'relative' }}>
+                              {userData?.profilePictureUrl ? (
+                                  <img src={getProfileImageUrl(userData.profilePictureUrl)} alt="avatar" className="avatar-img-large" />
+                              ) : (
+                                  userData?.fullName?.charAt(0) || 'U'
+                              )}
+                              <label htmlFor="profile-upload" className="camera-icon" style={{ position: 'absolute', bottom: 0, right: 0, cursor: 'pointer' }}>
+                                <span role="img" aria-label="Change profile picture">📷</span>
+                                <input
+                                    id="profile-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    onChange={handleImageChange}
+                                />
+                              </label>
+                            </div>
+                            {previewUrl && (
+                                <div className="profile-upload-preview">
+                                  <img src={previewUrl} alt="Preview" className="avatar-img-large" style={{ marginTop: 8 }} />
+                                  <button onClick={handleUpload} disabled={uploading} className="upload-btn">
+                                    {uploading ? "Uploading..." : "Upload"}
+                                  </button>
+                                  <button onClick={() => { setPreviewUrl(null); setSelectedImage(null); }} className="cancel-btn">Cancel</button>
+                                </div>
+                            )}
+                          </div>
+                          <div className="dropdown-links">
+                            <Link
+                                to={dashboardLink}
+                                className="dropdown-link"
+                                onClick={() => setIsUserMenuOpen(false)}
+                            >
+                              🏠 Dashboard
+                            </Link>
+                            <Link
+                                to="/profile"
+                                className="dropdown-link"
+                                onClick={() => setIsUserMenuOpen(false)}
+                            >
+                              👤 Profile
+                            </Link>
+                            <Link
+                                to="/settings"
+                                className="dropdown-link"
+                                onClick={() => setIsUserMenuOpen(false)}
+                            >
+                              ⚙️ Settings
+                            </Link>
+                            <div className="dropdown-divider"></div>
+                            <button
+                                onClick={handleLogout}
+                                className="dropdown-link logout-link"
+                            >
+                              🚪 Logout
+                            </button>
+                          </div>
+                        </div>
                     )}
                   </div>
-                  <span className="user-name">{userData?.fullName}</span>
-                  <span className="dropdown-arrow">▼</span>
-                </button>
-                {isUserMenuOpen && (
-                  <div className="user-dropdown">
-                    <div className="user-info">
-                      <div className="user-avatar-large" style={{ position: 'relative' }}>
-                        {userData?.profilePictureUrl ? (
-                          <img src={getProfileImageUrl(userData.profilePictureUrl)} alt="avatar" className="avatar-img-large" />
-                        ) : (
-                          userData?.fullName?.charAt(0) || 'U'
-                        )}
-                        <label htmlFor="profile-upload" className="camera-icon" style={{ position: 'absolute', bottom: 0, right: 0, cursor: 'pointer' }}>
-                          <span role="img" aria-label="Change profile picture">📷</span>
-                          <input
-                            id="profile-upload"
-                            type="file"
-                            accept="image/*"
-                            style={{ display: 'none' }}
-                            onChange={handleImageChange}
-                          />
-                        </label>
-                      </div>
-                      {previewUrl && (
-                        <div className="profile-upload-preview">
-                          <img src={previewUrl} alt="Preview" className="avatar-img-large" style={{ marginTop: 8 }} />
-                          <button onClick={handleUpload} disabled={uploading} className="upload-btn">
-                            {uploading ? "Uploading..." : "Upload"}
-                          </button>
-                          <button onClick={() => { setPreviewUrl(null); setSelectedImage(null); }} className="cancel-btn">Cancel</button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="dropdown-links">
-                      <Link 
-                        to={dashboardLink} 
-                        className="dropdown-link"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        🏠 Dashboard
-                      </Link>
-                      <Link 
-                        to="/profile" 
-                        className="dropdown-link"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        👤 Profile
-                      </Link>
-                      <Link 
-                        to="/settings" 
-                        className="dropdown-link"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        ⚙️ Settings
-                      </Link>
-                      <div className="dropdown-divider"></div>
-                      <button 
-                        onClick={handleLogout}
-                        className="dropdown-link logout-link"
-                      >
-                        🚪 Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
+                </div>
+            )}
+          </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+              className={`mobile-menu-btn ${isMenuOpen ? 'active' : ''}`}
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+
+        {/* Mobile Menu Overlay */}
+        {isMenuOpen && (
+            <div className="mobile-menu-overlay" onClick={toggleMenu}>
+              <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
+                <div className="mobile-menu-header">
+                  <h3>Menu</h3>
+                  <button onClick={toggleMenu} className="close-menu-btn">×</button>
+                </div>
+                <div className="mobile-menu-links">
+                  <Link to="/" className="mobile-link" onClick={toggleMenu}>🏠 Home</Link>
+                  <Link to="/about" className="mobile-link" onClick={toggleMenu}>ℹ️ About</Link>
+                  <Link to="/contact" className="mobile-link" onClick={toggleMenu}>📞 Contact</Link>
+                  {!isAuthenticated() || !userData ? (
+                      <>
+                        <Link to="/login" className="mobile-link" onClick={toggleMenu}>🔑 Login</Link>
+                        <Link to="/register" className="mobile-link" onClick={toggleMenu}>📝 Register</Link>
+                      </>
+                  ) : (
+                      <>
+                        <Link to={dashboardLink} className="mobile-link" onClick={toggleMenu}>🏠 Dashboard</Link>
+                        <Link to="/profile" className="mobile-link" onClick={toggleMenu}>👤 Profile</Link>
+                        <button onClick={handleLogout} className="mobile-link logout-mobile">🚪 Logout</button>
+                      </>
+                  )}
+                </div>
               </div>
             </div>
-          )}
-        </nav>
-
-        {/* Mobile Menu Button */}
-        <button 
-          className={`mobile-menu-btn ${isMenuOpen ? 'active' : ''}`}
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
-
-      {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div className="mobile-menu-overlay" onClick={toggleMenu}>
-          <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
-            <div className="mobile-menu-header">
-              <h3>Menu</h3>
-              <button onClick={toggleMenu} className="close-menu-btn">×</button>
-            </div>
-            <div className="mobile-menu-links">
-              <Link to="/" className="mobile-link" onClick={toggleMenu}>🏠 Home</Link>
-              <Link to="/about" className="mobile-link" onClick={toggleMenu}>ℹ️ About</Link>
-              <Link to="/contact" className="mobile-link" onClick={toggleMenu}>📞 Contact</Link>
-              {!isAuthenticated() || !userData ? (
-                <>
-                  <Link to="/login" className="mobile-link" onClick={toggleMenu}>🔑 Login</Link>
-                  <Link to="/register" className="mobile-link" onClick={toggleMenu}>📝 Register</Link>
-                </>
-              ) : (
-                <>
-                  <Link to={dashboardLink} className="mobile-link" onClick={toggleMenu}>🏠 Dashboard</Link>
-                  <Link to="/profile" className="mobile-link" onClick={toggleMenu}>👤 Profile</Link>
-                  <button onClick={handleLogout} className="mobile-link logout-mobile">🚪 Logout</button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </header>
+        )}
+      </header>
   );
 }
 
