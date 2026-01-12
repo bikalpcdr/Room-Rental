@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
+import {createPortal} from "react-dom";
 import {toast} from "react-toastify";
 import {useNavigate} from "react-router-dom";
 import Header from "../components/header";
@@ -141,7 +142,6 @@ function OwnerDashboard() {
             setBookings(response.data?.data || []);
         } catch (error) {
             toast.error("Failed to fetch booking requests");
-            console.error("Error fetching bookings:", error);
         } finally {
             setBookingLoading(false);
         }
@@ -169,6 +169,7 @@ function OwnerDashboard() {
             amenities: [],
         });
         setSelectedImages([]);
+        setSelectedProperty(null);
         setIsEdit(false);
         setShowFormModal(true);
     }, []);
@@ -324,7 +325,12 @@ function OwnerDashboard() {
                         </p>
                     </div>
                     {currentView === 'properties' && (
-                        <button className="create-user-btn" onClick={handleAddProperty}>
+                        <button
+                            type="button"
+                            className="create-user-btn"
+                            onClick={handleAddProperty}
+                            aria-label="Add new property"
+                        >
                             + Add Property
                         </button>
                     )}
@@ -382,13 +388,30 @@ function OwnerDashboard() {
                     </div>
                 )}
 
-                {/* Property Form Modal */}
-                {showFormModal && (
-                    <div className="modal-overlay">
-                        <div className="modal">
+                {/* Property Form Modal - Using Portal to render outside main */}
+                {showFormModal && createPortal(
+                    <div
+                        className="modal-overlay property-form-modal-overlay"
+                        onClick={(e) => {
+                            if (e.target === e.currentTarget) {
+                                setShowFormModal(false);
+                            }
+                        }}
+                        id="property-form-modal-overlay"
+                    >
+                        <div
+                            className="modal property-form-modal"
+                            onClick={(e) => e.stopPropagation()}
+                            id="property-form-modal"
+                        >
                             <div className="modal-header">
                                 <h2>{isEdit ? "Edit Property" : "Add Property"}</h2>
-                                <button className="close-btn" onClick={() => setShowFormModal(false)}>
+                                <button
+                                    type="button"
+                                    className="close-btn"
+                                    onClick={() => setShowFormModal(false)}
+                                    aria-label="Close modal"
+                                >
                                     ×
                                 </button>
                             </div>
@@ -403,7 +426,8 @@ function OwnerDashboard() {
                                 setSelectedImages={setSelectedImages}
                             />
                         </div>
-                    </div>
+                    </div>,
+                    document.body
                 )}
 
                 {/* Image Upload Modal */}
@@ -434,4 +458,4 @@ function OwnerDashboard() {
 
 OwnerDashboard.propTypes = {};
 
-export default React.memo(OwnerDashboard); 
+export default OwnerDashboard;
