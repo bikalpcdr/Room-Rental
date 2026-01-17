@@ -10,7 +10,7 @@
   import Terms from "./pages/terms";
   import Privacy from "./pages/privacy";
   import AdminDashboard from "./pages/admin/admin-dashboard";
-  import OwnerDashboard from "./pages/owner-dashboard";
+  import OwnerDashboard from "./pages/owner/owner-dashboard";
   import RenterDashboard from "./pages/renter-dashboard";
   import ProtectedRoute from "./components/ProtectedRoute";
   import ViewProperty from "./pages/view-property";

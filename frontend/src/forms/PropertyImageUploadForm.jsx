@@ -1,8 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import "../style/PropertyForm.css";
 
 function PropertyImageUploadForm({ selectedImages, setSelectedImages, onUpload, onCancel, existingImageCount }) {
+  const [isUploading, setIsUploading] = useState(false);
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     // Combine previous and new files, avoid duplicates by name and size
@@ -23,11 +25,21 @@ function PropertyImageUploadForm({ selectedImages, setSelectedImages, onUpload, 
     setSelectedImages(selectedImages.filter((_, i) => i !== idx));
   };
 
+  // Handle upload with loading state
+  const handleUpload = async () => {
+    setIsUploading(true);
+    try {
+      await onUpload();
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // Generate previews for selected images
   const previews = useMemo(() => selectedImages.map(file => URL.createObjectURL(file)), [selectedImages]);
 
   return (
-    <form onSubmit={e => { e.preventDefault(); onUpload(); }} autoComplete="off">
+    <form onSubmit={e => { e.preventDefault(); handleUpload(); }} autoComplete="off">
       <div className="form-group">
         <label htmlFor="property-images">Property Images</label>
         <input
@@ -80,7 +92,9 @@ function PropertyImageUploadForm({ selectedImages, setSelectedImages, onUpload, 
       </div>
       <div className="modal-actions">
         <button type="button" onClick={onCancel}>Cancel</button>
-        <button type="submit">Upload Images</button>
+        <button type="submit" disabled={isUploading}>
+          {isUploading ? 'Uploading...' : 'Upload Images'}
+        </button>
       </div>
     </form>
   );
