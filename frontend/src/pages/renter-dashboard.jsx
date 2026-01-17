@@ -3,7 +3,7 @@ import {toast} from "react-toastify";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import RenterBookingTable from "../components/RenterBookingTable";
-import "../style/admin-dashboard.css";
+// import "../style/admin-dashboard.css";
 import {cancelBooking, getAllProperties, getBookingsByRenterId} from "../api";
 import PropTypes from "prop-types";
 import {useNavigate} from "react-router-dom";

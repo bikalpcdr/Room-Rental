@@ -1,0 +1,90 @@
+/* Main */
+.od-main {
+  background-color: #f1f3f5;
+  min-height: 100vh;
+}
+
+/* Header */
+.od-header {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.od-welcome-text {
+  font-size: 0.95rem;
+  color: #6c757d;
+}
+
+/* Sections */
+.od-section {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Empty State */
+.od-empty p {
+  color: #6c757d;
+}
+
+.od-empty-icon {
+  font-size: 3rem;
+}
+
+/* Modal Overlay */
+.od-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1055;
+  padding: 1rem;
+}
+
+/* Modal Box */
+.od-modal-box {
+  background: #ffffff;
+  width: 100%;
+  max-width: 650px;
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  animation: odFadeIn 0.25s ease;
+}
+
+/* Modal Header */
+.od-modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Animation */
+@keyframes odFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .od-header,
+  .od-section {
+    padding: 1rem;
+  }
+
+  .od-modal-box {
+    max-width: 100%;
+  }
+}

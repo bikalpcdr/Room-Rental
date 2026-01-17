@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../api";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
+import logo from "../assets/logo1.png";
 
 const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
   const [formData, setFormData] = useState({
@@ -28,7 +29,7 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear specific error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -37,59 +38,59 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
 
   const validateForm = useCallback(() => {
     const newErrors = {};
-    
+
     // Full Name validation
     if (!formData.fullName.trim()) {
       newErrors.fullName = "Full name is required";
     } else if (formData.fullName.trim().length < 2) {
       newErrors.fullName = "Full name must be at least 2 characters";
     }
-    
+
     // Username validation
     if (!formData.username.trim()) {
       newErrors.username = "Username is required";
     } else if (formData.username.trim().length < 3) {
       newErrors.username = "Username must be at least 3 characters";
     }
-    
+
     // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
     }
-    
+
     // Phone number validation
     if (!formData.phoneNumber.trim()) {
       newErrors.phoneNumber = "Phone number is required";
     } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ''))) {
       newErrors.phoneNumber = "Please enter a valid 10-digit phone number";
     }
-    
+
     // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-    
+
     // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
-    
+
     // Role validation
     if (!formData.role) {
       newErrors.role = "Please select your role";
     }
-    
+
     // Terms validation
     if (!acceptTerms) {
       newErrors.terms = "Please accept the terms and conditions";
     }
-    
+
     setErrors(newErrors);
     setIsFormValid(Object.keys(newErrors).length === 0);
     return Object.keys(newErrors).length === 0;
@@ -102,26 +103,26 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setLoading(true);
     setErrors({});
-    
+
     try {
       const res = await registerUser(
-        formData.username, 
-        formData.email, 
-        formData.password, 
-        formData.fullName, 
-        formData.phoneNumber, 
+        formData.username,
+        formData.email,
+        formData.password,
+        formData.fullName,
+        formData.phoneNumber,
         formData.role
       );
-      
-      if (res.data?.message?.toLowerCase().includes("already exists") || 
-          res.data?.message?.toLowerCase().includes("exist")) {
+
+      if (res.data?.message?.toLowerCase().includes("already exists") ||
+        res.data?.message?.toLowerCase().includes("exist")) {
         toast.error(res.data.message);
         // Set specific error for username or email
         if (res.data.message.toLowerCase().includes("username")) {
@@ -131,7 +132,7 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
         }
       } else {
         toast.success(res.data?.message || "Registration successful! Please login.");
-        
+
         // Call onSuccess callback if provided
         if (onSuccess) {
           onSuccess(res.data);
@@ -145,7 +146,7 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Registration failed. Please try again.";
       toast.error(errorMessage);
-      
+
       // Set specific error messages based on response
       if (err.response?.status === 400) {
         if (err.response.data?.message?.toLowerCase().includes("username")) {
@@ -205,7 +206,7 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
   return (
     <div className="register-container">
       <div className="register-header">
-        <div className="register-logo">🏠</div>
+        <img src={logo} alt="Logo" className="login-logo mb-3" />
         <h1>Create Account</h1>
         <p>Join Room Rental Service and find your perfect space</p>
       </div>
@@ -386,7 +387,7 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
         <div className="form-group">
           <label htmlFor="role">I want to</label>
           <div className={`input-wrapper ${errors.role ? 'error' : ''}`}>
-            <span className="input-icon">🎯</span>
+
             <select
               id="role"
               name="role"
@@ -427,8 +428,8 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
           )}
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className={`register-button ${!isFormValid || loading ? 'disabled' : ''}`}
           disabled={!isFormValid || loading}
         >
@@ -443,9 +444,9 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
         </button>
       </form>
 
-      <div className="register-footer">
+      {/* <div className="register-footer">
         <p>Already have an account? <Link to="/login" className="login-link">Sign in here</Link></p>
-      </div>
+      </div> */}
 
       {showSocialRegister && (
         <>
@@ -454,7 +455,7 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
           </div>
 
           <div className="social-register">
-            <button 
+            <button
               className="social-button google"
               disabled={loading}
               type="button"
@@ -463,7 +464,7 @@ const RegisterForm = ({ onSuccess, showSocialRegister = true }) => {
               <span>🔍</span>
               Continue with Google
             </button>
-            <button 
+            <button
               className="social-button facebook"
               disabled={loading}
               type="button"

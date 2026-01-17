@@ -1,16 +1,23 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
-import Header from "../components/header";
-import Footer from "../components/footer";
-import "../style/admin-dashboard.css";
-import {createUser, deleteProperty, deleteUserById, getAllProperties, getAllUsers, updateUser} from "../api";
-import {toast} from "react-toastify";
-import {getUserData} from "../utils/auth";
-import UserForm from "../forms/UserForm";
-import UserTable from "../components/UserTable";
-import PropertyTable from "../components/PropertyTable";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Header from "../../components/header";
+import Footer from "../../components/footer";
+import "./style/admin-dashboard.css";
+import {
+    createUser,
+    deleteProperty,
+    deleteUserById,
+    getAllProperties,
+    getAllUsers,
+    updateUser
+} from "../../api";
+import { toast } from "react-toastify";
+import { getUserData } from "../../utils/auth";
+import UserForm from "../../forms/UserForm";
+import UserTable from "../../components/UserTable";
+import PropertyTable from "../../components/PropertyTable";
 import PropTypes from "prop-types";
 
-const StatsCards = React.memo(({stats}) => (
+const StatsCards = React.memo(({ stats }) => (
     <div className="stats-container">
         <div className="stat-card">
             <h3>Total Users</h3>
@@ -40,7 +47,7 @@ StatsCards.propTypes = {
     }).isRequired,
 };
 
-const ManagementCards = React.memo(({onUserManagementClick, onPropertyManagementClick}) => (
+const ManagementCards = React.memo(({ onUserManagementClick, onPropertyManagementClick }) => (
     <div className="management-cards-container">
         <div className="management-card" onClick={onUserManagementClick}>
             <div className="management-card-icon">👥</div>
@@ -132,7 +139,7 @@ function AdminDashboard() {
         const admins = users.filter(user => user.role === "ADMIN").length;
         const owners = users.filter(user => user.role === "OWNER").length;
         const renters = users.filter(user => user.role === "RENTER").length;
-        return {totalUsers, admins, owners, renters};
+        return { totalUsers, admins, owners, renters };
     }, [users]);
 
     const handleCreateUser = useCallback(async (e) => {
@@ -244,129 +251,149 @@ function AdminDashboard() {
     if (loading) {
         return (
             <>
-                <Header/>
+                <Header />
                 <div className="admin-loading">
                     <div className="loading-spinner"></div>
                     <p>Loading dashboard...</p>
                 </div>
-                <Footer/>
+                <Footer />
             </>
         );
     }
 
     return (
         <>
-            <Header/>
-            <main className="admin-dashboard">
-                <div className="dashboard-header">
-                    <div>
-                        <h1>Admin Dashboard</h1>
-                        <p style={{margin: '0.5rem 0 0 0', color: '#666', fontSize: '1rem'}}>
-                            Welcome, {userData?.fullName} ({userData?.email})
-                        </p>
-                    </div>
-                    {currentView === 'users' && (
-                        <button className="create-user-btn" onClick={openCreateModal}>
-                            + Create User
-                        </button>
-                    )}
-                    {(currentView === 'users' || currentView === 'properties') && (
-                        <button className="back-btn" onClick={handleBackToDashboard}>
-                            ← Back to Dashboard
-                        </button>
-                    )}
-                </div>
+            <Header />
+       <main className="ad-main container-fluid py-4">
 
-                {currentView === 'dashboard' && (
-                    <>
-                        {/* Statistics Cards */}
-                        <StatsCards stats={stats}/>
+  {/* Header */}
+  <div className="ad-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
 
-                        {/* Management Cards */}
-                        <ManagementCards
-                            onUserManagementClick={handleUserManagementClick}
-                            onPropertyManagementClick={handlePropertyManagementClick}
-                        />
-                    </>
-                )}
+    <div className="ad-header-text">
+      <h1 className="fw-bold mb-1">Admin Dashboard</h1>
+      <p className="ad-welcome-text">
+        Welcome, {userData?.fullName} ({userData?.email})
+      </p>
+    </div>
 
-                {currentView === 'users' && (
-                    <div className="users-section">
-                        <h2>User Management</h2>
-                        <UserTable users={users} onEdit={openEditModal} onDelete={handleDeleteUser}/>
-                    </div>
-                )}
+    <div className="ad-header-actions mt-3 mt-md-0 d-flex gap-2 flex-wrap">
+      {currentView === 'users' && (
+        <button
+          className="btn btn-primary ad-btn-create"
+          onClick={openCreateModal}
+        >
+          + Create User
+        </button>
+      )}
 
-                {currentView === 'properties' && (
-                    <div className="properties-section">
-                        <h2>Property Management</h2>
-                        {propertyLoading ? (
-                            <div className="admin-loading">
-                                <div className="loading-spinner"></div>
-                                <p>Loading properties...</p>
-                            </div>
-                        ) : properties.length === 0 ? (
-                            <div className="coming-soon">
-                                <div className="coming-soon-icon">🏠</div>
-                                <h3>No Properties Found</h3>
-                                <p>There are currently no properties in the system.</p>
-                            </div>
-                        ) : (
-                            <PropertyTable properties={properties} onDelete={handleDeleteProperty}/>
-                        )}
-                    </div>
-                )}
+      {(currentView === 'users' || currentView === 'properties') && (
+        <button
+          className="btn btn-outline-secondary ad-btn-back"
+          onClick={handleBackToDashboard}
+        >
+          ← Back to Dashboard
+        </button>
+      )}
+    </div>
+  </div>
 
-                {/* Create User Modal */}
-                {showCreateModal && (
-                    <div className="modal-overlay">
-                        <div className="modal">
-                            <div className="modal-header">
-                                <h2>Create New User</h2>
-                                <button
-                                    className="close-btn"
-                                    onClick={() => setShowCreateModal(false)}
-                                >
-                                    ×
-                                </button>
-                            </div>
-                            <UserForm
-                                formData={formData}
-                                setFormData={setFormData}
-                                onSubmit={handleCreateUser}
-                                onCancel={() => setShowCreateModal(false)}
-                                isEdit={false}
-                            />
-                        </div>
-                    </div>
-                )}
+  {/* Dashboard View */}
+  {currentView === 'dashboard' && (
+    <>
+      <StatsCards stats={stats} />
+      <ManagementCards
+        onUserManagementClick={handleUserManagementClick}
+        onPropertyManagementClick={handlePropertyManagementClick}
+      />
+    </>
+  )}
 
-                {/* Edit User Modal */}
-                {showEditModal && (
-                    <div className="modal-overlay">
-                        <div className="modal">
-                            <div className="modal-header">
-                                <h2>Edit User</h2>
-                                <button
-                                    className="close-btn"
-                                    onClick={() => setShowEditModal(false)}
-                                >
-                                    ×
-                                </button>
-                            </div>
-                            <UserForm
-                                formData={formData}
-                                setFormData={setFormData}
-                                onSubmit={handleUpdateUser}
-                                onCancel={() => setShowEditModal(false)}
-                                isEdit={true}
-                            />
-                        </div>
-                    </div>
-                )}
+  {/* Users View */}
+  {currentView === 'users' && (
+    <section className="ad-section">
+      <h2 className="mb-3">User Management</h2>
+      <UserTable
+        users={users}
+        onEdit={openEditModal}
+        onDelete={handleDeleteUser}
+      />
+    </section>
+  )}
 
-            </main>
-            <Footer/>
+  {/* Properties View */}
+  {currentView === 'properties' && (
+    <section className="ad-section">
+      <h2 className="mb-3">Property Management</h2>
+
+      {propertyLoading ? (
+        <div className="ad-loading text-center py-5">
+          <div className="spinner-border mb-3"></div>
+          <p>Loading properties...</p>
+        </div>
+      ) : properties.length === 0 ? (
+        <div className="ad-empty text-center py-5">
+          <div className="ad-empty-icon mb-2">🏠</div>
+          <h3>No Properties Found</h3>
+          <p>There are currently no properties in the system.</p>
+        </div>
+      ) : (
+        <PropertyTable
+          properties={properties}
+          onDelete={handleDeleteProperty}
+        />
+      )}
+    </section>
+  )}
+
+  {/* Create User Modal */}
+  {showCreateModal && (
+    <div className="ad-modal-overlay">
+      <div className="ad-modal-box">
+        <div className="ad-modal-header">
+          <h2>Create New User</h2>
+          <button
+            className="btn-close"
+            onClick={() => setShowCreateModal(false)}
+          ></button>
+        </div>
+
+        <UserForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleCreateUser}
+          onCancel={() => setShowCreateModal(false)}
+          isEdit={false}
+        />
+      </div>
+    </div>
+  )}
+
+  {/* Edit User Modal */}
+  {showEditModal && (
+    <div className="ad-modal-overlay">
+      <div className="ad-modal-box">
+        <div className="ad-modal-header">
+          <h2>Edit User</h2>
+          <button
+            className="btn-close"
+            onClick={() => setShowEditModal(false)}
+          ></button>
+        </div>
+
+        <UserForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleUpdateUser}
+          onCancel={() => setShowEditModal(false)}
+          isEdit={true}
+        />
+      </div>
+    </div>
+  )}
+
+</main>
+
+            <Footer />
         </>
     );
 }
