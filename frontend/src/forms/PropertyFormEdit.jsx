@@ -169,40 +169,26 @@ function PropertyFormEdit({ formData, setFormData, onSubmit, onCancel, propertyI
         {existingImages.length > 0 && (
             <div className="form-group">
               <label>Existing Images</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-                {existingImages.map((img) => (
-                    <div key={img.id} style={{ position: 'relative', display: 'inline-block' }}>
-                      <img
-                          src={toImageSrc(img)}
-                          alt="property"
-                          style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 4, border: '1px solid #ccc' }}
-                      />
-                      <button
-                          type="button"
-                          onClick={() => handleDeleteImage(img.id)}
-                          style={{
-                            position: 'absolute',
-                            top: -8,
-                            right: -8,
-                            background: '#f44336',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: 20,
-                            height: 20,
-                            cursor: 'pointer',
-                            fontSize: 14,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 0
-                          }}
-                          aria-label="Delete image"
-                      >
-                        ×
-                      </button>
-                    </div>
-                ))}
+              <div className="existing-images-container">
+                <div className="existing-images-grid">
+                  {existingImages.map((img) => (
+                      <div key={img.id} className="existing-image-item">
+                        <img
+                            src={toImageSrc(img)}
+                            alt="property"
+                            className="existing-image-thumbnail"
+                        />
+                        <button
+                            type="button"
+                            className="existing-image-delete"
+                            onClick={() => handleDeleteImage(img.id)}
+                            aria-label="Delete image"
+                        >
+                          ×
+                        </button>
+                      </div>
+                  ))}
+                </div>
               </div>
             </div>
         )}

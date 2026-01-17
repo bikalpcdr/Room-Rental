@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { getPropertyById } from "../api";
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -8,6 +8,7 @@ import "../style/view-property.css";
 
 function ViewProperty() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState(null);
@@ -56,7 +57,7 @@ function ViewProperty() {
 
   return (
     <>
-      <Header />
+     
       <main className="vp-container">
         <div className="vp-card">
           <div className="vp-gallery">
@@ -116,7 +117,7 @@ function ViewProperty() {
           </div>
         </div>
       </main>
-      <Footer />
+   
     </>
   );
 }

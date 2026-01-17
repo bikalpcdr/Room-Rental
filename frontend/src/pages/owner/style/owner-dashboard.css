@@ -1,0 +1,630 @@
+/* Main */
+.od-main {
+  background-color: #f1f3f5;
+  min-height: 90vh;
+}
+
+/* Header */
+.od-header {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width: 1200px;
+  margin: 0 auto;
+}
+
+
+
+
+/* ......................Header.............................. */
+/* ===============================
+   Owner Dashboard Header
+================================ */
+/* ===============================
+   Owner Dashboard Header
+================================ */
+
+.od-header-text {
+  position: relative;
+  padding: 1.5rem 0;
+  margin-bottom: 1.5rem;
+  animation: odHeaderFade 0.7s ease-out both;
+}
+
+/* Title */
+.od-header-text h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212529;
+  letter-spacing: 0.4px;
+  animation: odTitleSlide 0.6s ease-out both;
+}
+
+/* Welcome text */
+.od-welcome-text {
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin-top: 0.2rem;
+  opacity: 0;
+  animation: odTextFade 0.6s ease-out both;
+  animation-delay: 0.3s;
+}
+
+/* Accent underline */
+.od-header-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #0d6efd, #6f42c1);
+  border-radius: 6px;
+  animation: odLineGrow 0.6s ease-out both;
+  animation-delay: 0.4s;
+}
+
+/* ===============================
+   Animations
+================================ */
+
+@keyframes odHeaderFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes odTitleSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes odTextFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes odLineGrow {
+  from {
+    width: 0;
+  }
+  to {
+    width: 60px;
+  }
+}
+
+/* ===============================
+   Responsive
+================================ */
+
+@media (max-width: 768px) {
+  .od-header-text {
+    padding: 1.2rem 0;
+  }
+
+  .od-header-text h1 {
+    font-size: 1.6rem;
+  }
+
+  .od-welcome-text {
+    font-size: 0.85rem;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ===============================
+   Stats Container
+================================ */
+
+.stats-container {
+  margin-top: 1rem;
+  animation: statsFadeIn 0.6s ease-in-out;
+}
+
+/* ===============================
+   Stat Card
+================================ */
+
+.stat-card {
+  flex: 1 1 220px;
+  max-width: 260px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem 1.3rem;
+  text-align: center;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.07);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover effect */
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.1);
+}
+
+/* Accent top border */
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, #0d6efd, #6f42c1);
+}
+
+/* ===============================
+   Text Styling
+================================ */
+
+.stat-card h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 0.4rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+  animation: numberPop 0.5s ease;
+}
+
+/* ===============================
+   Animations
+================================ */
+
+@keyframes statsFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes numberPop {
+  from {
+    transform: scale(0.92);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ===============================
+   Responsive
+================================ */
+
+@media (max-width: 768px) {
+  .stat-card {
+    max-width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .stat-number {
+    font-size: 1.7rem;
+  }
+}
+
+
+
+/* ===============================
+   Management Cards Container
+================================ */
+
+.management-cards-container {
+  animation: mgFadeIn 0.6s ease-in-out;
+}
+
+/* ===============================
+   Management Card
+================================ */
+
+.management-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 1.5rem;
+  max-width: 420px;
+  flex: 1 1 360px;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover / Click feel */
+.management-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Left accent bar */
+.management-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, #0d6efd, #6f42c1);
+}
+
+/* ===============================
+   Icon
+================================ */
+
+.management-card-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  background: rgba(13, 110, 253, 0.1);
+  padding: 0.8rem;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+/* ===============================
+   Content
+================================ */
+
+.management-card-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+  color: #212529;
+}
+
+.management-card-content p {
+  font-size: 0.9rem;
+  color: #6c757d;
+  line-height: 1.6;
+  margin-bottom: 0.6rem;
+}
+
+/* Action hint */
+.management-card-actions {
+  margin-top: auto;
+}
+
+.click-hint {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0d6efd;
+  transition: transform 0.2s ease;
+}
+
+.management-card:hover .click-hint {
+  transform: translateX(4px);
+}
+
+/* ===============================
+   Animations
+================================ */
+
+@keyframes mgFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===============================
+   Responsive
+================================ */
+
+@media (max-width: 768px) {
+  .management-card {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .management-card-icon {
+    font-size: 2rem;
+  }
+
+  .management-card-content h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* ===============================
+   Dark Mode (Optional)
+================================ */
+
+.dark-mode .management-card {
+  background: #1e1e2f;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+}
+
+.dark-mode .management-card-content h3 {
+  color: #f8f9fa;
+}
+
+.dark-mode .management-card-content p {
+  color: #adb5bd;
+}
+
+.dark-mode .management-card-icon {
+  background: rgba(77, 171, 247, 0.15);
+}
+
+.dark-mode .click-hint {
+  color: #4dabf7;
+}
+
+.dark-mode .management-card::before {
+  background: linear-gradient(180deg, #4dabf7, #9775fa);
+}
+
+
+
+
+
+
+
+
+
+/* ===============================
+   Owner Dashboard Section
+================================ */
+
+.od-section {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 1.6rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  animation: odSectionFade 0.6s ease-out;
+  width: 1200px;
+  margin: 0 auto;
+}
+
+/* Section title */
+.od-section h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #212529;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+/* Underline accent */
+.od-section h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, #0d6efd, #6f42c1);
+  border-radius: 6px;
+}
+
+/* ===============================
+   Empty State
+================================ */
+
+.od-empty {
+  max-width: 420px;
+  margin: auto;
+  animation: odEmptyFade 0.6s ease-in-out;
+}
+
+.od-empty-icon {
+  font-size: 3rem;
+  background: rgba(13, 110, 253, 0.1);
+  width: 72px;
+  height: 72px;
+  margin: auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.od-empty h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 0.6rem;
+  color: #212529;
+}
+
+.od-empty p {
+  font-size: 0.95rem;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+.od-empty strong {
+  color: #0d6efd;
+}
+
+/* ===============================
+   Animations
+================================ */
+
+@keyframes odSectionFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes odEmptyFade {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===============================
+   Responsive
+================================ */
+
+@media (max-width: 768px) {
+  .od-section {
+    padding: 1.2rem;
+  }
+
+  .od-section h2 {
+    font-size: 1.2rem;
+  }
+
+  .od-empty-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2.4rem;
+  }
+}
+
+/* ===============================
+   Modal Styles
+================================ */
+
+.od-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 1rem;
+  animation: odModalFadeIn 0.3s ease-out;
+}
+
+.od-modal-box {
+  background: #ffffff;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: odModalSlideIn 0.3s ease-out;
+}
+
+.od-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+  border-radius: 12px 12px 0 0;
+}
+
+.od-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #212529;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close:hover {
+  color: #212529;
+}
+
+/* Modal Animations */
+@keyframes odModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes odModalSlideIn {
+  from {
+    transform: translateY(-30px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Modal Responsive */
+@media (max-width: 768px) {
+  .od-modal-box {
+    margin: 1rem;
+    max-width: calc(100% - 2rem);
+  }
+  
+  .od-modal-header {
+    padding: 1rem;
+  }
+  
+  .od-modal-header h2 {
+    font-size: 1.25rem;
+  }
+}
+

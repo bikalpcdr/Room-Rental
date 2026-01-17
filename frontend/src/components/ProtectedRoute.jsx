@@ -14,7 +14,7 @@ function ProtectedRoute({ children, requiredRole = null }) {
     // Redirect to appropriate dashboard based on user's actual role
     switch (userRole) {
       case 'ADMIN':
-        return <Navigate to="/admin" replace />;
+        return <Navigate to="/admin-dashboard" replace />;
       case 'OWNER':
         return <Navigate to="/owner-dashboard" replace />;
       case 'RENTER':

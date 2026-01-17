@@ -1,14 +1,14 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {createPortal} from "react-dom";
-import {toast} from "react-toastify";
-import {useNavigate} from "react-router-dom";
-import Header from "../components/header";
-import Footer from "../components/footer";
-import PropertyForm from "../forms/PropertyForm";
-import PropertyImageUploadForm from "../forms/PropertyImageUploadForm";
-import OwnerPropertyTable from "../components/OwnerPropertyTable";
-import OwnerBookingRequestTable from "../components/OwnerBookingRequestTable";
-import "../style/owner-dashboard.css";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import Header from "../../components/header";
+import Footer from "../../components/footer";
+import PropertyForm from "../../forms/PropertyForm";
+import PropertyImageUploadForm from "../../forms/PropertyImageUploadForm";
+import OwnerPropertyTable from "../../components/OwnerPropertyTable";
+import OwnerBookingRequestTable from "../../components/OwnerBookingRequestTable";
+import "./style/owner-dashboard.css";
 import {
     approveBooking,
     createPropertyWithImages,
@@ -19,11 +19,11 @@ import {
     rejectBooking,
     updateProperty,
     uploadPropertyImages
-} from "../api";
+} from "../../api";
 import PropTypes from "prop-types";
 
-const StatsCards = React.memo(({stats}) => (
-    <div className="stats-container">
+const StatsCards = React.memo(({ stats }) => (
+    <div className="stats-container d-flex gap-5 flex-wrap justify-content-center">
         <div className="stat-card">
             <h3>Total Properties</h3>
             <p className="stat-number">{stats.totalProperties}</p>
@@ -52,8 +52,8 @@ StatsCards.propTypes = {
     }).isRequired,
 };
 
-const ManagementCards = React.memo(({onPropertyManagementClick, onBookingRequestsClick}) => (
-    <div className="management-cards-container">
+const ManagementCards = React.memo(({ onPropertyManagementClick, onBookingRequestsClick }) => (
+    <div className="management-cards-container d-flex gap-4 flex-wrap justify-content-center mt-4 mb-4">
         <div className="management-card" onClick={onPropertyManagementClick}>
             <div className="management-card-icon">🏠</div>
             <div className="management-card-content">
@@ -152,7 +152,7 @@ function OwnerDashboard() {
         const available = properties.filter(prop => prop.isAvailable).length;
         const rented = totalProperties - available;
         const totalValue = properties.reduce((sum, prop) => sum + (prop.rentPrice || 0), 0);
-        return {totalProperties, available, rented, totalValue};
+        return { totalProperties, available, rented, totalValue };
     }, [properties]);
 
     const handleAddProperty = useCallback(() => {
@@ -213,8 +213,8 @@ function OwnerDashboard() {
         try {
             if (isEdit) {
                 const propertyId = selectedProperty?.propertyId || selectedProperty?.id;
-                await updateProperty({...formData, propertyId});
-                
+                await updateProperty({ ...formData, propertyId });
+
                 // Upload new images if any are selected
                 if (selectedImages && selectedImages.length > 0) {
                     await uploadPropertyImages(propertyId, selectedImages);
@@ -303,169 +303,169 @@ function OwnerDashboard() {
     if (loading) {
         return (
             <>
-                <Header/>
+                <Header />
                 <div className="admin-loading">
                     <div className="loading-spinner"></div>
                     <p>Loading dashboard...</p>
                 </div>
-                <Footer/>
+                <Footer />
             </>
         );
     }
 
     return (
         <>
-            <Header/>
-           <main className="od-main container-fluid py-4">
+            <Header />
+            <main className="od-main container-fluid py-4">
 
-  {/* Header */}
-  <div className="od-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                {/* Header */}
+                <div className="od-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
 
-    <div className="od-header-text">
-      <h1 className="fw-bold mb-1">Owner Dashboard</h1>
-      <p className="od-welcome-text">
-        Welcome, {userData?.fullName} ({userData?.email})
-      </p>
-    </div>
+                    <div className="od-header-text">
+                        <h1 className="fw-bold mb-1">Owner Dashboard</h1>
+                        <p className="od-welcome-text">
+                            Welcome, {userData?.fullName} ({userData?.email})
+                        </p>
+                    </div>
 
-    <div className="od-header-actions mt-3 mt-md-0 d-flex gap-2 flex-wrap">
-      {currentView === 'properties' && (
-        <button
-          type="button"
-          className="btn btn-success od-btn-add"
-          onClick={handleAddProperty}
-          aria-label="Add new property"
-        >
-          + Add Property
-        </button>
-      )}
+                    <div className="od-header-actions mt-3 mt-md-0 d-flex gap-2 flex-wrap">
+                        {currentView === 'properties' && (
+                            <button
+                                type="button"
+                                className="btn btn-success od-btn-add"
+                                onClick={handleAddProperty}
+                                aria-label="Add new property"
+                            >
+                                + Add Property
+                            </button>
+                        )}
 
-      {(currentView === 'properties' || currentView === 'bookings') && (
-        <button
-          className="btn btn-outline-secondary od-btn-back"
-          onClick={handleBackToDashboard}
-        >
-          ← Back to Dashboard
-        </button>
-      )}
-    </div>
-  </div>
+                        {(currentView === 'properties' || currentView === 'bookings') && (
+                            <button
+                                className="btn btn-outline-secondary bg-primary text-white"
+                                onClick={handleBackToDashboard}
+                            >
+                                ← Back to Dashboard
+                            </button>
+                        )}
+                    </div>
+                </div>
 
-  {/* Dashboard */}
-  {currentView === 'dashboard' && (
-    <>
-      <StatsCards stats={stats} />
-      <ManagementCards
-        onPropertyManagementClick={handlePropertyManagementClick}
-        onBookingRequestsClick={handleBookingRequestsClick}
-      />
-    </>
-  )}
+                {/* Dashboard */}
+                {currentView === 'dashboard' && (
+                    <>
+                        <StatsCards stats={stats} />
+                        <ManagementCards
+                            onPropertyManagementClick={handlePropertyManagementClick}
+                            onBookingRequestsClick={handleBookingRequestsClick}
+                        />
+                    </>
+                )}
 
-  {/* Property Management */}
-  {currentView === 'properties' && (
-    <section className="od-section">
-      <h2 className="mb-3">Property Management</h2>
+                {/* Property Management */}
+                {currentView === 'properties' && (
+                    <section className="od-section">
+                        <h2 className="mb-3">Property Management</h2>
 
-      {properties.length === 0 ? (
-        <div className="od-empty text-center py-5">
-          <div className="od-empty-icon mb-2">🏠</div>
-          <h3>No Properties Found</h3>
-          <p>
-            You haven't added any properties yet. Click
-            <strong> "Add Property"</strong> to get started!
-          </p>
-        </div>
-      ) : (
-        <OwnerPropertyTable
-          properties={properties}
-          onEdit={handleEditProperty}
-          onDelete={handleDeleteProperty}
-          onUploadImages={openImageUploadModal}
-          onViewProperty={handleViewProperty}
-        />
-      )}
-    </section>
-  )}
+                        {properties.length === 0 ? (
+                            <div className="od-empty text-center py-5">
+                                <div className="od-empty-icon mb-2">🏠</div>
+                                <h3>No Properties Found</h3>
+                                <p>
+                                    You haven't added any properties yet. Click
+                                    <strong> "Add Property"</strong> to get started!
+                                </p>
+                            </div>
+                        ) : (
+                            <OwnerPropertyTable
+                                properties={properties}
+                                onEdit={handleEditProperty}
+                                onDelete={handleDeleteProperty}
+                                onUploadImages={openImageUploadModal}
+                                onViewProperty={handleViewProperty}
+                            />
+                        )}
+                    </section>
+                )}
 
-  {/* Booking Requests */}
-  {currentView === 'bookings' && (
-    <section className="od-section">
-      <h2 className="mb-3">Booking Requests</h2>
-      <OwnerBookingRequestTable
-        bookings={bookings}
-        loading={bookingLoading}
-        onApprove={handleApproveBooking}
-        onReject={handleRejectBooking}
-        onViewProperty={handleViewPropertyFromBooking}
-      />
-    </section>
-  )}
+                {/* Booking Requests */}
+                {currentView === 'bookings' && (
+                    <section className="od-section">
+                        <h2 className="mb-3">Booking Requests</h2>
+                        <OwnerBookingRequestTable
+                            bookings={bookings}
+                            loading={bookingLoading}
+                            onApprove={handleApproveBooking}
+                            onReject={handleRejectBooking}
+                            onViewProperty={handleViewPropertyFromBooking}
+                        />
+                    </section>
+                )}
 
-  {/* Property Form Modal (Portal) */}
-  {showFormModal && createPortal(
-    <div
-      className="od-modal-overlay"
-      onClick={(e) => e.target === e.currentTarget && setShowFormModal(false)}
-      id="od-property-form-overlay"
-    >
-      <div
-        className="od-modal-box"
-        onClick={(e) => e.stopPropagation()}
-        id="od-property-form-modal"
-      >
-        <div className="od-modal-header">
-          <h2>{isEdit ? "Edit Property" : "Add Property"}</h2>
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setShowFormModal(false)}
-            aria-label="Close modal"
-          ></button>
-        </div>
+                {/* Property Form Modal (Portal) */}
+                {showFormModal && createPortal(
+                    <div
+                        className="od-modal-overlay"
+                        onClick={(e) => e.target === e.currentTarget && setShowFormModal(false)}
+                        id="od-property-form-overlay"
+                    >
+                        <div
+                            className="od-modal-box"
+                            onClick={(e) => e.stopPropagation()}
+                            id="od-property-form-modal"
+                        >
+                            <div className="od-modal-header">
+                                <h2>{isEdit ? "Edit Property" : "Add Property"}</h2>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => setShowFormModal(false)}
+                                    aria-label="Close modal"
+                                ></button>
+                            </div>
 
-        <PropertyForm
-          formData={formData}
-          setFormData={setFormData}
-          onSubmit={handleFormSubmit}
-          onCancel={() => setShowFormModal(false)}
-          isEdit={isEdit}
-          propertyId={selectedProperty?.propertyId || selectedProperty?.id}
-          selectedImages={selectedImages}
-          setSelectedImages={setSelectedImages}
-        />
-      </div>
-    </div>,
-    document.body
-  )}
+                            <PropertyForm
+                                formData={formData}
+                                setFormData={setFormData}
+                                onSubmit={handleFormSubmit}
+                                onCancel={() => setShowFormModal(false)}
+                                isEdit={isEdit}
+                                propertyId={selectedProperty?.propertyId || selectedProperty?.id}
+                                selectedImages={selectedImages}
+                                setSelectedImages={setSelectedImages}
+                            />
+                        </div>
+                    </div>,
+                    document.body
+                )}
 
-  {/* Image Upload Modal */}
-  {showImageUpload && (
-    <div className="od-modal-overlay">
-      <div className="od-modal-box">
-        <div className="od-modal-header">
-          <h2>Upload Images for Property</h2>
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setShowImageUpload(false)}
-          ></button>
-        </div>
+                {/* Image Upload Modal */}
+                {showImageUpload && (
+                    <div className="od-modal-overlay">
+                        <div className="od-modal-box">
+                            <div className="od-modal-header">
+                                <h2>Upload Images for Property</h2>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => setShowImageUpload(false)}
+                                ></button>
+                            </div>
 
-        <PropertyImageUploadForm
-          selectedImages={selectedImages}
-          setSelectedImages={setSelectedImages}
-          onUpload={handleImageUpload}
-          onCancel={() => setShowImageUpload(false)}
-          existingImageCount={existingImageCount}
-        />
-      </div>
-    </div>
-  )}
+                            <PropertyImageUploadForm
+                                selectedImages={selectedImages}
+                                setSelectedImages={setSelectedImages}
+                                onUpload={handleImageUpload}
+                                onCancel={() => setShowImageUpload(false)}
+                                existingImageCount={existingImageCount}
+                            />
+                        </div>
+                    </div>
+                )}
 
-</main>
+            </main>
 
-            <Footer/>
+            <Footer />
         </>
     );
 }
