@@ -113,7 +113,7 @@ function Home() {
                           </Link>
                           <Link
                               to="/login"
-                              className="btn btn-outline-light btn-lg px-4 py-2"
+                              className="btn bg-warning-outline-light btn-lg px-4 py-2"
                           >
                             Sign In
                           </Link>
@@ -133,7 +133,7 @@ function Home() {
                 </div>
                 <div className="col-12 col-lg-3 hero-image">
                   <div className="rounded-4 p-2">
-                    <div className="ratio ratio-16x9 d-flex align-items-center justify-content-center">
+                    <div className="ratioo ratio-16x9 d-flex align-items-center justify-content-center">
                       <span className="display-1 p-3">🏠</span>
                     </div>
                   </div>

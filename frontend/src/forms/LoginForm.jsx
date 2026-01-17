@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../api";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
+import logo from "../assets/logo1.png";
 
 const LoginForm = ({ onSuccess, showSocialLogin = true }) => {
   const [username, setUsername] = useState("");
@@ -123,7 +124,7 @@ const LoginForm = ({ onSuccess, showSocialLogin = true }) => {
         // Direct navigation without delay
         switch (userData.role) {
           case 'ADMIN':
-            navigate('/admin');
+            navigate('/admin-dashboard');
             break;
           case 'OWNER':
             navigate('/owner-dashboard');
@@ -201,145 +202,103 @@ const LoginForm = ({ onSuccess, showSocialLogin = true }) => {
   }, []);
 
   return (
-    <div className="login-container">
-      <div className="login-header">
-        <div className="login-logo">
-          🏠
-        </div>
-        <h1>Welcome Back</h1>
-        <p>Sign in to your account to continue</p>
-      </div>
-
-      <form className="login-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Username</label>
-          <div className={`input-wrapper ${errors.username ? 'error' : ''}`}>
-            <span className="password-toggle">👤</span>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              placeholder="Enter your username"
-              onChange={(e) => handleInputChange('username', e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={loading || locked}
-              aria-describedby="username-error"
-              aria-invalid={!!errors.username}
-              required
-            />
+      <div className="container min-vh-100 d-flex align-items-center justify-content-center">
+      <div className="login-card card shadow-lg w-100">
+        <div className="card-body p-1 p-md-5">
+          {/* Header */}
+          <div className="text-center mb-0">
+            <img src={logo} alt="Logo" className="login-logo mb-3" />
+            <h3 className="fw-bold">Welcome Back</h3>
+            <p className="text-muted">Sign in to your account</p>
           </div>
-          {errors.username && (
-            <span id="username-error" className="error-message">
-              👎 {errors.username}
-            </span>
-          )}
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <div className={`input-wrapper ${errors.password ? 'error' : ''}`}>
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              placeholder="Enter your password"
-              onChange={(e) => handleInputChange('password', e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={loading || locked}
-              aria-describedby="password-error"
-              aria-invalid={!!errors.password}
-              required
-            />
+          {/* Form */}
+          <form onSubmit={handleSubmit} >
+            {/* Username */}
+            <div className="mb-2">
+              <label className="form-label">Username</label>
+              <input
+                type="text"
+                className={`form-control ${errors.username ? "is-invalid" : ""}`}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={loading || locked}
+              />
+              {errors.username && (
+                <div className="invalid-feedback">{errors.username}</div>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="mb-2">
+              <label className="form-label">Password</label>
+              <div className="input-group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading || locked}
+                />
+                <button
+                  type="button"
+                  className="buttonn pe-3 ps-3"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "🙈" : "👁️"}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember me */}
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                <label className="form-check-label">Remember me</label>
+              </div>
+              <Link to="/forgot-password" className="small">
+                Forgot password?
+              </Link>
+            </div>
+
+            {/* Submit */}
             <button
-              type="button"
-              className="password-toggle"
-              onClick={handlePasswordToggle}
-              disabled={loading || locked}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              type="submit"
+              className="submit-btn  text-center w-100"
+              disabled={!isFormValid || loading || locked}
             >
-              {showPassword ? "🙈" : "👁️"}
+              {loading ? "Signing in..." : "Sign In"}
             </button>
+          </form>
+
+          {/* Footer */}
+          <div className="text-center mt-4">
+            {/* <p className="mb-1">
+              Don't have an account? <Link to="/register">Sign up</Link>
+            </p> */}
+
+            {showSocialLogin && (
+              <>
+                <div className="divider my-3">OR</div>
+                <div className="text-muted mb-2">Continue With</div>
+                <div className="mb-3 d-flex ">
+                  <button className="btn btn-outline-danger w-100 mb-2">
+                    🔍 Google
+                  </button>
+                  <button className="btn btn-outline-primary w-100">
+                    📘 Facebook
+                  </button></div>
+
+              </>
+            )}
           </div>
-          {errors.password && (
-            <span id="password-error" className="error-message">
-              👎 {errors.password}
-            </span>
-          )}
         </div>
-
-        {locked && (
-          <div className="lockout-message">
-            🔒 Account temporarily locked due to too many failed attempts. 
-            Please try again in 5 minutes.
-          </div>
-        )}
-
-        <div className="form-options">
-          <label className="checkbox-wrapper">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={handleRememberMe}
-              disabled={loading || locked}
-            />
-            <span className="checkmark"></span>
-            Remember me
-          </label>
-          <Link to="/forgot-password" className="forgot-password">
-            Forgot password?
-          </Link>
-        </div>
-
-        <button 
-          type="submit" 
-          className={`login-button ${!isFormValid || loading || locked ? 'disabled' : ''}`}
-          disabled={!isFormValid || loading || locked}
-        >
-          {loading ? (
-            <>
-              <span className="loading-spinner"></span>
-              Signing in...
-            </>
-          ) : locked ? (
-            "Account Locked"
-          ) : (
-            "Sign In"
-          )}
-        </button>
-      </form>
-
-      <div className="login-footer">
-        <p>Don't have an account? <Link to="/register" className="register-link">Sign up here</Link></p>
       </div>
-
-      {showSocialLogin && (
-        <>
-          <div className="login-divider">
-            <span>or</span>
-          </div>
-
-          <div className="social-login">
-            <button 
-              className="social-button google"
-              disabled={loading || locked}
-              type="button"
-              onClick={handleGoogleLogin}
-            >
-              <span>🔍</span>
-              Continue with Google
-            </button>
-            <button 
-              className="social-button facebook"
-              disabled={loading || locked}
-              type="button"
-              onClick={handleFacebookLogin}
-            >
-              <span>📘</span>
-              Continue with Facebook
-            </button>
-          </div>
-        </>
-      )}
     </div>
   );
 };
