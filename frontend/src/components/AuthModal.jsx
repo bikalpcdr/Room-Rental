@@ -5,14 +5,15 @@ import LoginForm from '../forms/LoginForm';
 import RegisterForm from '../forms/RegisterForm';
 import '../style/auth-modal.css';
 
-const AuthModal = ({ isOpen, onClose }) => {
-  const [isLogin, setIsLogin] = useState(true);
+const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }) => {
+  const [isLogin, setIsLogin] = useState(defaultTab === 'login');
   const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setIsMounted(true);
+      setIsLogin(defaultTab === 'login');
       // Trigger animation on next tick
       setTimeout(() => setIsVisible(true), 10);
       // Disable body scroll when modal is open
@@ -28,7 +29,7 @@ const AuthModal = ({ isOpen, onClose }) => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isOpen, defaultTab]);
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -39,43 +40,65 @@ const AuthModal = ({ isOpen, onClose }) => {
   if (!isMounted) return null;
 
   return createPortal(
-    <div 
+    <div
       className={`auth-modal-backdrop ${isVisible ? 'visible' : ''}`}
       onClick={handleBackdropClick}
       aria-modal="true"
       role="dialog"
     >
       <div className={`auth-modal-container ${isVisible ? 'visible' : ''}`}>
-        <button 
-          className="auth-modal-close" 
+        <button
+          className="auth-modal-close"
           onClick={onClose}
           aria-label="Close modal"
         >
           <X size={24} />
         </button>
-        
+
         <div className="auth-modal-content">
           <div className="auth-tabs pe-4 ps-4">
-            <button 
+            <button
               className={`auth-tab ${isLogin ? 'active' : ''}`}
               onClick={() => setIsLogin(true)}
             >
               Login
             </button>
-            <button 
+            <button
               className={`auth-tab ${!isLogin ? 'active' : ''}`}
               onClick={() => setIsLogin(false)}
             >
               Register
             </button>
           </div>
-          
+
           <div className="auth-form-container">
-            {isLogin ? <LoginForm onSuccess={onClose} /> : <RegisterForm onSuccess={onClose} />}
+            {isLogin ? (
+              <LoginForm
+                onSuccess={(userData) => {
+                  // Navigate to role-based dashboard
+                  switch (userData.role) {
+                    case 'ADMIN':
+                      window.location.href = '/admin-dashboard';
+                      break;
+                    case 'OWNER':
+                      window.location.href = '/owner-dashboard';
+                      break;
+                    case 'RENTER':
+                      window.location.href = '/renter-dashboard';
+                      break;
+                    default:
+                      window.location.href = '/';
+                  }
+                  onClose();
+                }}
+              />
+            ) : (
+              <RegisterForm onSuccess={onClose} />
+            )}
           </div>
         </div>
       </div>
-      
+
     </div>,
     document.body
   );
