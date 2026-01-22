@@ -1,7 +1,7 @@
 /* Main Layout */
 .ad-main {
   background-color: #f8f9fa;
-  min-height: 100vh;
+  min-height: 90vh;
 }
 
 /* Header */
@@ -9,8 +9,11 @@
   background: #ffffff;
   padding: 1.5rem;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
+
+  box-shadow: 0 6px 11px rgba(0, 0, 0, 0.05);
+  width: 1200px;
+  margin: 0 auto;
+  }
 
 .ad-welcome-text {
   color: #6c757d;

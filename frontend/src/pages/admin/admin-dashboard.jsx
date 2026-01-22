@@ -18,7 +18,7 @@ import PropertyTable from "../../components/PropertyTable";
 import PropTypes from "prop-types";
 
 const StatsCards = React.memo(({ stats }) => (
-    <div className="stats-container">
+    <div className="stats-container d-flex gap-5 justify-content-center mb-3">
         <div className="stat-card">
             <h3>Total Users</h3>
             <p className="stat-number">{stats.totalUsers}</p>
@@ -48,7 +48,7 @@ StatsCards.propTypes = {
 };
 
 const ManagementCards = React.memo(({ onUserManagementClick, onPropertyManagementClick }) => (
-    <div className="management-cards-container">
+    <div className="management-cards-container d-flex gap-5 justify-content-center mt-2">
         <div className="management-card" onClick={onUserManagementClick}>
             <div className="management-card-icon">👥</div>
             <div className="management-card-content">

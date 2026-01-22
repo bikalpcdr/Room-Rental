@@ -1,15 +1,15 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {toast} from "react-toastify";
-import Header from "../components/header";
-import Footer from "../components/footer";
-import RenterBookingTable from "../components/RenterBookingTable";
-// import "../style/admin-dashboard.css";
-import {cancelBooking, getAllProperties, getBookingsByRenterId} from "../api";
+import Header from "../../components/header";
+import Footer from "../../components/footer";
+import RenterBookingTable from "../../components/RenterBookingTable";
+// import "./style/renter-dashboard.css";
+import {cancelBooking, getAllProperties, getBookingsByRenterId} from "../../api";
 import PropTypes from "prop-types";
 import {useNavigate} from "react-router-dom";
 
 const StatsCards = React.memo(({stats}) => (
-    <div className="stats-container">
+    <div className="stats-container d-flex justify-content-center mt-3 mb-3 ">
         <div className="stat-card">
             <h3>Total Rentals</h3>
             <p className="stat-number">{stats.rentals}</p>
@@ -39,7 +39,7 @@ StatsCards.propTypes = {
 };
 
 const ManagementCards = React.memo(({onBookingManagementClick, onPropertySearchClick, onSavedPropertiesClick}) => (
-    <div className="management-cards-container">
+    <div className="management-cards-container d-flex justify-content-center mt-3 mb-3">
         <div className="management-card" onClick={onBookingManagementClick}>
             <div className="management-card-icon">📋</div>
             <div className="management-card-content">
@@ -196,7 +196,7 @@ function RenterDashboard() {
     return (
         <>
             <Header/>
-            <main className="admin-dashboard">
+            <main className="admin-dashboard w-80 border-1">
                 <div className="dashboard-header">
                     <div>
                         <h1>Renter Dashboard</h1>

@@ -11,7 +11,7 @@
   import Privacy from "./pages/privacy";
   import AdminDashboard from "./pages/admin/admin-dashboard";
   import OwnerDashboard from "./pages/owner/owner-dashboard";
-  import RenterDashboard from "./pages/renter-dashboard";
+  import RenterDashboard from "./pages/renter/renter-dashboard";
   import ProtectedRoute from "./components/ProtectedRoute";
   import ViewProperty from "./pages/view-property";
   import PropertySearch from "./pages/property-search";

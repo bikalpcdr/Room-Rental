@@ -12,6 +12,7 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [defaultTab, setDefaultTab] = useState('login');
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -20,8 +21,9 @@ function Header() {
   const location = useLocation();
   const prevScrollY = useRef(0);
 
-  const openAuthModal = useCallback(() => {
+  const openAuthModal = useCallback((tab = 'login') => {
     setIsAuthModalOpen(true);
+    setDefaultTab(tab);
     setIsMenuOpen(false);
   }, []);
 
@@ -132,10 +134,10 @@ function Header() {
           <Link to="/contact" className="nav-link">Contact</Link>
           {!isAuthenticated() ? (
             <div className="auth-buttons">
-              <button onClick={openAuthModal} className="login-link pt-1 pb-1 pe-3 ps-3 ">
+              <button onClick={() => openAuthModal('login')} className="login-link pt-1 pb-1 pe-3 ps-3 ">
                 Login
               </button>
-              <button onClick={openAuthModal} className="register-link pt-1 pb-1 pe-3 ps-3 ">
+              <button onClick={() => openAuthModal('register')} className="register-link pt-1 pb-1 pe-3 ps-3 ">
                 Register
               </button>
             </div>
@@ -253,10 +255,10 @@ function Header() {
               <Link to="/contact" className="mobile-link" onClick={toggleMenu}>📞 Contact</Link>
               {!isAuthenticated() ? (
                 <>
-                  <button onClick={openAuthModal} className="nav-link">
+                  <button onClick={() => openAuthModal('login')} className="nav-link">
                     Login
                   </button>
-                  <button onClick={openAuthModal} className="nav-link btn btn-primary">
+                  <button onClick={() => openAuthModal('register')} className="nav-link btn btn-primary">
                     Register
                   </button>
                 </>
@@ -271,7 +273,7 @@ function Header() {
           </div>
         </div>
       )}
-      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} defaultTab={defaultTab} />
     </header>
   );
 
