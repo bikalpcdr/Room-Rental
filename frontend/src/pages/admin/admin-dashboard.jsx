@@ -10,7 +10,8 @@ import {
     deleteUserById,
     getAllProperties,
     getAllUsers,
-    updateUser
+    updateUser,
+    getPendingApprovals
 } from "../../api";
 import { toast } from "react-toastify";
 import { getUserData } from "../../utils/auth";
@@ -89,13 +90,13 @@ const ManagementCards = React.memo(({ onUserManagementClick, onPropertyManagemen
                 </div>
             </div>
         </div>
-
     </div>
 ));
 
 ManagementCards.propTypes = {
     onUserManagementClick: PropTypes.func.isRequired,
     onPropertyManagementClick: PropTypes.func.isRequired,
+    onAccountApprovalClick: PropTypes.func.isRequired,
 };
 
 function AdminDashboard() {
@@ -106,7 +107,7 @@ function AdminDashboard() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'users', 'properties'
+    const [currentView, setCurrentView] = useState('dashboard');
     const [formData, setFormData] = useState({
         username: "",
         email: "",
@@ -116,11 +117,8 @@ function AdminDashboard() {
         role: "RENTER"
     });
     const [showApprovalModal, setShowApprovalModal] = useState(false);
-
-
-    const onAccountApprovalClick = () => {
-        setShowApprovalModal(true);
-    };
+    const [pendingApprovals, setPendingApprovals] = useState([]);
+    const [approvalLoading, setApprovalLoading] = useState(false);
 
     const userData = getUserData();
 
@@ -157,6 +155,19 @@ function AdminDashboard() {
             console.error("Error fetching properties:", error);
         } finally {
             setPropertyLoading(false);
+        }
+    }, []);
+
+    const fetchPendingApprovals = useCallback(async () => {
+        try {
+            setApprovalLoading(true);
+            const response = await getPendingApprovals();
+            setPendingApprovals(response.data?.data || []);
+        } catch (error) {
+            toast.error("Failed to fetch pending approvals");
+            console.error("Pending approvals error:", error);
+        } finally {
+            setApprovalLoading(false);
         }
     }, []);
 
@@ -267,12 +278,17 @@ function AdminDashboard() {
 
     const handlePropertyManagementClick = useCallback(() => {
         setCurrentView('properties');
-        fetchProperties(); // Fetch properties when switching to property view
+        fetchProperties();
     }, [fetchProperties]);
 
     const handleBackToDashboard = useCallback(() => {
         setCurrentView('dashboard');
     }, []);
+
+    const onAccountApprovalClick = useCallback(() => {
+        setShowApprovalModal(true);
+        fetchPendingApprovals();
+    }, [fetchPendingApprovals]);
 
     if (loading) {
         return (
@@ -417,6 +433,7 @@ function AdminDashboard() {
                         </div>
                     </div>
                 )}
+
                 {/* Account Approval Modal */}
                 {showApprovalModal && (
                     <div className="ad-modal-overlay">
@@ -435,7 +452,11 @@ function AdminDashboard() {
                                 ></button>
                             </div>
 
-                            <AccountApprovalForm/>
+                            <AccountApprovalForm
+                                approvals={pendingApprovals}
+                                loading={approvalLoading}
+                                onRefresh={fetchPendingApprovals}
+                            />
                         </div>
                     </div>
                 )}
@@ -449,4 +470,4 @@ function AdminDashboard() {
 
 AdminDashboard.propTypes = {};
 
-export default React.memo(AdminDashboard); 
+export default React.memo(AdminDashboard);

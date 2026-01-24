@@ -157,7 +157,7 @@ export const createPropertyWithImages = (propertyData, images = []) => {
 
     formData.append(
         "property",
-        new Blob([JSON.stringify(propertyData)], { type: "application/json" })
+        new Blob([JSON.stringify(propertyData)], {type: "application/json"})
     );
 
     (images || []).forEach((img) => formData.append("images", img));
@@ -340,7 +340,7 @@ export const verifyOtp = (emailOrUsername, otp) => {
 };
 
 // For forgot password / OTP flow
-export const resetPassword = ({ emailOrUsername, newPassword, confirmPassword }) => {
+export const resetPassword = ({emailOrUsername, newPassword, confirmPassword}) => {
     return apiClient.post('/auth/reset-password', {
         emailOrUsername,
         newPassword,
@@ -349,7 +349,7 @@ export const resetPassword = ({ emailOrUsername, newPassword, confirmPassword })
 };
 
 // For logged-in users (change password)
-export const changePassword = ({ emailOrUsername, currentPassword, newPassword, confirmPassword }) => {
+export const changePassword = ({emailOrUsername, currentPassword, newPassword, confirmPassword}) => {
     return apiClient.post('/user/change-password', {
         emailOrUsername,
         currentPassword,
@@ -357,3 +357,19 @@ export const changePassword = ({ emailOrUsername, currentPassword, newPassword, 
         confirmPassword
     });
 };
+
+/**
+ * Get pending approvals (admin / registrar)
+ * @returns {Promise}
+ */
+export const getPendingApprovals = () =>
+    apiClient.get('/auth/pending-approvals');
+
+/**
+ * Approve pending user registration
+ * @param {number|string} userId
+ * @returns {Promise}
+ */
+export const approvePendingRegistration = (userId) =>
+    apiClient.post(`/auth/approve/pending-registration/${userId}`);
+
