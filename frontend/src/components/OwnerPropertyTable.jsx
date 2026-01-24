@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import "../style/OwnerPropertyTable.css";
+import "./style/OwnerPropertyTable.css";
 
 class OwnerPropertyTable extends React.Component {
   handleView = (property) => {

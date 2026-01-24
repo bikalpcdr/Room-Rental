@@ -4,8 +4,8 @@ import { isAuthenticated, getUserData, logout, isAdmin, isOwner, isRenter } from
 import { uploadProfilePicture } from "../api";
 import { toast } from "react-toastify";
 import AuthModal from "./AuthModal.jsx";
-import "../style/header.css";
-import "../style/auth-modal.css";
+import "./style/header.css";
+import "./style/auth-modal.css";
 import logo from "../assets/logo1.png";
 
 function Header() {
