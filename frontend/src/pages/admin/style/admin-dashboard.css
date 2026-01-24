@@ -9,7 +9,6 @@
   background: #ffffff;
   padding: 1.5rem;
   border-radius: 0.75rem;
-
   box-shadow: 0 6px 11px rgba(0, 0, 0, 0.05);
   width: 1200px;
   margin: 0 auto;
@@ -55,7 +54,7 @@
 .ad-modal-box {
   background: #ffffff;
   width: 100%;
-  max-width: 1300px;
+  max-width: 1200px;
   border-radius: 0.75rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   animation: fadeInScale 0.25s ease;
