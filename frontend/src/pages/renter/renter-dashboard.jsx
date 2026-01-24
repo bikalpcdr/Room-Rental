@@ -3,28 +3,43 @@ import {toast} from "react-toastify";
 import Header from "../../components/header";
 import Footer from "../../components/footer";
 import RenterBookingTable from "../../components/RenterBookingTable";
-// import "./style/renter-dashboard.css";
 import {cancelBooking, getAllProperties, getBookingsByRenterId} from "../../api";
 import PropTypes from "prop-types";
 import {useNavigate} from "react-router-dom";
 
 const StatsCards = React.memo(({stats}) => (
-    <div className="stats-container d-flex justify-content-center mt-3 mb-3 ">
-        <div className="stat-card">
-            <h3>Total Rentals</h3>
-            <p className="stat-number">{stats.rentals}</p>
+    <div className="row justify-content-center g-4 mb-4">
+        <div className="col-md-3 col-sm-6">
+            <div className="stat-card card h-100">
+                <div className="card-body text-center">
+                    <h3 className="card-title">Total Rentals</h3>
+                    <p className="stat-number card-text display-4 fw-bold">{stats.rentals}</p>
+                </div>
+            </div>
         </div>
-        <div className="stat-card">
-            <h3>Active Bookings</h3>
-            <p className="stat-number">{stats.activeBookings}</p>
+        <div className="col-md-3 col-sm-6">
+            <div className="stat-card card h-100">
+                <div className="card-body text-center">
+                    <h3 className="card-title">Active Bookings</h3>
+                    <p className="stat-number card-text display-4 fw-bold">{stats.activeBookings}</p>
+                </div>
+            </div>
         </div>
-        <div className="stat-card">
-            <h3>Total Spent</h3>
-            <p className="stat-number">Rs. {stats.totalSpent}</p>
+        <div className="col-md-3 col-sm-6">
+            <div className="stat-card card h-100">
+                <div className="card-body text-center">
+                    <h3 className="card-title">Total Spent</h3>
+                    <p className="stat-number card-text display-4 fw-bold">Rs. {stats.totalSpent}</p>
+                </div>
+            </div>
         </div>
-        <div className="stat-card">
-            <h3>Saved Properties</h3>
-            <p className="stat-number">{stats.savedProperties}</p>
+        <div className="col-md-3 col-sm-6">
+            <div className="stat-card card h-100">
+                <div className="card-body text-center">
+                    <h3 className="card-title">Saved Properties</h3>
+                    <p className="stat-number card-text display-4 fw-bold">{stats.savedProperties}</p>
+                </div>
+            </div>
         </div>
     </div>
 ));
@@ -39,36 +54,42 @@ StatsCards.propTypes = {
 };
 
 const ManagementCards = React.memo(({onBookingManagementClick, onPropertySearchClick, onSavedPropertiesClick}) => (
-    <div className="management-cards-container d-flex justify-content-center mt-3 mb-3">
-        <div className="management-card" onClick={onBookingManagementClick}>
-            <div className="management-card-icon">📋</div>
-            <div className="management-card-content">
-                <h3>My Bookings</h3>
-                <p>View and manage your current bookings, track payment status, and cancel pending requests.</p>
-                <div className="management-card-actions">
-                    <span className="click-hint">Click to view →</span>
+    <div className="row justify-content-center g-4 mb-4">
+        <div className="col-md-4 col-sm-12">
+            <div className="management-card card h-100" onClick={onBookingManagementClick}>
+                <div className="card-body text-center">
+                    <div className="management-card-icon mb-3">📋</div>
+                    <h3 className="card-title">My Bookings</h3>
+                    <p className="card-text">View and manage your current bookings, track payment status, and cancel pending requests.</p>
+                    <div className="management-card-actions">
+                        <span className="click-hint">Click to view →</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div className="management-card" onClick={onPropertySearchClick}>
-            <div className="management-card-icon">🔍</div>
-            <div className="management-card-content">
-                <h3>Search Properties</h3>
-                <p>Browse available properties, filter by location and price, and book your perfect room.</p>
-                <div className="management-card-actions">
-                    <span className="click-hint">Click to view →</span>
+        <div className="col-md-4 col-sm-12">
+            <div className="management-card card h-100" onClick={onPropertySearchClick}>
+                <div className="card-body text-center">
+                    <div className="management-card-icon mb-3">🔍</div>
+                    <h3 className="card-title">Search Properties</h3>
+                    <p className="card-text">Browse available properties, filter by location and price, and book your perfect room.</p>
+                    <div className="management-card-actions">
+                        <span className="click-hint">Click to view →</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div className="management-card" onClick={onSavedPropertiesClick}>
-            <div className="management-card-icon">❤️</div>
-            <div className="management-card-content">
-                <h3>Saved Properties</h3>
-                <p>View your saved properties and favorite listings for quick access and future bookings.</p>
-                <div className="management-card-actions">
-                    <span className="click-hint">Click to view →</span>
+        <div className="col-md-4 col-sm-12">
+            <div className="management-card card h-100" onClick={onSavedPropertiesClick}>
+                <div className="card-body text-center">
+                    <div className="management-card-icon mb-3">❤️</div>
+                    <h3 className="card-title">Saved Properties</h3>
+                    <p className="card-text">View your saved properties and favorite listings for quick access and future bookings.</p>
+                    <div className="management-card-actions">
+                        <span className="click-hint">Click to view →</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -184,9 +205,11 @@ function RenterDashboard() {
         return (
             <>
                 <Header/>
-                <div className="admin-loading">
-                    <div className="loading-spinner"></div>
-                    <p>Loading dashboard...</p>
+                <div className="rd-loading d-flex flex-column justify-content-center align-items-center" style={{minHeight: '60vh'}}>
+                    <div className="spinner-border text-primary mb-3" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="text-muted">Loading dashboard...</p>
                 </div>
                 <Footer/>
             </>
@@ -196,19 +219,24 @@ function RenterDashboard() {
     return (
         <>
             <Header/>
-            <main className="admin-dashboard w-80 border-1">
-                <div className="dashboard-header">
-                    <div>
-                        <h1>Renter Dashboard</h1>
-                        <p style={{margin: '0.5rem 0 0 0', color: '#666', fontSize: '1rem'}}>
+            <main className="rd-main container-fluid py-4">
+                <div className="rd-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                    <div className="rd-header-text">
+                        <h1 className="fw-bold mb-1">Renter Dashboard</h1>
+                        <p className="rd-welcome-text">
                             Welcome, {userData?.fullName} ({userData?.email})
                         </p>
                     </div>
-                    {(currentView === 'bookings' || currentView === 'properties' || currentView === 'saved') && (
-                        <button className="back-btn" onClick={handleBackToDashboard}>
-                            ← Back to Dashboard
-                        </button>
-                    )}
+                    <div className="rd-header-actions mt-3 mt-md-0 d-flex gap-2 flex-wrap">
+                        {(currentView === 'bookings' || currentView === 'properties' || currentView === 'saved') && (
+                            <button
+                                className="btn btn-outline-secondary bg-primary text-white"
+                                onClick={handleBackToDashboard}
+                            >
+                                ← Back to Dashboard
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {currentView === 'dashboard' && (
@@ -226,14 +254,13 @@ function RenterDashboard() {
                 )}
 
                 {currentView === 'bookings' && (
-                    <div className="users-section">
-                        <h2>My Bookings</h2>
+                    <section className="rd-section">
+                        <h2 className="mb-3">My Bookings</h2>
                         {bookings.length === 0 ? (
-                            <div className="coming-soon">
-                                <div className="coming-soon-icon">📋</div>
+                            <div className="rd-empty text-center py-5">
+                                <div className="rd-empty-icon mb-2">📋</div>
                                 <h3>No Bookings Found</h3>
-                                <p>You haven't made any bookings yet. Start searching for properties to book your
-                                    perfect room!</p>
+                                <p>You haven't made any bookings yet. Start searching for properties to book your perfect room!</p>
                             </div>
                         ) : (
                             <RenterBookingTable
@@ -243,64 +270,69 @@ function RenterDashboard() {
                                 onViewProperty={handleViewProperty}
                             />
                         )}
-                    </div>
+                    </section>
                 )}
 
                 {currentView === 'properties' && (
-                    <div className="properties-section">
-                        <h2>All Properties</h2>
+                    <section className="rd-section">
+                        <h2 className="mb-3">All Properties</h2>
                         {propertyLoading ? (
-                            <div className="admin-loading">
-                                <div className="loading-spinner"></div>
+                            <div className="rd-loading text-center py-5">
+                                <div className="spinner-border mb-3"></div>
                                 <p>Loading properties...</p>
                             </div>
                         ) : propertyList.length === 0 ? (
-                            <div className="coming-soon">
-                                <div className="coming-soon-icon">🏠</div>
+                            <div className="rd-empty text-center py-5">
+                                <div className="rd-empty-icon mb-2">🏠</div>
                                 <h3>No Properties Found</h3>
                                 <p>There are currently no properties available in the system.</p>
                             </div>
                         ) : (
-                            <div className="table-container">
-                                <table className="users-table">
-                                    <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Type</th>
-                                        <th>Address</th>
-                                        <th>Rooms</th>
-                                        <th>Rent Price</th>
-                                        <th>Available</th>
-                                    </tr>
+                            <div className="table-responsive">
+                                <table className="table table-hover table-striped">
+                                    <thead className="table-light">
+                                        <tr>
+                                            <th scope="col">Title</th>
+                                            <th scope="col">Type</th>
+                                            <th scope="col">Address</th>
+                                            <th scope="col">Rooms</th>
+                                            <th scope="col">Rent Price</th>
+                                            <th scope="col">Available</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
-                                    {propertyList.map((property) => (
-                                        <tr key={property.id}>
-                                            <td>{property.title || 'N/A'}</td>
-                                            <td>{property.propertyType}</td>
-                                            <td>{property.address}</td>
-                                            <td>{property.roomCount}</td>
-                                            <td>{property.rentPrice}</td>
-                                            <td>{property.isAvailable ? 'Yes' : 'No'}</td>
-                                        </tr>
-                                    ))}
+                                        {propertyList.map((property) => (
+                                            <tr key={property.id}>
+                                                <td>{property.title || 'N/A'}</td>
+                                                <td><span className="badge bg-info text-dark">{property.propertyType}</span></td>
+                                                <td>{property.address}</td>
+                                                <td>{property.roomCount}</td>
+                                                <td><strong>Rs. {property.rentPrice}</strong></td>
+                                                <td>
+                                                    {property.isAvailable ? (
+                                                        <span className="badge bg-success">Available</span>
+                                                    ) : (
+                                                        <span className="badge bg-secondary">Not Available</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
                         )}
-                    </div>
+                    </section>
                 )}
 
                 {currentView === 'saved' && (
-                    <div className="properties-section">
-                        <h2>Saved Properties</h2>
-                        <div className="coming-soon">
-                            <div className="coming-soon-icon">❤️</div>
+                    <section className="rd-section">
+                        <h2 className="mb-3">Saved Properties</h2>
+                        <div className="rd-empty text-center py-5">
+                            <div className="rd-empty-icon mb-2">❤️</div>
                             <h3>Saved Properties Coming Soon</h3>
-                            <p>This feature is currently under development. You'll be able to save your favorite
-                                properties for quick access.</p>
+                            <p>This feature is currently under development. You'll be able to save your favorite properties for quick access.</p>
                         </div>
-                    </div>
+                    </section>
                 )}
             </main>
             <Footer/>

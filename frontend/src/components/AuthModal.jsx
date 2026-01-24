@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'react-feather';
 import LoginForm from '../forms/LoginForm';
 import RegisterForm from '../forms/RegisterForm';
-import '../style/auth-modal.css';
+import './style/auth-modal.css';
 
 const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }) => {
   const [isLogin, setIsLogin] = useState(defaultTab === 'login');

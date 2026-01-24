@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../style/footer.css";
+import "./style/footer.css";
 
 const quickLinks = [
   { to: "/", label: "🏠 Home" },
