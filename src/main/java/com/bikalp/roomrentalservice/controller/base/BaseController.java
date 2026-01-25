@@ -116,8 +116,8 @@ public class BaseController {
                         .build());
     }
 
-    protected ResponseEntity<GlobalAPIResponse> cancelResponse(String entityName) {
-        String message = String.format("%s  cancel successfully..!!", entityName);
+    protected ResponseEntity<GlobalAPIResponse> rejectResponse(String entityName) {
+        String message = String.format("%s  reject successfully..!!", entityName);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(GlobalAPIResponse.builder()
                         .status(true)

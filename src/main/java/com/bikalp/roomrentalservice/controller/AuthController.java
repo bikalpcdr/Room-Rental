@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController extends BaseController {
 
     private final AuthService authService;
+    String ENTITY_NAME = "Pending approval";
 
     @PostMapping("/register")
     public ResponseEntity<GlobalAPIResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -49,18 +50,18 @@ public class AuthController extends BaseController {
 
     @GetMapping("/pending-approvals")
     public ResponseEntity<GlobalAPIResponse> getPendingApprovalsForRegistrations() {
-        return fetchListResponse("Pending approval", authService.getPendingApprovalsForRegistrations());
+        return fetchListResponse(ENTITY_NAME, authService.getPendingApprovalsForRegistrations());
     }
 
     @PostMapping("/approve/pending-registration/{userId}")
     public ResponseEntity<GlobalAPIResponse> approveRegistration(@PathVariable Long userId) {
         authService.approveRegistration(userId);
-        return approveResponse("Pending approval");
+        return approveResponse(ENTITY_NAME);
     }
 
     @PostMapping("/reject/pending-registration/{userId}")
     public ResponseEntity<GlobalAPIResponse> rejectRegistration(@PathVariable Long userId) {
         authService.rejectRegistration(userId);
-        return approveResponse("Pending approval");
+        return rejectResponse(ENTITY_NAME);
     }
 }
