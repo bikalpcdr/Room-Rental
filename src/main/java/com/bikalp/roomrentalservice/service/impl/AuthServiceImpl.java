@@ -1,6 +1,5 @@
 package com.bikalp.roomrentalservice.service.impl;
 
-import com.bikalp.roomrentalservice.config.UserDataConfig;
 import com.bikalp.roomrentalservice.dto.request.LoginRequest;
 import com.bikalp.roomrentalservice.dto.request.RegisterRequest;
 import com.bikalp.roomrentalservice.dto.request.ResetPasswordRequest;
@@ -25,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -165,12 +163,25 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void approveRegistration(Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(
-                () -> new CustomizeException("User not found with provided id: " + userId));
+        User user = getUserEntity(userId);
 
         user.setAccountStatus(AccountStatus.ACTIVE);
         userRepo.save(user);
         log.info("User has been approved for user: {}", user.getUsername());
         emailService.sendRegistrationEmail(user);
+    }
+
+    @Override
+    public void rejectRegistration(Long userId) {
+        User user = getUserEntity(userId);
+
+        user.setAccountStatus(AccountStatus.REJECTED);
+        userRepo.save(user);
+        log.info("User has been reject for user: {}", user.getUsername());
+    }
+
+    private User getUserEntity(Long userId) {
+        return userRepo.findById(userId).orElseThrow(
+                () -> new CustomizeException("User not found with provided id: " + userId));
     }
 }

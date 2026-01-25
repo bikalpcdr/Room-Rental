@@ -24,4 +24,6 @@ public interface AuthService {
     List<UserResponse> getPendingApprovalsForRegistrations();
 
     void approveRegistration(Long userId);
+
+    void rejectRegistration(Long userId);
 }

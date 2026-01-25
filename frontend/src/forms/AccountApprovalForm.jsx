@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {toast} from 'react-toastify';
 import '../style/AccountApprovalForm.css';
-import { approvePendingRegistration } from "../api";
+import {approvePendingRegistration, rejectPendingRegistration} from '../api';
 
 const AccountApprovalForm = ({approvals, loading, onRefresh}) => {
     const [processingId, setProcessingId] = useState(null);
@@ -34,8 +34,7 @@ const AccountApprovalForm = ({approvals, loading, onRefresh}) => {
 
         try {
             setProcessingId(userId);
-            // TODO: Replace with your actual API call
-            // await rejectAccount(userId);
+            await rejectPendingRegistration(userId);
 
             toast.success(`${fullName}'s account has been rejected.`);
             onRefresh();

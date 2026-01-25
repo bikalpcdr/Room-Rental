@@ -373,3 +373,11 @@ export const getPendingApprovals = () =>
 export const approvePendingRegistration = (userId) =>
     apiClient.post(`/auth/approve/pending-registration/${userId}`);
 
+/**
+ * Reject pending user registration
+ * @param {number|string} userId
+ * @returns {Promise}
+ */
+export const rejectPendingRegistration = (userId)=>
+    apiClient.post(`/auth/reject/pending-registration/${userId}`);
+

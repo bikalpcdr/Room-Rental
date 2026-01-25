@@ -57,4 +57,10 @@ public class AuthController extends BaseController {
         authService.approveRegistration(userId);
         return approveResponse("Pending approval");
     }
+
+    @PostMapping("/reject/pending-registration/{userId}")
+    public ResponseEntity<GlobalAPIResponse> rejectRegistration(@PathVariable Long userId) {
+        authService.rejectRegistration(userId);
+        return approveResponse("Pending approval");
+    }
 }
