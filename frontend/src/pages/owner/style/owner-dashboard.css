@@ -549,13 +549,14 @@
 
 .od-modal-box {
   background: #ffffff;
-
-  max-width: 100%;
+  border-radius: 12px;
+  max-width: 1200px;
   width: 100%;
-  max-height: 100vh;
+  max-height: 100%;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: odModalSlideIn 0.3s ease-out;
+
 }
 
 .od-modal-header {
