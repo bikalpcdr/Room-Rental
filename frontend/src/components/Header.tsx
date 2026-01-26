@@ -1,10 +1,10 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { isAuthenticated, getUserData, logout, isAdmin, isOwner, isRenter } from "../utils/auth.js";
-import { uploadProfilePicture } from "../api";
+import { Menu, X, LogOut, User, Home, Building, Users, ChevronDown, Upload } from "lucide-react";
 import { toast } from "react-toastify";
+import { logout, isAuthenticated, getUserData, isAdmin, isOwner, isRenter } from "../utils/auth.js";
 import AuthModal from "./AuthModal";
-import { User, Menu, X, Camera, LogOut, Settings } from 'lucide-react';
+import { uploadProfilePicture } from "../api";
 
 interface UserData {
   id: string;
@@ -83,13 +83,25 @@ function Header() {
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append('file', selectedImage);
-      const res = await uploadProfilePicture(formData);
-      const newUrl = res.data?.data;
-      updateUserProfilePictureUrl(newUrl);
-      toast.success("Profile picture updated!");
-      setSelectedImage(null);
-      setPreviewUrl(null);
+      const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+          setUploading(true);
+          const userData = getUserData();
+          if (userData) {
+            await uploadProfilePicture(userData.id, file);
+            toast.success('Profile picture updated successfully!');
+            // Refresh user data
+            window.location.reload();
+          }
+        } catch (error) {
+          toast.error('Failed to upload profile picture');
+        } finally {
+          setUploading(false);
+        }
+      };
     } catch (err) {
       toast.error("Failed to upload profile picture");
     } finally {

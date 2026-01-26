@@ -70,9 +70,9 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
   }, [isEdit, propertyId]);
 
   const handleAmenityChange = useCallback((amenity: string) => {
-    setFormData((prev) =>
+    setFormData((prev: any) =>
         prev.amenities.includes(amenity)
-            ? { ...prev, amenities: prev.amenities.filter((a) => a !== amenity) }
+            ? { ...prev, amenities: prev.amenities.filter((a: string) => a !== amenity) }
             : { ...prev, amenities: [...prev.amenities, amenity] }
     );
   }, [setFormData]);
@@ -112,7 +112,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
   // Remove a selected image by index
   const handleRemoveSelectedImage = useCallback((idx: number) => {
     if (!setSelectedImages) return;
-    setSelectedImages((prev) => prev.filter((_, i) => i !== idx));
+    setSelectedImages((prev: File[]) => prev.filter((_: File, i: number) => i !== idx));
   }, [setSelectedImages]);
 
   const amenityRows = useMemo(() => [AMENITIES.slice(0, 4), AMENITIES.slice(4, 8)], []);

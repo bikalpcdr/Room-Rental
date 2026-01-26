@@ -55,8 +55,10 @@ export const loginUser = (username: string, password: string) =>
  * @param {string} role
  * @returns {Promise}
  */
-export const registerUser = (username: string, email: string, password: string, fullName: string, phoneNumber: string, role: string) =>
-    apiClient.post(`/auth/register`, {username, email, password, fullName, phoneNumber, role});
+export const registerUser = (userData: any) => {
+  const { username, email, password, fullName, phoneNumber, role } = userData;
+  return apiClient.post(`/auth/register`, {username, email, password, fullName, phoneNumber, role});
+};
 
 /**
  * Create a new user (admin)
@@ -197,6 +199,12 @@ export const getPropertyById = (propertyId: string) => apiClient.get(`/property/
 export const getAllProperties = () => apiClient.get('/property');
 
 /**
+ * Alias for getAllProperties
+ * @returns {Promise}
+ */
+export const getProperties = getAllProperties;
+
+/**
  * Search properties with filters
  * @param {object} filterRequest
  * @returns {Promise}
@@ -217,6 +225,20 @@ export const getBookingsByRenterId = (renterId: string) => apiClient.get(`/booki
  * @returns {Promise}
  */
 export const getBookingsByOwnerId = (ownerId: string) => apiClient.get(`/booking/owner/${ownerId}`);
+
+/**
+ * Alias for getBookingsByOwnerId
+ * @param {string} ownerId
+ * @returns {Promise}
+ */
+export const getOwnerBookings = getBookingsByOwnerId;
+
+/**
+ * Alias for getBookingsByRenterId
+ * @param {string} renterId
+ * @returns {Promise}
+ */
+export const getUserBookings = getBookingsByRenterId;
 
 /**
  * Get all bookings (admin only)
@@ -332,6 +354,13 @@ export const esewaStatusCheck = ({request_id, amount, transaction_code}: any) =>
 export const requestOpt = (emailOrUsername: string) => {
     return apiClient.post(`/auth/request-otp?emailOrUsername=${encodeURIComponent(emailOrUsername)}`);
 };
+
+/**
+ * Alias for requestOpt
+ * @param {string} emailOrUsername
+ * @returns {Promise}
+ */
+export const requestPasswordReset = requestOpt;
 
 // verify otp
 

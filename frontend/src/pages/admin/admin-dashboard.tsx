@@ -1,30 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { getAllUsers, getAllBookings } from '../../api';
-import { logout } from '../../utils/auth';
+import { getAllUsers, getAllBookings, updateUser, deleteUserById } from '../../api';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import { toast } from 'react-toastify';
 
 interface User {
-  id: string;
+  userId: string;
   username: string;
   email: string;
+  fullName: string;
+  phoneNumber: string;
   role: string;
-  status: string;
-  createdAt: string;
+  isActive: boolean;
+  profilePictureUrl: string | null;
+  accountStatus: string | null;
 }
 
 interface Booking {
   id: string;
-  property: {
-    title: string;
-    location: string;
-  };
-  user: {
-    username: string;
-    email: string;
-  };
   status: string;
-  totalAmount: number;
-  createdAt: string;
+  property: {
+    id: string;
+    title: string;
+    description: string;
+    propertyType: string | null;
+    address: string;
+    latitude: number | null;
+    longitude: number | null;
+    roomCount: number;
+    status: string | null;
+    rentPrice: number;
+    isAvailable: boolean;
+    isActive: boolean | null;
+    ownerId: string | null;
+    ownerName: string | null;
+    amenities: string[];
+    images: string[];
+  };
+  renter: {
+    userId: string;
+    username: string | null;
+    email: string;
+    fullName: string;
+    phoneNumber: string;
+    role: string | null;
+    isActive: boolean | null;
+    profilePictureUrl: string | null;
+    accountStatus: string | null;
+  };
 }
 
 const AdminDashboard: React.FC = () => {
@@ -43,17 +66,61 @@ const AdminDashboard: React.FC = () => {
         getAllUsers(),
         getAllBookings()
       ]);
-      setUsers(usersResponse.data);
-      setBookings(bookingsResponse.data);
+      
+      // Extract data from the nested structure
+      const usersData = Array.isArray(usersResponse.data?.data) ? usersResponse.data.data : [];
+      const bookingsData = Array.isArray(bookingsResponse.data?.data) ? bookingsResponse.data.data : [];
+      
+      console.log('Users data:', usersData);
+      console.log('Bookings data:', bookingsData);
+      
+      setUsers(usersData);
+      setBookings(bookingsData);
     } catch (error) {
       console.error('Failed to fetch data:', error);
+      // Set empty arrays on error
+      setUsers([]);
+      setBookings([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleEditUser = (user: User) => {
+    // For now, just show a toast. In a real app, this would open an edit modal
+    toast.info(`Edit user: ${user.fullName} (ID: ${user.userId})`);
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    if (window.confirm(`Are you sure you want to delete ${user.fullName}?`)) {
+      try {
+        await deleteUserById(user.userId);
+        toast.success(`User ${user.fullName} deleted successfully`);
+        // Refresh the users list
+        fetchData();
+      } catch (error) {
+        toast.error('Failed to delete user');
+        console.error('Error deleting user:', error);
+      }
+    }
+  };
+
+  const handleToggleUserStatus = async (user: User) => {
+    try {
+      await updateUser(
+        user.userId,
+        user.username,
+        user.fullName,
+        user.phoneNumber,
+        user.role
+      );
+      toast.success(`User ${user.fullName} status updated`);
+      // Refresh the users list
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to update user status');
+      console.error('Error updating user:', error);
+    }
   };
 
   if (loading) {
@@ -65,28 +132,21 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-blue-600 text-white shadow-lg">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center py-4">
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <div className="flex items-center space-x-4">
-              <Link to="/" className="hover:text-blue-200">Home</Link>
-              <button 
-                onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded transition"
-              >
-                Logout
-              </button>
-            </div>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <div className="flex-1 bg-gray-50">
+        {/* Page Header */}
+        <div className="bg-blue-600 text-white py-8">
+          <div className="container mx-auto px-4">
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-blue-100">Manage users, bookings, and monitor system activity</p>
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="container mx-auto px-4 py-8">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-3xl font-bold text-blue-600">{users.length}</div>
             <div className="text-gray-600">Total Users</div>
@@ -97,13 +157,13 @@ const AdminDashboard: React.FC = () => {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-3xl font-bold text-purple-600">
-              {users.filter(u => u.role === 'OWNER').length}
+              {Array.isArray(users) ? users.filter(u => u.role === 'OWNER').length : 0}
             </div>
             <div className="text-gray-600">Property Owners</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-3xl font-bold text-orange-600">
-              {users.filter(u => u.role === 'RENTER').length}
+              {Array.isArray(users) ? users.filter(u => u.role === 'RENTER').length : 0}
             </div>
             <div className="text-gray-600">Renters</div>
           </div>
@@ -159,7 +219,7 @@ const AdminDashboard: React.FC = () => {
                     <p className="text-sm text-gray-600">
                       {bookings.slice(0, 3).map(booking => (
                         <div key={booking.id} className="mb-2">
-                          New booking: {booking.property.title} by {booking.user.username}
+                          New booking: {booking.property.title} by {booking.renter.fullName}
                         </div>
                       ))}
                     </p>
@@ -208,7 +268,7 @@ const AdminDashboard: React.FC = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {users.map((user) => (
-                        <tr key={user.id}>
+                        <tr key={user.userId}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {user.username}
                           </td>
@@ -226,14 +286,34 @@ const AdminDashboard: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              user.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                              user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                             }`}>
-                              {user.status}
+                              {user.isActive ? 'ACTIVE' : 'INACTIVE'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                            <button className="text-red-600 hover:text-red-900">Delete</button>
+                            <button 
+                              onClick={() => handleEditUser(user)}
+                              className="text-blue-600 hover:text-blue-900 mr-3"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleToggleUserStatus(user)}
+                              className={`mr-3 ${
+                                user.isActive 
+                                  ? 'text-yellow-600 hover:text-yellow-900' 
+                                  : 'text-green-600 hover:text-green-900'
+                              }`}
+                            >
+                              {user.isActive ? 'Deactivate' : 'Activate'}
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteUser(user)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -274,10 +354,10 @@ const AdminDashboard: React.FC = () => {
                             {booking.property.title}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {booking.user.username}
+                            {booking.renter.fullName}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            ${booking.totalAmount}
+                            Rs. {booking.property.rentPrice.toLocaleString()}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -289,7 +369,7 @@ const AdminDashboard: React.FC = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(booking.createdAt).toLocaleDateString()}
+                            {new Date().toLocaleDateString()}
                           </td>
                         </tr>
                       ))}
@@ -300,7 +380,9 @@ const AdminDashboard: React.FC = () => {
             )}
           </div>
         </div>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 };

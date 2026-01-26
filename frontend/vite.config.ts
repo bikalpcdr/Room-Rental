@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    host: true, // Ensure it binds to all interfaces
+    strictPort: true, // Fail if port 3000 is not available
     proxy: {
       '/api': {
         target: 'http://localhost:7777',
@@ -33,6 +35,8 @@ export default defineConfig({
   },
   preview: {
     port: 3000,
+    host: true, // Ensure it binds to all interfaces
+    strictPort: true, // Fail if port 3000 is not available
     cors: true,
     headers: {
       'Access-Control-Allow-Origin': '*',

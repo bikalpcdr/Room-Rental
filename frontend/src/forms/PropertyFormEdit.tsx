@@ -13,6 +13,21 @@ interface Property {
   amenities: string[];
   latitude?: number;
   longitude?: number;
+  [key: string]: any;
+}
+
+interface PropertyFormData {
+  title: string;
+  description: string;
+  propertyType: string;
+  address: string;
+  roomCount: number;
+  rentPrice: number;
+  isAvailable: boolean;
+  amenities: string[];
+  latitude?: number;
+  longitude?: number;
+  [key: string]: any;
 }
 
 interface PropertyFormEditProps {
