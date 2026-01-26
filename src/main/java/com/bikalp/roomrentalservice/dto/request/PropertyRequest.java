@@ -22,5 +22,5 @@ public class PropertyRequest {
     private Boolean isAvailable;
     private Long ownerId;
     private List<Amenities> amenities;
-//    private List<MultipartFile> images;
+    private List<Long> removedImageIds;
 }

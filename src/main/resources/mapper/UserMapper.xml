@@ -44,6 +44,7 @@
                is_active      as isActive,
                account_status as accountStatus
         from users
-        where is_active and account_status='PENDING'
+        where is_active
+          and account_status in ('PENDING', 'REJECTED')
     </select>
 </mapper>

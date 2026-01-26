@@ -4,7 +4,6 @@ import com.bikalp.roomrentalservice.controller.base.BaseController;
 import com.bikalp.roomrentalservice.dto.request.FilterRequest;
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
 import com.bikalp.roomrentalservice.dto.response.GlobalAPIResponse;
-import com.bikalp.roomrentalservice.enums.PropertyType;
 import com.bikalp.roomrentalservice.service.PropertyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -41,17 +40,20 @@ public class PropertyController extends BaseController {
         return customResponse("Property created successfully..!!", propertyId);
     }
 
-    @PostMapping(value = "/{propertyId}/images",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<GlobalAPIResponse> uploadImagesForProperty(@PathVariable("propertyId") Long propertyId, @RequestParam List<MultipartFile> images) {
-        propertyService.uploadImagesForProperty(propertyId, images);
-        return uploadResponse("Property images");
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PutMapping(value = "/with-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GlobalAPIResponse> updatePropertyWithImages(
+            @RequestPart("property") PropertyRequest request,
+            @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages
+    ) {
+        Long updatedId = propertyService.updatePropertyWithImages(request, newImages);
+        return customResponse("Property updated successfully..!!", updatedId);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    @PutMapping
-    public ResponseEntity<GlobalAPIResponse> updateProperty(@RequestBody PropertyRequest request) {
-        propertyService.updateProperty(request);
-        return updateResponse(entity);
+    @PostMapping(value = "/{propertyId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GlobalAPIResponse> uploadImagesForProperty(@PathVariable Long propertyId, @RequestParam List<MultipartFile> images) {
+        propertyService.uploadImagesForProperty(propertyId, images);
+        return uploadResponse("Property images");
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
@@ -87,12 +89,12 @@ public class PropertyController extends BaseController {
     }
 
     @PostMapping("/search-property")
-    public ResponseEntity<GlobalAPIResponse> searchProperty(@RequestBody FilterRequest request){
-        return fetchListResponse(entity,propertyService.searchProperty(request));
+    public ResponseEntity<GlobalAPIResponse> searchProperty(@RequestBody FilterRequest request) {
+        return fetchListResponse(entity, propertyService.searchProperty(request));
     }
 
     @GetMapping("/fetch-booking-request")
-    public ResponseEntity<GlobalAPIResponse> fetchBookingRequest(){
-        return fetchListResponse(entity,propertyService.fetchBookingRequest());
+    public ResponseEntity<GlobalAPIResponse> fetchBookingRequest() {
+        return fetchListResponse(entity, propertyService.fetchBookingRequest());
     }
 }

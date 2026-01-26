@@ -4,9 +4,8 @@ import com.bikalp.roomrentalservice.config.UserDataConfig;
 import com.bikalp.roomrentalservice.dto.CloudinaryUploadResponse;
 import com.bikalp.roomrentalservice.dto.request.FilterRequest;
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
-import com.bikalp.roomrentalservice.dto.response.BookingRequestResponse;
+import com.bikalp.roomrentalservice.dto.response.BookingResponse;
 import com.bikalp.roomrentalservice.dto.response.PropertyResponse;
-import com.bikalp.roomrentalservice.enums.PropertyType;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.mapper.BookingMapper;
@@ -22,18 +21,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
-import com.bikalp.roomrentalservice.dto.response.BookingResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -70,11 +63,22 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void updateProperty(PropertyRequest request) {
+    @Transactional
+    public Long updatePropertyWithImages(PropertyRequest request, List<MultipartFile> newImages) {
+
         Property property = getPropertyByIdOrThrow(request.getPropertyId());
 
         updateEntity(property, request, userDataConfig.getLoggedInUser());
-        propertyRepo.save(property);
+
+        if (request.getRemovedImageIds() != null && !request.getRemovedImageIds().isEmpty()) {
+            removePropertyImages(property, request.getRemovedImageIds());
+        }
+
+        if (newImages != null && !newImages.isEmpty()) {
+            uploadImagesForExistingProperty(property, newImages);
+        }
+
+        return propertyRepo.save(property).getId();
     }
 
     @Override
@@ -113,7 +117,6 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    @Transactional
     public void uploadImagesForProperty(Long propertyId, List<MultipartFile> images) {
 
         if (images == null || images.isEmpty()) {
@@ -122,7 +125,7 @@ public class PropertyServiceImpl implements PropertyService {
 
         long count = images.stream().filter(f -> !f.isEmpty()).count();
         if (count > 20) {
-            throw new MultipartException("Maximum 20 images allowed");
+            throw new CustomizeException("Maximum 20 images allowed");
         }
 
         Property property = getPropertyByIdOrThrow(propertyId);
@@ -206,5 +209,49 @@ public class PropertyServiceImpl implements PropertyService {
         property.setRentPrice(request.getRentPrice());
         property.setAmenities(request.getAmenities());
         property.setOwner(owner);
+    }
+
+    public void uploadImagesForExistingProperty(Property property, List<MultipartFile> images) {
+
+        long newCount = images.stream().filter(f -> !f.isEmpty()).count();
+        long existingCount = property.getImages() == null ? 0 : property.getImages().size();
+
+        if (existingCount + newCount > 20) {
+            throw new MultipartException("Maximum 20 images allowed");
+        }
+
+        if (property.getImages() == null) {
+            property.setImages(new ArrayList<>());
+        }
+
+        for (MultipartFile file : images) {
+            if (file.isEmpty()) continue;
+
+            CloudinaryUploadResponse response = cloudinaryService.uploadImage(file);
+
+            PropertyImage propertyImage = PropertyImage.builder()
+                    .imageUrl(response.getImageUrl())
+                    .publicId(response.getPublicId())
+                    .property(property)
+                    .build();
+
+            property.getImages().add(propertyImage);
+        }
+    }
+
+    public void removePropertyImages(Property property, List<Long> removedImageIds) {
+
+        if (property.getImages() == null || property.getImages().isEmpty()) return;
+
+        Iterator<PropertyImage> iterator = property.getImages().iterator();
+
+        while (iterator.hasNext()) {
+            PropertyImage image = iterator.next();
+
+            if (removedImageIds.contains(image.getId())) {
+                cloudinaryService.deleteImage(image.getPublicId());
+                iterator.remove();
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@ public interface PropertyService {
 
     Long createPropertyWithImages(PropertyRequest request, List<MultipartFile> images);
 
-    void updateProperty(PropertyRequest request);
+    Long updatePropertyWithImages(PropertyRequest request, List<MultipartFile> newImages);
 
     void deleteProperty(Long propertyId);
 
