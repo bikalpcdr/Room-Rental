@@ -22,7 +22,7 @@ import PropertyTable from "../../components/PropertyTable";
 import PropTypes from "prop-types";
 
 const StatsCards = React.memo(({ stats }) => (
-    <div className="stats-container d-flex gap-5 justify-content-center mb-3">
+    <div className="stats-container d-flex gap-5 justify-content-center mb-4 mt-4">
         <div className="stat-card">
             <h3>Total Users</h3>
             <p className="stat-number">{stats.totalUsers}</p>
@@ -52,7 +52,7 @@ StatsCards.propTypes = {
 };
 
 const ManagementCards = React.memo(({ onUserManagementClick, onPropertyManagementClick, onAccountApprovalClick }) => (
-    <div className="management-cards-container d-flex gap-5 justify-content-center mt-2">
+    <div className="management-cards-container d-flex gap-5 justify-content-center mt-4 ">
         <div className="management-card" onClick={onUserManagementClick}>
             <div className="management-card-icon">👥</div>
             <div className="management-card-content">
@@ -309,7 +309,7 @@ function AdminDashboard() {
             <main className="ad-main container-fluid py-4">
 
                 {/* Header */}
-                <div className="ad-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                <div className="ad-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 mt-4">
 
                     <div className="ad-header-text">
                         <h1 className="fw-bold mb-1">Admin Dashboard</h1>
