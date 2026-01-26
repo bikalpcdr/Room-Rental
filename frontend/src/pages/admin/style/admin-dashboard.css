@@ -25,6 +25,8 @@
   padding: 1.5rem;
   border-radius: 0.75rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  width: 1200px;
+  margin: 0 auto;
 }
 
 /* Empty / Loading */

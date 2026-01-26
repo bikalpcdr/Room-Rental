@@ -248,6 +248,8 @@
 
 .management-cards-container {
   animation: mgFadeIn 0.6s ease-in-out;
+  width: 1200px;
+  margin: 0 auto;
 }
 
 /* ===============================
@@ -547,10 +549,10 @@
 
 .od-modal-box {
   background: #ffffff;
-  border-radius: 12px;
-  max-width: 600px;
+
+  max-width: 100%;
   width: 100%;
-  max-height: 90vh;
+  max-height: 100vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: odModalSlideIn 0.3s ease-out;
