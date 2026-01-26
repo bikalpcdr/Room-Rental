@@ -41,13 +41,10 @@ public class PropertyController extends BaseController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    @PutMapping(value = "/with-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<GlobalAPIResponse> updatePropertyWithImages(
-            @RequestPart("property") PropertyRequest request,
-            @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages
-    ) {
-        Long updatedId = propertyService.updatePropertyWithImages(request, newImages);
-        return customResponse("Property updated successfully..!!", updatedId);
+    @PutMapping
+    public ResponseEntity<GlobalAPIResponse> updateProperty(@RequestBody PropertyRequest request) {
+        propertyService.updateProperty(request);
+        return updateResponse(entity);
     }
 
     @PostMapping(value = "/{propertyId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

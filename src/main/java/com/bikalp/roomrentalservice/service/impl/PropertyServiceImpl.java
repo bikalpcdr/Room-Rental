@@ -63,38 +63,21 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    @Transactional
-    public Long updatePropertyWithImages(PropertyRequest request, List<MultipartFile> newImages) {
-
+    public void updateProperty(PropertyRequest request) {
         Property property = getPropertyByIdOrThrow(request.getPropertyId());
 
         updateEntity(property, request, userDataConfig.getLoggedInUser());
-
-        if (request.getRemovedImageIds() != null && !request.getRemovedImageIds().isEmpty()) {
-            removePropertyImages(property, request.getRemovedImageIds());
-        }
-
-        if (newImages != null && !newImages.isEmpty()) {
-            uploadImagesForExistingProperty(property, newImages);
-        }
-
-        return propertyRepo.save(property).getId();
+        propertyRepo.save(property);
     }
 
     @Override
+    @Transactional
     public void deleteProperty(Long propertyId) {
         Property property = getPropertyByIdOrThrow(propertyId);
-        // Delete associated image files from the filesystem
-        if (property.getImages() != null) {
-            String uploadDir = propertyImagesDir;
+
+        if (property.getImages() != null && !property.getImages().isEmpty()) {
             for (PropertyImage image : property.getImages()) {
-                if (image.getImageUrl() != null) {
-                    String fileName = image.getImageUrl().replace("/property-images/", "");
-                    java.io.File file = new java.io.File(uploadDir, fileName);
-                    if (file.exists()) {
-                        file.delete();
-                    }
-                }
+                deletePropertyImagesByImageId(image.getId());
             }
         }
         propertyRepo.delete(property);
@@ -209,49 +192,5 @@ public class PropertyServiceImpl implements PropertyService {
         property.setRentPrice(request.getRentPrice());
         property.setAmenities(request.getAmenities());
         property.setOwner(owner);
-    }
-
-    public void uploadImagesForExistingProperty(Property property, List<MultipartFile> images) {
-
-        long newCount = images.stream().filter(f -> !f.isEmpty()).count();
-        long existingCount = property.getImages() == null ? 0 : property.getImages().size();
-
-        if (existingCount + newCount > 20) {
-            throw new MultipartException("Maximum 20 images allowed");
-        }
-
-        if (property.getImages() == null) {
-            property.setImages(new ArrayList<>());
-        }
-
-        for (MultipartFile file : images) {
-            if (file.isEmpty()) continue;
-
-            CloudinaryUploadResponse response = cloudinaryService.uploadImage(file);
-
-            PropertyImage propertyImage = PropertyImage.builder()
-                    .imageUrl(response.getImageUrl())
-                    .publicId(response.getPublicId())
-                    .property(property)
-                    .build();
-
-            property.getImages().add(propertyImage);
-        }
-    }
-
-    public void removePropertyImages(Property property, List<Long> removedImageIds) {
-
-        if (property.getImages() == null || property.getImages().isEmpty()) return;
-
-        Iterator<PropertyImage> iterator = property.getImages().iterator();
-
-        while (iterator.hasNext()) {
-            PropertyImage image = iterator.next();
-
-            if (removedImageIds.contains(image.getId())) {
-                cloudinaryService.deleteImage(image.getPublicId());
-                iterator.remove();
-            }
-        }
     }
 }

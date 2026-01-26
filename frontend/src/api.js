@@ -171,30 +171,10 @@ export const createPropertyWithImages = (propertyData, images = []) => {
 
 /**
  * Update a property
+ * @param {object} data
  * @returns {Promise}
- * @param propertyData
- * @param newImages
  */
-export const updatePropertyWithImages = (propertyData, newImages = []) => {
-    const formData = new FormData();
-
-    // JSON part
-    formData.append(
-        "property",
-        new Blob([JSON.stringify(propertyData)], { type: "application/json" })
-    );
-
-    // Images part (must match @RequestPart name: newImages)
-    (newImages || []).forEach((img) =>
-        formData.append("newImages", img)
-    );
-
-    return apiClient.put('/property/with-images', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
-};
+export const updateProperty = (data) => apiClient.put('/property', data);
 
 /**
  * Delete a property

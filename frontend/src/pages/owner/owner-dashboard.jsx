@@ -17,7 +17,7 @@ import {
     getOwnerProperties,
     getPropertyById,
     rejectBooking,
-    updatePropertyWithImages,
+    updateProperty,
     uploadPropertyImages
 } from "../../api";
 import PropTypes from "prop-types";
@@ -213,7 +213,7 @@ function OwnerDashboard() {
         try {
             if (isEdit) {
                 const propertyId = selectedProperty?.propertyId || selectedProperty?.id;
-                await updatePropertyWithImages({ ...formData, propertyId });
+                await updateProperty({ ...formData, propertyId });
 
                 // Upload new images if any are selected
                 if (selectedImages && selectedImages.length > 0) {
