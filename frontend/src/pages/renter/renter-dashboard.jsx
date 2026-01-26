@@ -6,6 +6,7 @@ import RenterBookingTable from "../../components/RenterBookingTable";
 import {cancelBooking, getAllProperties, getBookingsByRenterId} from "../../api";
 import PropTypes from "prop-types";
 import {useNavigate} from "react-router-dom";
+import "./style/renter-dashboard.css"
 
 const StatsCards = React.memo(({stats}) => (
     <div className="row justify-content-center g-4 mb-4">

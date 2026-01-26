@@ -321,7 +321,8 @@ function Home() {
 
               {!isAuthenticated() ? (
                 <div className="rh-cta-buttons d-flex flex-wrap justify-content-center gap-3">
-                  <Link onClick={() => openAuthModal('register')} className="rh-cta-btn-primary btn-lg">
+                  <Link onClick={() => openAuthModal('register')}cd frontend
+                      className="rh-cta-btn-primary btn-lg">
                     Start Your Search
                   </Link>
                   <Link to="/contact" className="rh-cta-btn-secondary btn-lg">
