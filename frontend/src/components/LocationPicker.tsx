@@ -13,8 +13,8 @@ L.Icon.Default.mergeOptions({
 
 interface LocationPickerProps {
     formData: {
-        latitude?: number;
-        longitude?: number;
+        latitude: number | null;
+        longitude: number | null;
         [key: string]: any;
     };
     setFormData: (data: any) => void;
