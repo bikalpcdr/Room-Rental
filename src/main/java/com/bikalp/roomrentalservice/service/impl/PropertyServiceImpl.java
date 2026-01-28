@@ -6,6 +6,7 @@ import com.bikalp.roomrentalservice.dto.request.FilterRequest;
 import com.bikalp.roomrentalservice.dto.request.PropertyRequest;
 import com.bikalp.roomrentalservice.dto.response.BookingResponse;
 import com.bikalp.roomrentalservice.dto.response.PropertyResponse;
+import com.bikalp.roomrentalservice.enums.Amenities;
 import com.bikalp.roomrentalservice.exception.custom.CustomizeException;
 import com.bikalp.roomrentalservice.exception.custom.DataNotFoundException;
 import com.bikalp.roomrentalservice.mapper.BookingMapper;
@@ -63,6 +64,7 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    @Transactional
     public void updateProperty(PropertyRequest request) {
         Property property = getPropertyByIdOrThrow(request.getPropertyId());
 
@@ -177,7 +179,8 @@ public class PropertyServiceImpl implements PropertyService {
                 .rentPrice(request.getRentPrice())
                 .isAvailable(request.getIsAvailable())
                 .owner(owner)
-                .amenities(request.getAmenities())
+                .amenities(request.getAmenities() != null ?
+                        new ArrayList<>(request.getAmenities()) : new ArrayList<>())
                 .build();
     }
 
@@ -190,7 +193,37 @@ public class PropertyServiceImpl implements PropertyService {
         property.setLongitude(request.getLongitude());
         property.setRoomCount(request.getRoomCount());
         property.setRentPrice(request.getRentPrice());
-        property.setAmenities(request.getAmenities());
+        property.setIsAvailable(request.getIsAvailable());
         property.setOwner(owner);
+
+        // Smart amenities update: compare and sync
+        updateAmenities(property, request.getAmenities());
+    }
+
+    private void updateAmenities(Property property, List<Amenities> newAmenities) {
+        // Initialize property amenities if null
+        if (property.getAmenities() == null) {
+            property.setAmenities(new ArrayList<>());
+        }
+
+        // Handle null or empty new amenities - clear all
+        if (newAmenities == null || newAmenities.isEmpty()) {
+            property.getAmenities().clear();
+            return;
+        }
+
+        // Create a copy of new amenities to work with
+        List<Amenities> requestAmenities = new ArrayList<>(newAmenities);
+
+        // Remove amenities that are no longer in the request
+        // Remove amenity not in new list
+        property.getAmenities().removeIf(existingAmenity -> !requestAmenities.contains(existingAmenity));
+
+        // Add new amenities that don't exist yet
+        for (Amenities newAmenity : requestAmenities) {
+            if (!property.getAmenities().contains(newAmenity)) {
+                property.getAmenities().add(newAmenity); // Add new amenity
+            }
+        }
     }
 }
